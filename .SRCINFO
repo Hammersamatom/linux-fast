@@ -1,0 +1,60 @@
+pkgbase = linux-ck
+	pkgver = 5.5.13
+	pkgrel = 1
+	url = https://wiki.archlinux.org/index.php/Linux-ck
+	arch = x86_64
+	license = GPL2
+	makedepends = bc
+	makedepends = kmod
+	makedepends = libelf
+	options = !strip
+	source = https://www.kernel.org/pub/linux/kernel/v5.x/linux-5.5.13.tar.xz
+	source = https://www.kernel.org/pub/linux/kernel/v5.x/linux-5.5.13.tar.sign
+	source = config
+	source = enable_additional_cpu_optimizations-20191217.tar.gz::https://github.com/graysky2/kernel_gcc_patch/archive/20191217.tar.gz
+	source = http://ck.kolivas.org/patches/5.0/5.5/5.5-ck1/patch-5.5-ck1.xz
+	source = 0001-ZEN-Add-sysctl-and-CONFIG-to-disallow-unprivileged-C.patch
+	source = 0002-iwlwifi-pcie-restore-support-for-Killer-Qu-C0-NICs.patch
+	source = 0003-drm-Remove-PageReserved-manipulation-from-drm_pci_al.patch
+	source = 0004-drm-i915-Serialise-i915_active_acquire-with-__active.patch
+	source = 0005-drm-i915-gem-Take-runtime-pm-wakeref-prior-to-unbind.patch
+	source = 0006-drm-i915-gem-Avoid-parking-the-vma-as-we-unbind.patch
+	source = 0007-drm-i915-gem-Try-to-flush-pending-unbind-events.patch
+	source = 0008-drm-i915-gem-Reinitialise-the-local-list-before-repe.patch
+	source = 0009-drm-i915-Add-a-simple-is-bound-check-before-unbindin.patch
+	source = 0010-drm-i915-Introduce-a-vma.kref.patch
+	source = 0011-iwlwifi-don-t-send-GEO_TX_POWER_LIMIT-if-no-wgds-tab.patch
+	validpgpkeys = ABAF11C65A2970B130ABE3C479BE3E4300411886
+	validpgpkeys = 647F28654894E3BD457199BE38DBBDC86092693E
+	sha256sums = 1f3b3614a06bffc9c621c82f98d8ca88c60538a8c6dd77f96f2e7fee310a4ee2
+	sha256sums = SKIP
+	sha256sums = a841aa011edf6bae0ffbe8ead8177e5056de5a6d7333bb96e16917903de4d868
+	sha256sums = 7a4a209de815f4bae49c7c577c0584c77257e3953ac4324d2aa425859ba657f5
+	sha256sums = 37a9d61e8a0b5a73992e1397c3a9cc947d39e715f205f3c665eb157b96d58f98
+	sha256sums = 566bc20e90afbac7d3836e5ccf32eca927858dda45b18431c6c91d46ae494c70
+	sha256sums = e40d89048087c139359cf12798d5cbab3b5077e903d7b1cb78e6a5269d92013f
+	sha256sums = 00496b895c63f6fd73e292ead6634de4e7a8187fa0bd11eb5700ec6ef1a3c259
+	sha256sums = 1a92cefbc60cd3bbc404267f6a42329e25ca0265bbff92b84f42ef668edef85f
+	sha256sums = 8e171645648ce9c853663751da4163e53e052763a8a90a6a127118b2b50d613c
+	sha256sums = 29ab130f003665ba4a9f0051e4b28ded7c58ecc642f6f2fc937b74c20bafb00a
+	sha256sums = fb5f39f4cb9f1f356d078d909c479774d717174aa07c94eb98c66f0889ddf719
+	sha256sums = 5121de6344e3c44b5bd37ba6ac22f2c2d42632abf5d2d678f2e1a74a5cdfe5ca
+	sha256sums = 1b8896c1944b549dd32e27439faef82dc2366f26916c445e6950ea3a764cc8a9
+	sha256sums = 220800dfa73834230ee0c321120ab18cf14a304a437c7f985f582758c5853e67
+	sha256sums = c00c5b6f45cb92512eaead6ae01d5b8c07b91cc8a83ae6ef961d6a6ce3ea90be
+
+pkgname = linux-ck
+	pkgdesc = The Linux-ck kernel and modules with the ck1 patchset featuring MuQSS CPU scheduler
+	depends = coreutils
+	depends = kmod
+	depends = initramfs
+	optdepends = crda: to set the correct wireless channels of your country
+	optdepends = linux-firmware: firmware images needed for some devices
+	provides = linux-ck=5.5.13
+
+pkgname = linux-ck-headers
+	pkgdesc = Headers and scripts for building modules for Linux-ck kernel
+	depends = linux-ck
+	provides = linux-ck-headers=5.5.13
+	provides = linux-headers=5.5.13
+

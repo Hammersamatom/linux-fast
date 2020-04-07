@@ -1,0 +1,2409 @@
+From d4556f5e99d5f603913bac01adaff8670cb2d08b Mon Sep 17 00:00:00 2001
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Tue, 22 Oct 2019 16:26:48 +0200
+Subject: PM / devfreq: exynos-ppmu: Fix excessive stack usage
+
+Putting a 'struct devfreq_event_dev' object on the stack is generally
+a bad idea and here it leads to a warnig about potential stack overflow:
+
+drivers/devfreq/event/exynos-ppmu.c:643:12: error: stack frame size of 1040 bytes in function 'exynos_ppmu_probe' [-Werror,-Wframe-larger-than=]
+
+There is no real need for the device structure, only the string inside
+it, so add an internal helper function that simply takes the string
+as its argument and remove the device structure.
+
+Fixes: 1dd62c66d345 ("PM / devfreq: events: extend events by type of counted data")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+[cw00.choi: Fix the issue from 'desc->name' to 'desc[j].name']
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/event/exynos-ppmu.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/devfreq/event/exynos-ppmu.c b/drivers/devfreq/event/exynos-ppmu.c
+index 85c7a77bf3f0..055deea42c37 100644
+--- a/drivers/devfreq/event/exynos-ppmu.c
++++ b/drivers/devfreq/event/exynos-ppmu.c
+@@ -101,17 +101,22 @@ static struct __exynos_ppmu_events {
+ 	PPMU_EVENT(dmc1_1),
+ };
+ 
+-static int exynos_ppmu_find_ppmu_id(struct devfreq_event_dev *edev)
++static int __exynos_ppmu_find_ppmu_id(const char *edev_name)
+ {
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(ppmu_events); i++)
+-		if (!strcmp(edev->desc->name, ppmu_events[i].name))
++		if (!strcmp(edev_name, ppmu_events[i].name))
+ 			return ppmu_events[i].id;
+ 
+ 	return -EINVAL;
+ }
+ 
++static int exynos_ppmu_find_ppmu_id(struct devfreq_event_dev *edev)
++{
++	return __exynos_ppmu_find_ppmu_id(edev->desc->name);
++}
++
+ /*
+  * The devfreq-event ops structure for PPMU v1.1
+  */
+@@ -556,13 +561,11 @@ static int of_get_devfreq_events(struct device_node *np,
+ 			 * use default if not.
+ 			 */
+ 			if (info->ppmu_type == EXYNOS_TYPE_PPMU_V2) {
+-				struct devfreq_event_dev edev;
+ 				int id;
+ 				/* Not all registers take the same value for
+ 				 * read+write data count.
+ 				 */
+-				edev.desc = &desc[j];
+-				id = exynos_ppmu_find_ppmu_id(&edev);
++				id = __exynos_ppmu_find_ppmu_id(desc[j].name);
+ 
+ 				switch (id) {
+ 				case PPMU_PMNCNT0:
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From d96c60b48a0b51e4711f9cf88b8da520b521b432 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Wed, 20 Nov 2019 21:42:16 +0800
+Subject: PM / devfreq: Fix Kconfig indentation
+
+Adjust indentation from spaces to tab (+optional two spaces) as in
+coding style with command like:
+	$ sed -e 's/^        /\t/' -i */Kconfig
+
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/Kconfig | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/devfreq/Kconfig b/drivers/devfreq/Kconfig
+index 35535833b6f7..ca45d57ad947 100644
+--- a/drivers/devfreq/Kconfig
++++ b/drivers/devfreq/Kconfig
+@@ -120,9 +120,9 @@ config ARM_RK3399_DMC_DEVFREQ
+ 	select DEVFREQ_GOV_SIMPLE_ONDEMAND
+ 	select PM_DEVFREQ_EVENT
+ 	help
+-          This adds the DEVFREQ driver for the RK3399 DMC(Dynamic Memory Controller).
+-          It sets the frequency for the memory controller and reads the usage counts
+-          from hardware.
++	  This adds the DEVFREQ driver for the RK3399 DMC(Dynamic Memory Controller).
++	  It sets the frequency for the memory controller and reads the usage counts
++	  from hardware.
+ 
+ source "drivers/devfreq/event/Kconfig"
+ 
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From c49a5d0968690a08378fd14371678c3479f269aa Mon Sep 17 00:00:00 2001
+From: Leonard Crestez <leonard.crestez@nxp.com>
+Date: Fri, 22 Nov 2019 23:45:02 +0200
+Subject: dt-bindings: memory: Add bindings for imx8m ddr controller
+
+Add devicetree bindings for the i.MX DDR Controller on imx8m series
+chips. It supports dynamic frequency switching between multiple data
+rates and this is exposed to Linux via the devfreq subsystem.
+
+Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+Acked-by: Chanwoo Choi <cw00.choi@samsung.com>
+Reviewed-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ .../memory-controllers/fsl/imx8m-ddrc.yaml         | 72 ++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/memory-controllers/fsl/imx8m-ddrc.yaml
+
+diff --git a/Documentation/devicetree/bindings/memory-controllers/fsl/imx8m-ddrc.yaml b/Documentation/devicetree/bindings/memory-controllers/fsl/imx8m-ddrc.yaml
+new file mode 100644
+index 000000000000..c9e6c22cb5be
+--- /dev/null
++++ b/Documentation/devicetree/bindings/memory-controllers/fsl/imx8m-ddrc.yaml
+@@ -0,0 +1,72 @@
++# SPDX-License-Identifier: GPL-2.0
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/memory-controllers/fsl/imx8m-ddrc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: i.MX8M DDR Controller
++
++maintainers:
++  - Leonard Crestez <leonard.crestez@nxp.com>
++
++description:
++  The DDRC block is integrated in i.MX8M for interfacing with DDR based
++  memories.
++
++  It supports switching between different frequencies at runtime but during
++  this process RAM itself becomes briefly inaccessible so actual frequency
++  switching is implemented by TF-A code which runs from a SRAM area.
++
++  The Linux driver for the DDRC doesn't even map registers (they're included
++  for the sake of "describing hardware"), it mostly just exposes firmware
++  capabilities through standard Linux mechanism like devfreq and OPP tables.
++
++properties:
++  compatible:
++    items:
++      - enum:
++        - fsl,imx8mn-ddrc
++        - fsl,imx8mm-ddrc
++        - fsl,imx8mq-ddrc
++      - const: fsl,imx8m-ddrc
++
++  reg:
++    maxItems: 1
++    description:
++      Base address and size of DDRC CTL area.
++      This is not currently mapped by the imx8m-ddrc driver.
++
++  clocks:
++    maxItems: 4
++
++  clock-names:
++    items:
++      - const: core
++      - const: pll
++      - const: alt
++      - const: apb
++
++  operating-points-v2: true
++  opp-table: true
++
++required:
++  - reg
++  - compatible
++  - clocks
++  - clock-names
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/imx8mm-clock.h>
++    ddrc: memory-controller@3d400000 {
++        compatible = "fsl,imx8mm-ddrc", "fsl,imx8m-ddrc";
++        reg = <0x3d400000 0x400000>;
++        clock-names = "core", "pll", "alt", "apb";
++        clocks = <&clk IMX8MM_CLK_DRAM_CORE>,
++                 <&clk IMX8MM_DRAM_PLL>,
++                 <&clk IMX8MM_CLK_DRAM_ALT>,
++                 <&clk IMX8MM_CLK_DRAM_APB>;
++        operating-points-v2 = <&ddrc_opp_table>;
++    };
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 5af744ebae856a50e8b5e208a5acf28713a4ce98 Mon Sep 17 00:00:00 2001
+From: Leonard Crestez <leonard.crestez@nxp.com>
+Date: Fri, 22 Nov 2019 23:45:03 +0200
+Subject: PM / devfreq: Add dynamic scaling for imx8m ddr controller
+
+Add driver for dynamic scaling the DDR Controller on imx8m chips. Actual
+frequency switching is implemented inside TF-A, this driver wraps the
+SMC calls and synchronizes the clk tree.
+
+The DRAM clocks on imx8m have the following structure (abridged):
+
+ +----------+       |\            +------+
+ | dram_pll |-------|M| dram_core |      |
+ +----------+       |U|---------->| D    |
+                 /--|X|           |  D   |
+   dram_alt_root |  |/            |   R  |
+                 |                |    C |
+            +---------+           |      |
+            |FIX DIV/4|           |      |
+            +---------+           |      |
+  composite:     |                |      |
+ +----------+    |                |      |
+ | dram_alt |----/                |      |
+ +----------+                     |      |
+ | dram_apb |-------------------->|      |
+ +----------+                     +------+
+
+The dram_pll is used for higher rates and dram_alt is used for lower
+rates. The dram_alt and dram_apb clocks are "imx composite" and their
+parent can also be modified.
+
+This driver will prepare/enable the new parents ahead of switching (so
+that the expected roots are enabled) and afterwards it will call
+clk_set_parent to ensure the parents in clock framework are up-to-date.
+
+The driver relies on dram_pll dram_alt and dram_apb being marked with
+CLK_GET_RATE_NOCACHE for rate updates.
+
+Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+Acked-by: Chanwoo Choi <cw00.choi@samsung.com>
+[cw00.choi: Edit the COMPILE_TEST module dependency in Kconfig]
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/Kconfig      |  10 +
+ drivers/devfreq/Makefile     |   1 +
+ drivers/devfreq/imx8m-ddrc.c | 465 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 476 insertions(+)
+ create mode 100644 drivers/devfreq/imx8m-ddrc.c
+
+diff --git a/drivers/devfreq/Kconfig b/drivers/devfreq/Kconfig
+index ca45d57ad947..8485f948caeb 100644
+--- a/drivers/devfreq/Kconfig
++++ b/drivers/devfreq/Kconfig
+@@ -91,6 +91,16 @@ config ARM_EXYNOS_BUS_DEVFREQ
+ 	  and adjusts the operating frequencies and voltages with OPP support.
+ 	  This does not yet operate with optimal voltages.
+ 
++config ARM_IMX8M_DDRC_DEVFREQ
++	tristate "i.MX8M DDRC DEVFREQ Driver"
++	depends on (ARCH_MXC && HAVE_ARM_SMCCC) || \
++		(COMPILE_TEST && HAVE_ARM_SMCCC)
++	select DEVFREQ_GOV_SIMPLE_ONDEMAND
++	select DEVFREQ_GOV_USERSPACE
++	help
++	  This adds the DEVFREQ driver for the i.MX8M DDR Controller. It allows
++	  adjusting DRAM frequency.
++
+ config ARM_TEGRA_DEVFREQ
+ 	tristate "NVIDIA Tegra30/114/124/210 DEVFREQ Driver"
+ 	depends on ARCH_TEGRA_3x_SOC || ARCH_TEGRA_114_SOC || \
+diff --git a/drivers/devfreq/Makefile b/drivers/devfreq/Makefile
+index 338ae8440db6..3eb4d5e6635c 100644
+--- a/drivers/devfreq/Makefile
++++ b/drivers/devfreq/Makefile
+@@ -9,6 +9,7 @@ obj-$(CONFIG_DEVFREQ_GOV_PASSIVE)	+= governor_passive.o
+ 
+ # DEVFREQ Drivers
+ obj-$(CONFIG_ARM_EXYNOS_BUS_DEVFREQ)	+= exynos-bus.o
++obj-$(CONFIG_ARM_IMX8M_DDRC_DEVFREQ)	+= imx8m-ddrc.o
+ obj-$(CONFIG_ARM_RK3399_DMC_DEVFREQ)	+= rk3399_dmc.o
+ obj-$(CONFIG_ARM_TEGRA_DEVFREQ)		+= tegra30-devfreq.o
+ obj-$(CONFIG_ARM_TEGRA20_DEVFREQ)	+= tegra20-devfreq.o
+diff --git a/drivers/devfreq/imx8m-ddrc.c b/drivers/devfreq/imx8m-ddrc.c
+new file mode 100644
+index 000000000000..01ff9afdc8bf
+--- /dev/null
++++ b/drivers/devfreq/imx8m-ddrc.c
+@@ -0,0 +1,465 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright 2019 NXP
++ */
++
++#include <linux/module.h>
++#include <linux/device.h>
++#include <linux/of_device.h>
++#include <linux/platform_device.h>
++#include <linux/devfreq.h>
++#include <linux/pm_opp.h>
++#include <linux/clk.h>
++#include <linux/clk-provider.h>
++#include <linux/arm-smccc.h>
++
++#define IMX_SIP_DDR_DVFS			0xc2000004
++
++/* Values starting from 0 switch to specific frequency */
++#define IMX_SIP_DDR_FREQ_SET_HIGH		0x00
++
++/* Deprecated after moving IRQ handling to ATF */
++#define IMX_SIP_DDR_DVFS_WAIT_CHANGE		0x0F
++
++/* Query available frequencies. */
++#define IMX_SIP_DDR_DVFS_GET_FREQ_COUNT		0x10
++#define IMX_SIP_DDR_DVFS_GET_FREQ_INFO		0x11
++
++/*
++ * This should be in a 1:1 mapping with devicetree OPPs but
++ * firmware provides additional info.
++ */
++struct imx8m_ddrc_freq {
++	unsigned long rate;
++	unsigned long smcarg;
++	int dram_core_parent_index;
++	int dram_alt_parent_index;
++	int dram_apb_parent_index;
++};
++
++/* Hardware limitation */
++#define IMX8M_DDRC_MAX_FREQ_COUNT 4
++
++/*
++ * i.MX8M DRAM Controller clocks have the following structure (abridged):
++ *
++ * +----------+       |\            +------+
++ * | dram_pll |-------|M| dram_core |      |
++ * +----------+       |U|---------->| D    |
++ *                 /--|X|           |  D   |
++ *   dram_alt_root |  |/            |   R  |
++ *                 |                |    C |
++ *            +---------+           |      |
++ *            |FIX DIV/4|           |      |
++ *            +---------+           |      |
++ *  composite:     |                |      |
++ * +----------+    |                |      |
++ * | dram_alt |----/                |      |
++ * +----------+                     |      |
++ * | dram_apb |-------------------->|      |
++ * +----------+                     +------+
++ *
++ * The dram_pll is used for higher rates and dram_alt is used for lower rates.
++ *
++ * Frequency switching is implemented in TF-A (via SMC call) and can change the
++ * configuration of the clocks, including mux parents. The dram_alt and
++ * dram_apb clocks are "imx composite" and their parent can change too.
++ *
++ * We need to prepare/enable the new mux parents head of switching and update
++ * their information afterwards.
++ */
++struct imx8m_ddrc {
++	struct devfreq_dev_profile profile;
++	struct devfreq *devfreq;
++
++	/* For frequency switching: */
++	struct clk *dram_core;
++	struct clk *dram_pll;
++	struct clk *dram_alt;
++	struct clk *dram_apb;
++
++	int freq_count;
++	struct imx8m_ddrc_freq freq_table[IMX8M_DDRC_MAX_FREQ_COUNT];
++};
++
++static struct imx8m_ddrc_freq *imx8m_ddrc_find_freq(struct imx8m_ddrc *priv,
++						    unsigned long rate)
++{
++	struct imx8m_ddrc_freq *freq;
++	int i;
++
++	/*
++	 * Firmware reports values in MT/s, so we round-down from Hz
++	 * Rounding is extra generous to ensure a match.
++	 */
++	rate = DIV_ROUND_CLOSEST(rate, 250000);
++	for (i = 0; i < priv->freq_count; ++i) {
++		freq = &priv->freq_table[i];
++		if (freq->rate == rate ||
++				freq->rate + 1 == rate ||
++				freq->rate - 1 == rate)
++			return freq;
++	}
++
++	return NULL;
++}
++
++static void imx8m_ddrc_smc_set_freq(int target_freq)
++{
++	struct arm_smccc_res res;
++	u32 online_cpus = 0;
++	int cpu;
++
++	local_irq_disable();
++
++	for_each_online_cpu(cpu)
++		online_cpus |= (1 << (cpu * 8));
++
++	/* change the ddr freqency */
++	arm_smccc_smc(IMX_SIP_DDR_DVFS, target_freq, online_cpus,
++			0, 0, 0, 0, 0, &res);
++
++	local_irq_enable();
++}
++
++static struct clk *clk_get_parent_by_index(struct clk *clk, int index)
++{
++	struct clk_hw *hw;
++
++	hw = clk_hw_get_parent_by_index(__clk_get_hw(clk), index);
++
++	return hw ? hw->clk : NULL;
++}
++
++static int imx8m_ddrc_set_freq(struct device *dev, struct imx8m_ddrc_freq *freq)
++{
++	struct imx8m_ddrc *priv = dev_get_drvdata(dev);
++	struct clk *new_dram_core_parent;
++	struct clk *new_dram_alt_parent;
++	struct clk *new_dram_apb_parent;
++	int ret;
++
++	/*
++	 * Fetch new parents
++	 *
++	 * new_dram_alt_parent and new_dram_apb_parent are optional but
++	 * new_dram_core_parent is not.
++	 */
++	new_dram_core_parent = clk_get_parent_by_index(
++			priv->dram_core, freq->dram_core_parent_index - 1);
++	if (!new_dram_core_parent) {
++		dev_err(dev, "failed to fetch new dram_core parent\n");
++		return -EINVAL;
++	}
++	if (freq->dram_alt_parent_index) {
++		new_dram_alt_parent = clk_get_parent_by_index(
++				priv->dram_alt,
++				freq->dram_alt_parent_index - 1);
++		if (!new_dram_alt_parent) {
++			dev_err(dev, "failed to fetch new dram_alt parent\n");
++			return -EINVAL;
++		}
++	} else
++		new_dram_alt_parent = NULL;
++
++	if (freq->dram_apb_parent_index) {
++		new_dram_apb_parent = clk_get_parent_by_index(
++				priv->dram_apb,
++				freq->dram_apb_parent_index - 1);
++		if (!new_dram_apb_parent) {
++			dev_err(dev, "failed to fetch new dram_apb parent\n");
++			return -EINVAL;
++		}
++	} else
++		new_dram_apb_parent = NULL;
++
++	/* increase reference counts and ensure clks are ON before switch */
++	ret = clk_prepare_enable(new_dram_core_parent);
++	if (ret) {
++		dev_err(dev, "failed to enable new dram_core parent: %d\n",
++			ret);
++		goto out;
++	}
++	ret = clk_prepare_enable(new_dram_alt_parent);
++	if (ret) {
++		dev_err(dev, "failed to enable new dram_alt parent: %d\n",
++			ret);
++		goto out_disable_core_parent;
++	}
++	ret = clk_prepare_enable(new_dram_apb_parent);
++	if (ret) {
++		dev_err(dev, "failed to enable new dram_apb parent: %d\n",
++			ret);
++		goto out_disable_alt_parent;
++	}
++
++	imx8m_ddrc_smc_set_freq(freq->smcarg);
++
++	/* update parents in clk tree after switch. */
++	ret = clk_set_parent(priv->dram_core, new_dram_core_parent);
++	if (ret)
++		dev_warn(dev, "failed to set dram_core parent: %d\n", ret);
++	if (new_dram_alt_parent) {
++		ret = clk_set_parent(priv->dram_alt, new_dram_alt_parent);
++		if (ret)
++			dev_warn(dev, "failed to set dram_alt parent: %d\n",
++				 ret);
++	}
++	if (new_dram_apb_parent) {
++		ret = clk_set_parent(priv->dram_apb, new_dram_apb_parent);
++		if (ret)
++			dev_warn(dev, "failed to set dram_apb parent: %d\n",
++				 ret);
++	}
++
++	/*
++	 * Explicitly refresh dram PLL rate.
++	 *
++	 * Even if it's marked with CLK_GET_RATE_NOCACHE the rate will not be
++	 * automatically refreshed when clk_get_rate is called on children.
++	 */
++	clk_get_rate(priv->dram_pll);
++
++	/*
++	 * clk_set_parent transfer the reference count from old parent.
++	 * now we drop extra reference counts used during the switch
++	 */
++	clk_disable_unprepare(new_dram_apb_parent);
++out_disable_alt_parent:
++	clk_disable_unprepare(new_dram_alt_parent);
++out_disable_core_parent:
++	clk_disable_unprepare(new_dram_core_parent);
++out:
++	return ret;
++}
++
++static int imx8m_ddrc_target(struct device *dev, unsigned long *freq, u32 flags)
++{
++	struct imx8m_ddrc *priv = dev_get_drvdata(dev);
++	struct imx8m_ddrc_freq *freq_info;
++	struct dev_pm_opp *new_opp;
++	unsigned long old_freq, new_freq;
++	int ret;
++
++	new_opp = devfreq_recommended_opp(dev, freq, flags);
++	if (IS_ERR(new_opp)) {
++		ret = PTR_ERR(new_opp);
++		dev_err(dev, "failed to get recommended opp: %d\n", ret);
++		return ret;
++	}
++	dev_pm_opp_put(new_opp);
++
++	old_freq = clk_get_rate(priv->dram_core);
++	if (*freq == old_freq)
++		return 0;
++
++	freq_info = imx8m_ddrc_find_freq(priv, *freq);
++	if (!freq_info)
++		return -EINVAL;
++
++	/*
++	 * Read back the clk rate to verify switch was correct and so that
++	 * we can report it on all error paths.
++	 */
++	ret = imx8m_ddrc_set_freq(dev, freq_info);
++
++	new_freq = clk_get_rate(priv->dram_core);
++	if (ret)
++		dev_err(dev, "ddrc failed freq switch to %lu from %lu: error %d. now at %lu\n",
++			*freq, old_freq, ret, new_freq);
++	else if (*freq != new_freq)
++		dev_err(dev, "ddrc failed freq update to %lu from %lu, now at %lu\n",
++			*freq, old_freq, new_freq);
++	else
++		dev_dbg(dev, "ddrc freq set to %lu (was %lu)\n",
++			*freq, old_freq);
++
++	return ret;
++}
++
++static int imx8m_ddrc_get_cur_freq(struct device *dev, unsigned long *freq)
++{
++	struct imx8m_ddrc *priv = dev_get_drvdata(dev);
++
++	*freq = clk_get_rate(priv->dram_core);
++
++	return 0;
++}
++
++static int imx8m_ddrc_get_dev_status(struct device *dev,
++				     struct devfreq_dev_status *stat)
++{
++	struct imx8m_ddrc *priv = dev_get_drvdata(dev);
++
++	stat->busy_time = 0;
++	stat->total_time = 0;
++	stat->current_frequency = clk_get_rate(priv->dram_core);
++
++	return 0;
++}
++
++static int imx8m_ddrc_init_freq_info(struct device *dev)
++{
++	struct imx8m_ddrc *priv = dev_get_drvdata(dev);
++	struct arm_smccc_res res;
++	int index;
++
++	/* An error here means DDR DVFS API not supported by firmware */
++	arm_smccc_smc(IMX_SIP_DDR_DVFS, IMX_SIP_DDR_DVFS_GET_FREQ_COUNT,
++			0, 0, 0, 0, 0, 0, &res);
++	priv->freq_count = res.a0;
++	if (priv->freq_count <= 0 ||
++			priv->freq_count > IMX8M_DDRC_MAX_FREQ_COUNT)
++		return -ENODEV;
++
++	for (index = 0; index < priv->freq_count; ++index) {
++		struct imx8m_ddrc_freq *freq = &priv->freq_table[index];
++
++		arm_smccc_smc(IMX_SIP_DDR_DVFS, IMX_SIP_DDR_DVFS_GET_FREQ_INFO,
++			      index, 0, 0, 0, 0, 0, &res);
++		/* Result should be strictly positive */
++		if ((long)res.a0 <= 0)
++			return -ENODEV;
++
++		freq->rate = res.a0;
++		freq->smcarg = index;
++		freq->dram_core_parent_index = res.a1;
++		freq->dram_alt_parent_index = res.a2;
++		freq->dram_apb_parent_index = res.a3;
++
++		/* dram_core has 2 options: dram_pll or dram_alt_root */
++		if (freq->dram_core_parent_index != 1 &&
++				freq->dram_core_parent_index != 2)
++			return -ENODEV;
++		/* dram_apb and dram_alt have exactly 8 possible parents */
++		if (freq->dram_alt_parent_index > 8 ||
++				freq->dram_apb_parent_index > 8)
++			return -ENODEV;
++		/* dram_core from alt requires explicit dram_alt parent */
++		if (freq->dram_core_parent_index == 2 &&
++				freq->dram_alt_parent_index == 0)
++			return -ENODEV;
++	}
++
++	return 0;
++}
++
++static int imx8m_ddrc_check_opps(struct device *dev)
++{
++	struct imx8m_ddrc *priv = dev_get_drvdata(dev);
++	struct imx8m_ddrc_freq *freq_info;
++	struct dev_pm_opp *opp;
++	unsigned long freq;
++	int i, opp_count;
++
++	/* Enumerate DT OPPs and disable those not supported by firmware */
++	opp_count = dev_pm_opp_get_opp_count(dev);
++	if (opp_count < 0)
++		return opp_count;
++	for (i = 0, freq = 0; i < opp_count; ++i, ++freq) {
++		opp = dev_pm_opp_find_freq_ceil(dev, &freq);
++		if (IS_ERR(opp)) {
++			dev_err(dev, "Failed enumerating OPPs: %ld\n",
++				PTR_ERR(opp));
++			return PTR_ERR(opp);
++		}
++		dev_pm_opp_put(opp);
++
++		freq_info = imx8m_ddrc_find_freq(priv, freq);
++		if (!freq_info) {
++			dev_info(dev, "Disable unsupported OPP %luHz %luMT/s\n",
++					freq, DIV_ROUND_CLOSEST(freq, 250000));
++			dev_pm_opp_disable(dev, freq);
++		}
++	}
++
++	return 0;
++}
++
++static void imx8m_ddrc_exit(struct device *dev)
++{
++	dev_pm_opp_of_remove_table(dev);
++}
++
++static int imx8m_ddrc_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct imx8m_ddrc *priv;
++	const char *gov = DEVFREQ_GOV_USERSPACE;
++	int ret;
++
++	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++
++	platform_set_drvdata(pdev, priv);
++
++	ret = imx8m_ddrc_init_freq_info(dev);
++	if (ret) {
++		dev_err(dev, "failed to init firmware freq info: %d\n", ret);
++		return ret;
++	}
++
++	priv->dram_core = devm_clk_get(dev, "core");
++	priv->dram_pll = devm_clk_get(dev, "pll");
++	priv->dram_alt = devm_clk_get(dev, "alt");
++	priv->dram_apb = devm_clk_get(dev, "apb");
++	if (IS_ERR(priv->dram_core) ||
++		IS_ERR(priv->dram_pll) ||
++		IS_ERR(priv->dram_alt) ||
++		IS_ERR(priv->dram_apb)) {
++		ret = PTR_ERR(priv->devfreq);
++		dev_err(dev, "failed to fetch clocks: %d\n", ret);
++		return ret;
++	}
++
++	ret = dev_pm_opp_of_add_table(dev);
++	if (ret < 0) {
++		dev_err(dev, "failed to get OPP table\n");
++		return ret;
++	}
++
++	ret = imx8m_ddrc_check_opps(dev);
++	if (ret < 0)
++		goto err;
++
++	priv->profile.polling_ms = 1000;
++	priv->profile.target = imx8m_ddrc_target;
++	priv->profile.get_dev_status = imx8m_ddrc_get_dev_status;
++	priv->profile.exit = imx8m_ddrc_exit;
++	priv->profile.get_cur_freq = imx8m_ddrc_get_cur_freq;
++	priv->profile.initial_freq = clk_get_rate(priv->dram_core);
++
++	priv->devfreq = devm_devfreq_add_device(dev, &priv->profile,
++						gov, NULL);
++	if (IS_ERR(priv->devfreq)) {
++		ret = PTR_ERR(priv->devfreq);
++		dev_err(dev, "failed to add devfreq device: %d\n", ret);
++		goto err;
++	}
++
++	return 0;
++
++err:
++	dev_pm_opp_of_remove_table(dev);
++	return ret;
++}
++
++static const struct of_device_id imx8m_ddrc_of_match[] = {
++	{ .compatible = "fsl,imx8m-ddrc", },
++	{ /* sentinel */ },
++};
++MODULE_DEVICE_TABLE(of, imx8m_ddrc_of_match);
++
++static struct platform_driver imx8m_ddrc_platdrv = {
++	.probe		= imx8m_ddrc_probe,
++	.driver = {
++		.name	= "imx8m-ddrc-devfreq",
++		.of_match_table = of_match_ptr(imx8m_ddrc_of_match),
++	},
++};
++module_platform_driver(imx8m_ddrc_platdrv);
++
++MODULE_DESCRIPTION("i.MX8M DDR Controller frequency driver");
++MODULE_AUTHOR("Leonard Crestez <leonard.crestez@nxp.com>");
++MODULE_LICENSE("GPL v2");
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 2fee1a7cc6b1ce6634bb0f025be2c94a58dfa34d Mon Sep 17 00:00:00 2001
+From: Chanwoo Choi <cw00.choi@samsung.com>
+Date: Tue, 5 Nov 2019 18:18:03 +0900
+Subject: PM / devfreq: Add new name attribute for sysfs
+
+The commit 4585fbcb5331 ("PM / devfreq: Modify the device name as devfreq(X) for
+sysfs") changed the node name to devfreq(x). After this commit, it is not
+possible to get the device name through /sys/class/devfreq/devfreq(X)/*.
+
+Add new name attribute in order to get device name.
+
+Cc: stable@vger.kernel.org
+Fixes: 4585fbcb5331 ("PM / devfreq: Modify the device name as devfreq(X) for sysfs")
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ Documentation/ABI/testing/sysfs-class-devfreq | 7 +++++++
+ drivers/devfreq/devfreq.c                     | 9 +++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/Documentation/ABI/testing/sysfs-class-devfreq b/Documentation/ABI/testing/sysfs-class-devfreq
+index 01196e19afca..75897e2fde43 100644
+--- a/Documentation/ABI/testing/sysfs-class-devfreq
++++ b/Documentation/ABI/testing/sysfs-class-devfreq
+@@ -7,6 +7,13 @@ Description:
+ 		The name of devfreq object denoted as ... is same as the
+ 		name of device using devfreq.
+ 
++What:		/sys/class/devfreq/.../name
++Date:		November 2019
++Contact:	Chanwoo Choi <cw00.choi@samsung.com>
++Description:
++		The /sys/class/devfreq/.../name shows the name of device
++		of the corresponding devfreq object.
++
+ What:		/sys/class/devfreq/.../governor
+ Date:		September 2011
+ Contact:	MyungJoo Ham <myungjoo.ham@samsung.com>
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index 57f6944d65a6..07602083c743 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -1259,6 +1259,14 @@ err_out:
+ }
+ EXPORT_SYMBOL(devfreq_remove_governor);
+ 
++static ssize_t name_show(struct device *dev,
++			struct device_attribute *attr, char *buf)
++{
++	struct devfreq *devfreq = to_devfreq(dev);
++	return sprintf(buf, "%s\n", dev_name(devfreq->dev.parent));
++}
++static DEVICE_ATTR_RO(name);
++
+ static ssize_t governor_show(struct device *dev,
+ 			     struct device_attribute *attr, char *buf)
+ {
+@@ -1592,6 +1600,7 @@ static ssize_t trans_stat_show(struct device *dev,
+ static DEVICE_ATTR_RO(trans_stat);
+ 
+ static struct attribute *devfreq_attrs[] = {
++	&dev_attr_name.attr,
+ 	&dev_attr_governor.attr,
+ 	&dev_attr_available_governors.attr,
+ 	&dev_attr_cur_freq.attr,
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From b76b3479dab948bea0a98b6d263eb56d8f358528 Mon Sep 17 00:00:00 2001
+From: Kamil Konieczny <k.konieczny@samsung.com>
+Date: Thu, 5 Dec 2019 15:55:25 +0100
+Subject: PM / devfreq: Change time stats to 64-bit
+
+Change time stats counting to bigger type by using 64-bit jiffies.
+This will make devfreq stats code look similar to cpufreq stats and
+prevents overflow (for HZ = 1000 after 49.7 days).
+
+Signed-off-by: Kamil Konieczny <k.konieczny@samsung.com>
+Acked-by: Chanwoo Choi <cw00.choi@samsung.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/devfreq.c | 14 +++++++-------
+ include/linux/devfreq.h   |  4 ++--
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index 07602083c743..554d155106a5 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -209,10 +209,10 @@ static int set_freq_table(struct devfreq *devfreq)
+ int devfreq_update_status(struct devfreq *devfreq, unsigned long freq)
+ {
+ 	int lev, prev_lev, ret = 0;
+-	unsigned long cur_time;
++	u64 cur_time;
+ 
+ 	lockdep_assert_held(&devfreq->lock);
+-	cur_time = jiffies;
++	cur_time = get_jiffies_64();
+ 
+ 	/* Immediately exit if previous_freq is not initialized yet. */
+ 	if (!devfreq->previous_freq)
+@@ -535,7 +535,7 @@ void devfreq_monitor_resume(struct devfreq *devfreq)
+ 			msecs_to_jiffies(devfreq->profile->polling_ms));
+ 
+ out_update:
+-	devfreq->last_stat_updated = jiffies;
++	devfreq->last_stat_updated = get_jiffies_64();
+ 	devfreq->stop_polling = false;
+ 
+ 	if (devfreq->profile->get_cur_freq &&
+@@ -820,7 +820,7 @@ struct devfreq *devfreq_add_device(struct device *dev,
+ 
+ 	devfreq->time_in_state = devm_kcalloc(&devfreq->dev,
+ 			devfreq->profile->max_state,
+-			sizeof(unsigned long),
++			sizeof(*devfreq->time_in_state),
+ 			GFP_KERNEL);
+ 	if (!devfreq->time_in_state) {
+ 		mutex_unlock(&devfreq->lock);
+@@ -828,7 +828,7 @@ struct devfreq *devfreq_add_device(struct device *dev,
+ 		goto err_devfreq;
+ 	}
+ 
+-	devfreq->last_stat_updated = jiffies;
++	devfreq->last_stat_updated = get_jiffies_64();
+ 
+ 	srcu_init_notifier_head(&devfreq->transition_notifier_list);
+ 
+@@ -1589,8 +1589,8 @@ static ssize_t trans_stat_show(struct device *dev,
+ 		for (j = 0; j < max_state; j++)
+ 			len += sprintf(buf + len, "%10u",
+ 				devfreq->trans_table[(i * max_state) + j]);
+-		len += sprintf(buf + len, "%10u\n",
+-			jiffies_to_msecs(devfreq->time_in_state[i]));
++		len += sprintf(buf + len, "%10llu\n", (u64)
++			jiffies64_to_msecs(devfreq->time_in_state[i]));
+ 	}
+ 
+ 	len += sprintf(buf + len, "Total transition : %u\n",
+diff --git a/include/linux/devfreq.h b/include/linux/devfreq.h
+index fb376b5b7281..95816a8e3d26 100644
+--- a/include/linux/devfreq.h
++++ b/include/linux/devfreq.h
+@@ -177,8 +177,8 @@ struct devfreq {
+ 	/* information for device frequency transition */
+ 	unsigned int total_trans;
+ 	unsigned int *trans_table;
+-	unsigned long *time_in_state;
+-	unsigned long last_stat_updated;
++	u64 *time_in_state;
++	u64 last_stat_updated;
+ 
+ 	struct srcu_notifier_head transition_notifier_list;
+ 
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 14a34396819960865ff737c665c6e46b64d0e04a Mon Sep 17 00:00:00 2001
+From: Kamil Konieczny <k.konieczny@samsung.com>
+Date: Thu, 5 Dec 2019 15:55:26 +0100
+Subject: PM / devfreq: Add clearing transitions stats
+
+Add clearing transition table and time in states devfreq statistics
+by writing 0 (zero) to trans_stat file in devfreq sysfs. An example use
+is like following:
+
+echo 0 > /sys/class/devfreq/devfreqX/trans_stat
+
+Signed-off-by: Kamil Konieczny <k.konieczny@samsung.com>
+[cw00.choi: Edit return value if entering the wrong value for reset
+ and use arrary3_size() to get the size of 3-dimensional array]
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ Documentation/ABI/testing/sysfs-class-devfreq | 11 ++++++----
+ drivers/devfreq/devfreq.c                     | 29 ++++++++++++++++++++++++++-
+ 2 files changed, 35 insertions(+), 5 deletions(-)
+
+diff --git a/Documentation/ABI/testing/sysfs-class-devfreq b/Documentation/ABI/testing/sysfs-class-devfreq
+index 75897e2fde43..9758eb85ade3 100644
+--- a/Documentation/ABI/testing/sysfs-class-devfreq
++++ b/Documentation/ABI/testing/sysfs-class-devfreq
+@@ -55,12 +55,15 @@ What:		/sys/class/devfreq/.../trans_stat
+ Date:		October 2012
+ Contact:	MyungJoo Ham <myungjoo.ham@samsung.com>
+ Description:
+-		This ABI shows the statistics of devfreq behavior on a
+-		specific device. It shows the time spent in each state and
+-		the number of transitions between states.
++		This ABI shows or clears the statistics of devfreq behavior
++		on a specific device. It shows the time spent in each state
++		and the number of transitions between states.
+ 		In order to activate this ABI, the devfreq target device
+ 		driver should provide the list of available frequencies
+-		with its profile.
++		with its profile. If need to reset the statistics of devfreq
++		behavior on a specific device, enter 0(zero) to 'trans_stat'
++		as following:
++			echo 0 > /sys/class/devfreq/.../trans_stat
+ 
+ What:		/sys/class/devfreq/.../userspace/set_freq
+ Date:		September 2011
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index 554d155106a5..af5bd521a734 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -1597,7 +1597,34 @@ static ssize_t trans_stat_show(struct device *dev,
+ 					devfreq->total_trans);
+ 	return len;
+ }
+-static DEVICE_ATTR_RO(trans_stat);
++
++static ssize_t trans_stat_store(struct device *dev,
++				struct device_attribute *attr,
++				const char *buf, size_t count)
++{
++	struct devfreq *df = to_devfreq(dev);
++	int err, value;
++
++	if (df->profile->max_state == 0)
++		return count;
++
++	err = kstrtoint(buf, 10, &value);
++	if (err || value != 0)
++		return -EINVAL;
++
++	mutex_lock(&df->lock);
++	memset(df->time_in_state, 0, (df->profile->max_state *
++					sizeof(*df->time_in_state)));
++	memset(df->trans_table, 0, array3_size(sizeof(unsigned int),
++					df->profile->max_state,
++					df->profile->max_state));
++	df->total_trans = 0;
++	df->last_stat_updated = get_jiffies_64();
++	mutex_unlock(&df->lock);
++
++	return count;
++}
++static DEVICE_ATTR_RW(trans_stat);
+ 
+ static struct attribute *devfreq_attrs[] = {
+ 	&dev_attr_name.attr,
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 1ebd0bc0e8adbfa548335d016ead922cc85fcecd Mon Sep 17 00:00:00 2001
+From: Kamil Konieczny <k.konieczny@samsung.com>
+Date: Fri, 6 Dec 2019 13:46:39 +0900
+Subject: PM / devfreq: Move statistics to separate struct devfreq_stats
+
+Count time and transitions between devfreq frequencies in separate
+struct devfreq_stats for improved code readability and maintenance.
+
+Signed-off-by: Kamil Konieczny <k.konieczny@samsung.com>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+[cw00.choi: Fix the merge conflict in trasn_stat_store
+ and use 'devfreq->stats.*' style for consistent coding style
+ and restore the clean-up code of 'devfreq->profile->*']
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/devfreq.c | 44 +++++++++++++++++++++++---------------------
+ include/linux/devfreq.h   | 26 +++++++++++++++++---------
+ 2 files changed, 40 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index af5bd521a734..0828988ce263 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -224,8 +224,8 @@ int devfreq_update_status(struct devfreq *devfreq, unsigned long freq)
+ 		goto out;
+ 	}
+ 
+-	devfreq->time_in_state[prev_lev] +=
+-			 cur_time - devfreq->last_stat_updated;
++	devfreq->stats.time_in_state[prev_lev] +=
++			cur_time - devfreq->stats.last_update;
+ 
+ 	lev = devfreq_get_freq_level(devfreq, freq);
+ 	if (lev < 0) {
+@@ -234,13 +234,13 @@ int devfreq_update_status(struct devfreq *devfreq, unsigned long freq)
+ 	}
+ 
+ 	if (lev != prev_lev) {
+-		devfreq->trans_table[(prev_lev *
+-				devfreq->profile->max_state) + lev]++;
+-		devfreq->total_trans++;
++		devfreq->stats.trans_table[
++			(prev_lev * devfreq->profile->max_state) + lev]++;
++		devfreq->stats.total_trans++;
+ 	}
+ 
+ out:
+-	devfreq->last_stat_updated = cur_time;
++	devfreq->stats.last_update = cur_time;
+ 	return ret;
+ }
+ EXPORT_SYMBOL(devfreq_update_status);
+@@ -535,7 +535,7 @@ void devfreq_monitor_resume(struct devfreq *devfreq)
+ 			msecs_to_jiffies(devfreq->profile->polling_ms));
+ 
+ out_update:
+-	devfreq->last_stat_updated = get_jiffies_64();
++	devfreq->stats.last_update = get_jiffies_64();
+ 	devfreq->stop_polling = false;
+ 
+ 	if (devfreq->profile->get_cur_freq &&
+@@ -807,28 +807,29 @@ struct devfreq *devfreq_add_device(struct device *dev,
+ 		goto err_out;
+ 	}
+ 
+-	devfreq->trans_table = devm_kzalloc(&devfreq->dev,
++	devfreq->stats.trans_table = devm_kzalloc(&devfreq->dev,
+ 			array3_size(sizeof(unsigned int),
+ 				    devfreq->profile->max_state,
+ 				    devfreq->profile->max_state),
+ 			GFP_KERNEL);
+-	if (!devfreq->trans_table) {
++	if (!devfreq->stats.trans_table) {
+ 		mutex_unlock(&devfreq->lock);
+ 		err = -ENOMEM;
+ 		goto err_devfreq;
+ 	}
+ 
+-	devfreq->time_in_state = devm_kcalloc(&devfreq->dev,
++	devfreq->stats.time_in_state = devm_kcalloc(&devfreq->dev,
+ 			devfreq->profile->max_state,
+-			sizeof(*devfreq->time_in_state),
++			sizeof(*devfreq->stats.time_in_state),
+ 			GFP_KERNEL);
+-	if (!devfreq->time_in_state) {
++	if (!devfreq->stats.time_in_state) {
+ 		mutex_unlock(&devfreq->lock);
+ 		err = -ENOMEM;
+ 		goto err_devfreq;
+ 	}
+ 
+-	devfreq->last_stat_updated = get_jiffies_64();
++	devfreq->stats.total_trans = 0;
++	devfreq->stats.last_update = get_jiffies_64();
+ 
+ 	srcu_init_notifier_head(&devfreq->transition_notifier_list);
+ 
+@@ -1588,13 +1589,14 @@ static ssize_t trans_stat_show(struct device *dev,
+ 				devfreq->profile->freq_table[i]);
+ 		for (j = 0; j < max_state; j++)
+ 			len += sprintf(buf + len, "%10u",
+-				devfreq->trans_table[(i * max_state) + j]);
++				devfreq->stats.trans_table[(i * max_state) + j]);
++
+ 		len += sprintf(buf + len, "%10llu\n", (u64)
+-			jiffies64_to_msecs(devfreq->time_in_state[i]));
++			jiffies64_to_msecs(devfreq->stats.time_in_state[i]));
+ 	}
+ 
+ 	len += sprintf(buf + len, "Total transition : %u\n",
+-					devfreq->total_trans);
++					devfreq->stats.total_trans);
+ 	return len;
+ }
+ 
+@@ -1613,13 +1615,13 @@ static ssize_t trans_stat_store(struct device *dev,
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&df->lock);
+-	memset(df->time_in_state, 0, (df->profile->max_state *
+-					sizeof(*df->time_in_state)));
+-	memset(df->trans_table, 0, array3_size(sizeof(unsigned int),
++	memset(df->stats.time_in_state, 0, (df->profile->max_state *
++					sizeof(*df->stats.time_in_state)));
++	memset(df->stats.trans_table, 0, array3_size(sizeof(unsigned int),
+ 					df->profile->max_state,
+ 					df->profile->max_state));
+-	df->total_trans = 0;
+-	df->last_stat_updated = get_jiffies_64();
++	df->stats.total_trans = 0;
++	df->stats.last_update = get_jiffies_64();
+ 	mutex_unlock(&df->lock);
+ 
+ 	return count;
+diff --git a/include/linux/devfreq.h b/include/linux/devfreq.h
+index 95816a8e3d26..9e73c84adf50 100644
+--- a/include/linux/devfreq.h
++++ b/include/linux/devfreq.h
+@@ -107,6 +107,20 @@ struct devfreq_dev_profile {
+ 	unsigned int max_state;
+ };
+ 
++/**
++ * struct devfreq_stats - Statistics of devfreq device behavior
++ * @total_trans:	Number of devfreq transitions.
++ * @trans_table:	Statistics of devfreq transitions.
++ * @time_in_state:	Statistics of devfreq states.
++ * @last_update:	The last time stats were updated.
++ */
++struct devfreq_stats {
++	unsigned int total_trans;
++	unsigned int *trans_table;
++	u64 *time_in_state;
++	u64 last_update;
++};
++
+ /**
+  * struct devfreq - Device devfreq structure
+  * @node:	list node - contains the devices with devfreq that have been
+@@ -132,10 +146,7 @@ struct devfreq_dev_profile {
+  * @suspend_freq:	 frequency of a device set during suspend phase.
+  * @resume_freq:	 frequency of a device set in resume phase.
+  * @suspend_count:	 suspend requests counter for a device.
+- * @total_trans:	Number of devfreq transitions
+- * @trans_table:	Statistics of devfreq transitions
+- * @time_in_state:	Statistics of devfreq states
+- * @last_stat_updated:	The last time stat updated
++ * @stats:	Statistics of devfreq device behavior
+  * @transition_notifier_list: list head of DEVFREQ_TRANSITION_NOTIFIER notifier
+  * @nb_min:		Notifier block for DEV_PM_QOS_MIN_FREQUENCY
+  * @nb_max:		Notifier block for DEV_PM_QOS_MAX_FREQUENCY
+@@ -174,11 +185,8 @@ struct devfreq {
+ 	unsigned long resume_freq;
+ 	atomic_t suspend_count;
+ 
+-	/* information for device frequency transition */
+-	unsigned int total_trans;
+-	unsigned int *trans_table;
+-	u64 *time_in_state;
+-	u64 last_stat_updated;
++	/* information for device frequency transitions */
++	struct devfreq_stats stats;
+ 
+ 	struct srcu_notifier_head transition_notifier_list;
+ 
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From f9002b169a6ec84612ddec18e460fe82ef811c18 Mon Sep 17 00:00:00 2001
+From: Kamil Konieczny <k.konieczny@samsung.com>
+Date: Fri, 6 Dec 2019 11:11:29 +0100
+Subject: PM / devfreq: Move declaration of DEVICE_ATTR_RW(min_freq)
+
+Declaration of DEVICE_ATTR_RW(min_freq) is placed after function
+max_freq_store. Move it to the correct place after min_freq_show.
+
+Signed-off-by: Kamil Konieczny <k.konieczny@samsung.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/devfreq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index 0828988ce263..8ef66e4598f3 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -1470,6 +1470,7 @@ static ssize_t min_freq_show(struct device *dev, struct device_attribute *attr,
+ 
+ 	return sprintf(buf, "%lu\n", min_freq);
+ }
++static DEVICE_ATTR_RW(min_freq);
+ 
+ static ssize_t max_freq_store(struct device *dev, struct device_attribute *attr,
+ 			      const char *buf, size_t count)
+@@ -1510,7 +1511,6 @@ static ssize_t max_freq_store(struct device *dev, struct device_attribute *attr,
+ 
+ 	return count;
+ }
+-static DEVICE_ATTR_RW(min_freq);
+ 
+ static ssize_t max_freq_show(struct device *dev, struct device_attribute *attr,
+ 			     char *buf)
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From a47a97ece54e8de03ed6c1eb3bd80c69b555769c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Artur=20=C5=9Awigo=C5=84?= <a.swigon@samsung.com>
+Date: Mon, 9 Dec 2019 11:48:59 +0100
+Subject: PM / devfreq: exynos-bus: Extract exynos_bus_profile_init()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch adds a new exynos_bus_profile_init() extracted
+from exynos_bus_probe() for devfreq device using simple_ondemand governor
+like parent devfreq device.
+
+Signed-off-by: Artur Świgoń <a.swigon@samsung.com>
+[cw00.choi: Edit description to indicate that new function is
+for parent devfreq device]
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/exynos-bus.c | 102 ++++++++++++++++++++++++-------------------
+ 1 file changed, 58 insertions(+), 44 deletions(-)
+
+diff --git a/drivers/devfreq/exynos-bus.c b/drivers/devfreq/exynos-bus.c
+index c832673273a2..b8ca6b9f4b82 100644
+--- a/drivers/devfreq/exynos-bus.c
++++ b/drivers/devfreq/exynos-bus.c
+@@ -287,52 +287,12 @@ err_clk:
+ 	return ret;
+ }
+ 
+-static int exynos_bus_probe(struct platform_device *pdev)
++static int exynos_bus_profile_init(struct exynos_bus *bus,
++				   struct devfreq_dev_profile *profile)
+ {
+-	struct device *dev = &pdev->dev;
+-	struct device_node *np = dev->of_node, *node;
+-	struct devfreq_dev_profile *profile;
++	struct device *dev = bus->dev;
+ 	struct devfreq_simple_ondemand_data *ondemand_data;
+-	struct devfreq_passive_data *passive_data;
+-	struct devfreq *parent_devfreq;
+-	struct exynos_bus *bus;
+-	int ret, max_state;
+-	unsigned long min_freq, max_freq;
+-	bool passive = false;
+-
+-	if (!np) {
+-		dev_err(dev, "failed to find devicetree node\n");
+-		return -EINVAL;
+-	}
+-
+-	bus = devm_kzalloc(&pdev->dev, sizeof(*bus), GFP_KERNEL);
+-	if (!bus)
+-		return -ENOMEM;
+-	mutex_init(&bus->lock);
+-	bus->dev = &pdev->dev;
+-	platform_set_drvdata(pdev, bus);
+-
+-	profile = devm_kzalloc(dev, sizeof(*profile), GFP_KERNEL);
+-	if (!profile)
+-		return -ENOMEM;
+-
+-	node = of_parse_phandle(dev->of_node, "devfreq", 0);
+-	if (node) {
+-		of_node_put(node);
+-		passive = true;
+-	} else {
+-		ret = exynos_bus_parent_parse_of(np, bus);
+-		if (ret < 0)
+-			return ret;
+-	}
+-
+-	/* Parse the device-tree to get the resource information */
+-	ret = exynos_bus_parse_of(np, bus);
+-	if (ret < 0)
+-		goto err_reg;
+-
+-	if (passive)
+-		goto passive;
++	int ret;
+ 
+ 	/* Initialize the struct profile and governor data for parent device */
+ 	profile->polling_ms = 50;
+@@ -381,6 +341,60 @@ static int exynos_bus_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
++err:
++	return ret;
++}
++
++static int exynos_bus_probe(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct device_node *np = dev->of_node, *node;
++	struct devfreq_dev_profile *profile;
++	struct devfreq_passive_data *passive_data;
++	struct devfreq *parent_devfreq;
++	struct exynos_bus *bus;
++	int ret, max_state;
++	unsigned long min_freq, max_freq;
++	bool passive = false;
++
++	if (!np) {
++		dev_err(dev, "failed to find devicetree node\n");
++		return -EINVAL;
++	}
++
++	bus = devm_kzalloc(&pdev->dev, sizeof(*bus), GFP_KERNEL);
++	if (!bus)
++		return -ENOMEM;
++	mutex_init(&bus->lock);
++	bus->dev = &pdev->dev;
++	platform_set_drvdata(pdev, bus);
++
++	profile = devm_kzalloc(dev, sizeof(*profile), GFP_KERNEL);
++	if (!profile)
++		return -ENOMEM;
++
++	node = of_parse_phandle(dev->of_node, "devfreq", 0);
++	if (node) {
++		of_node_put(node);
++		passive = true;
++	} else {
++		ret = exynos_bus_parent_parse_of(np, bus);
++		if (ret < 0)
++			return ret;
++	}
++
++	/* Parse the device-tree to get the resource information */
++	ret = exynos_bus_parse_of(np, bus);
++	if (ret < 0)
++		goto err_reg;
++
++	if (passive)
++		goto passive;
++
++	ret = exynos_bus_profile_init(bus, profile);
++	if (ret < 0)
++		goto err;
++
+ 	goto out;
+ passive:
+ 	/* Initialize the struct profile and governor data for passive device */
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From a05bb963435f14267e406182f8fb93b5d307baff Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Artur=20=C5=9Awigo=C5=84?= <a.swigon@samsung.com>
+Date: Mon, 9 Dec 2019 11:49:00 +0100
+Subject: PM / devfreq: exynos-bus: Extract exynos_bus_profile_init_passive()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This patch adds a new exynos_bus_profile_init_passive()
+extracted from exynos_bus_probe() for devfreq device using passive governor.
+
+Signed-off-by: Artur Świgoń <a.swigon@samsung.com>
+[cw00.choi: Edit description to indicate that function is for devfreq device
+using passive governor]
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/exynos-bus.c | 70 ++++++++++++++++++++++++++------------------
+ 1 file changed, 42 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/devfreq/exynos-bus.c b/drivers/devfreq/exynos-bus.c
+index b8ca6b9f4b82..19d9f9f8ced2 100644
+--- a/drivers/devfreq/exynos-bus.c
++++ b/drivers/devfreq/exynos-bus.c
+@@ -345,13 +345,51 @@ err:
+ 	return ret;
+ }
+ 
++static int exynos_bus_profile_init_passive(struct exynos_bus *bus,
++					   struct devfreq_dev_profile *profile)
++{
++	struct device *dev = bus->dev;
++	struct devfreq_passive_data *passive_data;
++	struct devfreq *parent_devfreq;
++	int ret = 0;
++
++	/* Initialize the struct profile and governor data for passive device */
++	profile->target = exynos_bus_target;
++	profile->exit = exynos_bus_passive_exit;
++
++	/* Get the instance of parent devfreq device */
++	parent_devfreq = devfreq_get_devfreq_by_phandle(dev, 0);
++	if (IS_ERR(parent_devfreq)) {
++		ret = -EPROBE_DEFER;
++		goto err;
++	}
++
++	passive_data = devm_kzalloc(dev, sizeof(*passive_data), GFP_KERNEL);
++	if (!passive_data) {
++		ret = -ENOMEM;
++		goto err;
++	}
++	passive_data->parent = parent_devfreq;
++
++	/* Add devfreq device for exynos bus with passive governor */
++	bus->devfreq = devm_devfreq_add_device(dev, profile, DEVFREQ_GOV_PASSIVE,
++						passive_data);
++	if (IS_ERR(bus->devfreq)) {
++		dev_err(dev,
++			"failed to add devfreq dev with passive governor\n");
++		ret = PTR_ERR(bus->devfreq);
++		goto err;
++	}
++
++err:
++	return ret;
++}
++
+ static int exynos_bus_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct device_node *np = dev->of_node, *node;
+ 	struct devfreq_dev_profile *profile;
+-	struct devfreq_passive_data *passive_data;
+-	struct devfreq *parent_devfreq;
+ 	struct exynos_bus *bus;
+ 	int ret, max_state;
+ 	unsigned long min_freq, max_freq;
+@@ -397,33 +435,9 @@ static int exynos_bus_probe(struct platform_device *pdev)
+ 
+ 	goto out;
+ passive:
+-	/* Initialize the struct profile and governor data for passive device */
+-	profile->target = exynos_bus_target;
+-	profile->exit = exynos_bus_passive_exit;
+-
+-	/* Get the instance of parent devfreq device */
+-	parent_devfreq = devfreq_get_devfreq_by_phandle(dev, 0);
+-	if (IS_ERR(parent_devfreq)) {
+-		ret = -EPROBE_DEFER;
+-		goto err;
+-	}
+-
+-	passive_data = devm_kzalloc(dev, sizeof(*passive_data), GFP_KERNEL);
+-	if (!passive_data) {
+-		ret = -ENOMEM;
+-		goto err;
+-	}
+-	passive_data->parent = parent_devfreq;
+-
+-	/* Add devfreq device for exynos bus with passive governor */
+-	bus->devfreq = devm_devfreq_add_device(dev, profile, DEVFREQ_GOV_PASSIVE,
+-						passive_data);
+-	if (IS_ERR(bus->devfreq)) {
+-		dev_err(dev,
+-			"failed to add devfreq dev with passive governor\n");
+-		ret = PTR_ERR(bus->devfreq);
++	ret = exynos_bus_profile_init_passive(bus, profile);
++	if (ret < 0)
+ 		goto err;
+-	}
+ 
+ out:
+ 	max_state = bus->devfreq->profile->max_state;
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 54cb5740526a2f30d57f146d8a17364c59287187 Mon Sep 17 00:00:00 2001
+From: Randy Dunlap <rdunlap@infradead.org>
+Date: Sat, 14 Dec 2019 08:03:11 -0800
+Subject: PM / devfreq: Fix multiple kernel-doc warnings
+
+Fix kernel-doc warnings in devfreq files.
+Also fix a typo.
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/devfreq-event.c | 4 ++--
+ drivers/devfreq/devfreq.c       | 4 ++--
+ include/linux/devfreq.h         | 3 ++-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/devfreq/devfreq-event.c b/drivers/devfreq/devfreq-event.c
+index 3dc5fd6065a3..8c31b0f2e28f 100644
+--- a/drivers/devfreq/devfreq-event.c
++++ b/drivers/devfreq/devfreq-event.c
+@@ -346,9 +346,9 @@ EXPORT_SYMBOL_GPL(devfreq_event_add_edev);
+ 
+ /**
+  * devfreq_event_remove_edev() - Remove the devfreq-event device registered.
+- * @dev		: the devfreq-event device
++ * @edev	: the devfreq-event device
+  *
+- * Note that this function remove the registered devfreq-event device.
++ * Note that this function removes the registered devfreq-event device.
+  */
+ int devfreq_event_remove_edev(struct devfreq_event_dev *edev)
+ {
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index 8ef66e4598f3..89260b17598f 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -1852,7 +1852,7 @@ static void devm_devfreq_notifier_release(struct device *dev, void *res)
+ 
+ /**
+  * devm_devfreq_register_notifier()
+-	- Resource-managed devfreq_register_notifier()
++ *	- Resource-managed devfreq_register_notifier()
+  * @dev:	The devfreq user device. (parent of devfreq)
+  * @devfreq:	The devfreq object.
+  * @nb:		The notifier block to be unregistered.
+@@ -1888,7 +1888,7 @@ EXPORT_SYMBOL(devm_devfreq_register_notifier);
+ 
+ /**
+  * devm_devfreq_unregister_notifier()
+-	- Resource-managed devfreq_unregister_notifier()
++ *	- Resource-managed devfreq_unregister_notifier()
+  * @dev:	The devfreq user device. (parent of devfreq)
+  * @devfreq:	The devfreq object.
+  * @nb:		The notifier block to be unregistered.
+diff --git a/include/linux/devfreq.h b/include/linux/devfreq.h
+index 9e73c84adf50..c6f82d4bec9f 100644
+--- a/include/linux/devfreq.h
++++ b/include/linux/devfreq.h
+@@ -136,6 +136,7 @@ struct devfreq_stats {
+  *		devfreq.nb to the corresponding register notifier call chain.
+  * @work:	delayed work for load monitoring.
+  * @previous_freq:	previously configured frequency value.
++ * @last_status:	devfreq user device info, performance statistics
+  * @data:	Private data of the governor. The devfreq framework does not
+  *		touch this.
+  * @user_min_freq_req:	PM QoS minimum frequency request from user (via sysfs)
+@@ -151,7 +152,7 @@ struct devfreq_stats {
+  * @nb_min:		Notifier block for DEV_PM_QOS_MIN_FREQUENCY
+  * @nb_max:		Notifier block for DEV_PM_QOS_MAX_FREQUENCY
+  *
+- * This structure stores the devfreq information for a give device.
++ * This structure stores the devfreq information for a given device.
+  *
+  * Note that when a governor accesses entries in struct devfreq in its
+  * functions except for the context of callbacks defined in struct
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From fb90fa80452b1bfd96a8decd455b294b1d672fb7 Mon Sep 17 00:00:00 2001
+From: Yangtao Li <tiny.windzz@gmail.com>
+Date: Sat, 14 Dec 2019 18:11:29 +0000
+Subject: PM / devfreq: rockchip-dfi: Add missing of_node_put()
+
+of_node_put needs to be called when the device node which is got
+from of_parse_phandle has finished using.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/event/rockchip-dfi.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/devfreq/event/rockchip-dfi.c b/drivers/devfreq/event/rockchip-dfi.c
+index 5d1042188727..45b190e443d8 100644
+--- a/drivers/devfreq/event/rockchip-dfi.c
++++ b/drivers/devfreq/event/rockchip-dfi.c
+@@ -200,6 +200,7 @@ static int rockchip_dfi_probe(struct platform_device *pdev)
+ 	node = of_parse_phandle(np, "rockchip,pmu", 0);
+ 	if (node) {
+ 		data->regmap_pmu = syscon_node_to_regmap(node);
++		of_node_put(node);
+ 		if (IS_ERR(data->regmap_pmu))
+ 			return PTR_ERR(data->regmap_pmu);
+ 	}
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 29d867e97f7d781972ed542acfca3c2c0b512603 Mon Sep 17 00:00:00 2001
+From: Yangtao Li <tiny.windzz@gmail.com>
+Date: Sat, 14 Dec 2019 18:11:30 +0000
+Subject: PM / devfreq: rk3399_dmc: Add missing of_node_put()
+
+of_node_put() needs to be called when the device node which is got
+from of_parse_phandle has finished using.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/rk3399_dmc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/devfreq/rk3399_dmc.c b/drivers/devfreq/rk3399_dmc.c
+index 2e65d7279d79..2f1027c5b647 100644
+--- a/drivers/devfreq/rk3399_dmc.c
++++ b/drivers/devfreq/rk3399_dmc.c
+@@ -372,6 +372,7 @@ static int rk3399_dmcfreq_probe(struct platform_device *pdev)
+ 	node = of_parse_phandle(np, "rockchip,pmu", 0);
+ 	if (node) {
+ 		data->regmap_pmu = syscon_node_to_regmap(node);
++		of_node_put(node);
+ 		if (IS_ERR(data->regmap_pmu))
+ 			return PTR_ERR(data->regmap_pmu);
+ 	}
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From f0c792192753abdcb4cd18677ad28acaea23a77a Mon Sep 17 00:00:00 2001
+From: Yangtao Li <tiny.windzz@gmail.com>
+Date: Sun, 15 Dec 2019 13:53:15 +0000
+Subject: PM / devfreq: rockchip-dfi: Convert to devm_platform_ioremap_resource
+
+Use devm_platform_ioremap_resource() to simplify code.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/event/rockchip-dfi.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/devfreq/event/rockchip-dfi.c b/drivers/devfreq/event/rockchip-dfi.c
+index 45b190e443d8..9a88faaf8b27 100644
+--- a/drivers/devfreq/event/rockchip-dfi.c
++++ b/drivers/devfreq/event/rockchip-dfi.c
+@@ -177,7 +177,6 @@ static int rockchip_dfi_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct rockchip_dfi *data;
+-	struct resource *res;
+ 	struct devfreq_event_desc *desc;
+ 	struct device_node *np = pdev->dev.of_node, *node;
+ 
+@@ -185,8 +184,7 @@ static int rockchip_dfi_probe(struct platform_device *pdev)
+ 	if (!data)
+ 		return -ENOMEM;
+ 
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	data->regs = devm_ioremap_resource(&pdev->dev, res);
++	data->regs = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(data->regs))
+ 		return PTR_ERR(data->regs);
+ 
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From eff5d31f7407fa9d31fb840106f1593399457298 Mon Sep 17 00:00:00 2001
+From: Chanwoo Choi <cw00.choi@samsung.com>
+Date: Thu, 12 Dec 2019 11:20:30 +0900
+Subject: PM / devfreq: rk3399_dmc: Add COMPILE_TEST and HAVE_ARM_SMCCC
+ dependency
+
+To build test, add COMPILE_TEST depedency to both ARM_RK3399_DMC_DEVFREQ
+and DEVFREQ_EVENT_ROCKCHIP_DFI configuration. And ARM_RK3399_DMC_DEVFREQ
+used the SMCCC interface so that add HAVE_ARM_SMCCC dependency to prevent
+the build break.
+
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/Kconfig       | 3 ++-
+ drivers/devfreq/event/Kconfig | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/devfreq/Kconfig b/drivers/devfreq/Kconfig
+index 8485f948caeb..1526f758daeb 100644
+--- a/drivers/devfreq/Kconfig
++++ b/drivers/devfreq/Kconfig
+@@ -125,7 +125,8 @@ config ARM_TEGRA20_DEVFREQ
+ 
+ config ARM_RK3399_DMC_DEVFREQ
+ 	tristate "ARM RK3399 DMC DEVFREQ Driver"
+-	depends on ARCH_ROCKCHIP
++	depends on (ARCH_ROCKCHIP && HAVE_ARM_SMCCC) || \
++		(COMPILE_TEST && HAVE_ARM_SMCCC)
+ 	select DEVFREQ_EVENT_ROCKCHIP_DFI
+ 	select DEVFREQ_GOV_SIMPLE_ONDEMAND
+ 	select PM_DEVFREQ_EVENT
+diff --git a/drivers/devfreq/event/Kconfig b/drivers/devfreq/event/Kconfig
+index cef2cf5347ca..a53e0a6ffdfe 100644
+--- a/drivers/devfreq/event/Kconfig
++++ b/drivers/devfreq/event/Kconfig
+@@ -34,7 +34,7 @@ config DEVFREQ_EVENT_EXYNOS_PPMU
+ 
+ config DEVFREQ_EVENT_ROCKCHIP_DFI
+ 	tristate "ROCKCHIP DFI DEVFREQ event Driver"
+-	depends on ARCH_ROCKCHIP
++	depends on ARCH_ROCKCHIP || COMPILE_TEST
+ 	help
+ 	  This add the devfreq-event driver for Rockchip SoC. It provides DFI
+ 	  (DDR Monitor Module) driver to count ddr load.
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From a440892142118e68d05940fde66afd0278ce3d45 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Artur=20=C5=9Awigo=C5=84?= <a.swigon@samsung.com>
+Date: Mon, 16 Dec 2019 11:47:48 +0100
+Subject: PM / devfreq: exynos-bus: Reduce goto statements and remove unused
+ headers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Improve code readability by changing the goto statements
+as well as eliminating a few more goto statements (related to return
+paths). Moreover, remove unused header file and adds a missing <linux/of.h>.
+
+Signed-off-by: Artur Świgoń <a.swigon@samsung.com>
+[cw00.choi: Edit patch title and description]
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/exynos-bus.c | 54 ++++++++++++++++----------------------------
+ 1 file changed, 19 insertions(+), 35 deletions(-)
+
+diff --git a/drivers/devfreq/exynos-bus.c b/drivers/devfreq/exynos-bus.c
+index 19d9f9f8ced2..7f5917d59072 100644
+--- a/drivers/devfreq/exynos-bus.c
++++ b/drivers/devfreq/exynos-bus.c
+@@ -15,11 +15,10 @@
+ #include <linux/device.h>
+ #include <linux/export.h>
+ #include <linux/module.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
+ #include <linux/pm_opp.h>
+ #include <linux/platform_device.h>
+ #include <linux/regulator/consumer.h>
+-#include <linux/slab.h>
+ 
+ #define DEFAULT_SATURATION_RATIO	40
+ 
+@@ -301,10 +300,9 @@ static int exynos_bus_profile_init(struct exynos_bus *bus,
+ 	profile->exit = exynos_bus_exit;
+ 
+ 	ondemand_data = devm_kzalloc(dev, sizeof(*ondemand_data), GFP_KERNEL);
+-	if (!ondemand_data) {
+-		ret = -ENOMEM;
+-		goto err;
+-	}
++	if (!ondemand_data)
++		return -ENOMEM;
++
+ 	ondemand_data->upthreshold = 40;
+ 	ondemand_data->downdifferential = 5;
+ 
+@@ -314,15 +312,14 @@ static int exynos_bus_profile_init(struct exynos_bus *bus,
+ 						ondemand_data);
+ 	if (IS_ERR(bus->devfreq)) {
+ 		dev_err(dev, "failed to add devfreq device\n");
+-		ret = PTR_ERR(bus->devfreq);
+-		goto err;
++		return PTR_ERR(bus->devfreq);
+ 	}
+ 
+ 	/* Register opp_notifier to catch the change of OPP  */
+ 	ret = devm_devfreq_register_opp_notifier(dev, bus->devfreq);
+ 	if (ret < 0) {
+ 		dev_err(dev, "failed to register opp notifier\n");
+-		goto err;
++		return ret;
+ 	}
+ 
+ 	/*
+@@ -332,17 +329,16 @@ static int exynos_bus_profile_init(struct exynos_bus *bus,
+ 	ret = exynos_bus_enable_edev(bus);
+ 	if (ret < 0) {
+ 		dev_err(dev, "failed to enable devfreq-event devices\n");
+-		goto err;
++		return ret;
+ 	}
+ 
+ 	ret = exynos_bus_set_event(bus);
+ 	if (ret < 0) {
+ 		dev_err(dev, "failed to set event to devfreq-event devices\n");
+-		goto err;
++		return ret;
+ 	}
+ 
+-err:
+-	return ret;
++	return 0;
+ }
+ 
+ static int exynos_bus_profile_init_passive(struct exynos_bus *bus,
+@@ -351,7 +347,6 @@ static int exynos_bus_profile_init_passive(struct exynos_bus *bus,
+ 	struct device *dev = bus->dev;
+ 	struct devfreq_passive_data *passive_data;
+ 	struct devfreq *parent_devfreq;
+-	int ret = 0;
+ 
+ 	/* Initialize the struct profile and governor data for passive device */
+ 	profile->target = exynos_bus_target;
+@@ -359,16 +354,13 @@ static int exynos_bus_profile_init_passive(struct exynos_bus *bus,
+ 
+ 	/* Get the instance of parent devfreq device */
+ 	parent_devfreq = devfreq_get_devfreq_by_phandle(dev, 0);
+-	if (IS_ERR(parent_devfreq)) {
+-		ret = -EPROBE_DEFER;
+-		goto err;
+-	}
++	if (IS_ERR(parent_devfreq))
++		return -EPROBE_DEFER;
+ 
+ 	passive_data = devm_kzalloc(dev, sizeof(*passive_data), GFP_KERNEL);
+-	if (!passive_data) {
+-		ret = -ENOMEM;
+-		goto err;
+-	}
++	if (!passive_data)
++		return -ENOMEM;
++
+ 	passive_data->parent = parent_devfreq;
+ 
+ 	/* Add devfreq device for exynos bus with passive governor */
+@@ -377,12 +369,10 @@ static int exynos_bus_profile_init_passive(struct exynos_bus *bus,
+ 	if (IS_ERR(bus->devfreq)) {
+ 		dev_err(dev,
+ 			"failed to add devfreq dev with passive governor\n");
+-		ret = PTR_ERR(bus->devfreq);
+-		goto err;
++		return PTR_ERR(bus->devfreq);
+ 	}
+ 
+-err:
+-	return ret;
++	return 0;
+ }
+ 
+ static int exynos_bus_probe(struct platform_device *pdev)
+@@ -427,19 +417,13 @@ static int exynos_bus_probe(struct platform_device *pdev)
+ 		goto err_reg;
+ 
+ 	if (passive)
+-		goto passive;
+-
+-	ret = exynos_bus_profile_init(bus, profile);
+-	if (ret < 0)
+-		goto err;
++		ret = exynos_bus_profile_init_passive(bus, profile);
++	else
++		ret = exynos_bus_profile_init(bus, profile);
+ 
+-	goto out;
+-passive:
+-	ret = exynos_bus_profile_init_passive(bus, profile);
+ 	if (ret < 0)
+ 		goto err;
+ 
+-out:
+ 	max_state = bus->devfreq->profile->max_state;
+ 	min_freq = (bus->devfreq->profile->freq_table[0] / 1000);
+ 	max_freq = (bus->devfreq->profile->freq_table[max_state - 1] / 1000);
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 15e4e74ea899515bf4eaf6d400d0c04f5433f15a Mon Sep 17 00:00:00 2001
+From: Leonard Crestez <leonard.crestez@nxp.com>
+Date: Thu, 19 Dec 2019 17:42:47 +0200
+Subject: PM / devfreq: imx8m-ddrc: Remove unused defines
+
+The IMX_SIP_DDR_DVFS_WAIT_CHANGE and IMX_SIP_DDR_FREQ_SET_HIGH defines
+are not used so they can be removed.
+
+Fixes: 518e99e2a22e ("PM / devfreq: Add dynamic scaling for imx8m ddr controller")
+Reported-by: Shawn Guo <shawn.guo@kernel.org>
+Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/imx8m-ddrc.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/devfreq/imx8m-ddrc.c b/drivers/devfreq/imx8m-ddrc.c
+index 01ff9afdc8bf..53df7923d893 100644
+--- a/drivers/devfreq/imx8m-ddrc.c
++++ b/drivers/devfreq/imx8m-ddrc.c
+@@ -15,12 +15,6 @@
+ 
+ #define IMX_SIP_DDR_DVFS			0xc2000004
+ 
+-/* Values starting from 0 switch to specific frequency */
+-#define IMX_SIP_DDR_FREQ_SET_HIGH		0x00
+-
+-/* Deprecated after moving IRQ handling to ATF */
+-#define IMX_SIP_DDR_DVFS_WAIT_CHANGE		0x0F
+-
+ /* Query available frequencies. */
+ #define IMX_SIP_DDR_DVFS_GET_FREQ_COUNT		0x10
+ #define IMX_SIP_DDR_DVFS_GET_FREQ_INFO		0x11
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 39a6e4739c19d5334e552d71ceca544ed84f4b87 Mon Sep 17 00:00:00 2001
+From: Yangtao Li <tiny.windzz@gmail.com>
+Date: Sun, 22 Dec 2019 17:41:31 +0000
+Subject: PM / devfreq: rk3399_dmc: Disable devfreq-event device when fails
+
+The probe process may fail, but the devfreq event device remains
+enabled. Call devfreq_event_disable_edev on the error return path.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/rk3399_dmc.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/devfreq/rk3399_dmc.c b/drivers/devfreq/rk3399_dmc.c
+index 2f1027c5b647..24f04f78285b 100644
+--- a/drivers/devfreq/rk3399_dmc.c
++++ b/drivers/devfreq/rk3399_dmc.c
+@@ -364,7 +364,8 @@ static int rk3399_dmcfreq_probe(struct platform_device *pdev)
+ 			if (res.a0) {
+ 				dev_err(dev, "Failed to set dram param: %ld\n",
+ 					res.a0);
+-				return -EINVAL;
++				ret = -EINVAL;
++				goto err_edev;
+ 			}
+ 		}
+ 	}
+@@ -373,8 +374,10 @@ static int rk3399_dmcfreq_probe(struct platform_device *pdev)
+ 	if (node) {
+ 		data->regmap_pmu = syscon_node_to_regmap(node);
+ 		of_node_put(node);
+-		if (IS_ERR(data->regmap_pmu))
+-			return PTR_ERR(data->regmap_pmu);
++		if (IS_ERR(data->regmap_pmu)) {
++			ret = PTR_ERR(data->regmap_pmu);
++			goto err_edev;
++		}
+ 	}
+ 
+ 	regmap_read(data->regmap_pmu, RK3399_PMUGRF_OS_REG2, &val);
+@@ -392,7 +395,8 @@ static int rk3399_dmcfreq_probe(struct platform_device *pdev)
+ 		data->odt_dis_freq = data->timing.lpddr4_odt_dis_freq;
+ 		break;
+ 	default:
+-		return -EINVAL;
++		ret = -EINVAL;
++		goto err_edev;
+ 	};
+ 
+ 	arm_smccc_smc(ROCKCHIP_SIP_DRAM_FREQ, 0, 0,
+@@ -426,7 +430,8 @@ static int rk3399_dmcfreq_probe(struct platform_device *pdev)
+ 	 */
+ 	if (dev_pm_opp_of_add_table(dev)) {
+ 		dev_err(dev, "Invalid operating-points in device tree.\n");
+-		return -EINVAL;
++		ret = -EINVAL;
++		goto err_edev;
+ 	}
+ 
+ 	of_property_read_u32(np, "upthreshold",
+@@ -466,6 +471,9 @@ static int rk3399_dmcfreq_probe(struct platform_device *pdev)
+ 
+ err_free_opp:
+ 	dev_pm_opp_of_remove_table(&pdev->dev);
++err_edev:
++	devfreq_event_disable_edev(data->edev);
++
+ 	return ret;
+ }
+ 
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 6c315d8fe3c931e1f2e7c34c8d81d6016db8f978 Mon Sep 17 00:00:00 2001
+From: Yangtao Li <tiny.windzz@gmail.com>
+Date: Sun, 22 Dec 2019 17:41:32 +0000
+Subject: PM / devfreq: exynos-bus: Disable devfreq-event device when fails
+
+The exynos_bus_profile_init process may fail, but the devfreq event device
+remains enabled. Call devfreq_event_disable_edev on the error return path.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/exynos-bus.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/devfreq/exynos-bus.c b/drivers/devfreq/exynos-bus.c
+index 7f5917d59072..1259a0da7db7 100644
+--- a/drivers/devfreq/exynos-bus.c
++++ b/drivers/devfreq/exynos-bus.c
+@@ -335,10 +335,16 @@ static int exynos_bus_profile_init(struct exynos_bus *bus,
+ 	ret = exynos_bus_set_event(bus);
+ 	if (ret < 0) {
+ 		dev_err(dev, "failed to set event to devfreq-event devices\n");
+-		return ret;
++		goto err_edev;
+ 	}
+ 
+ 	return 0;
++
++err_edev:
++	if (exynos_bus_disable_edev(bus))
++		dev_warn(dev, "failed to disable the devfreq-event devices\n");
++
++	return ret;
+ }
+ 
+ static int exynos_bus_profile_init_passive(struct exynos_bus *bus,
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 28135762b83ab5767fecafb997f2dc760b7d2739 Mon Sep 17 00:00:00 2001
+From: Yangtao Li <tiny.windzz@gmail.com>
+Date: Tue, 24 Dec 2019 14:49:54 +0000
+Subject: PM / devfreq: exynos-bus: Add error log when fail to get
+ devfreq-event
+
+Adding an error log makes it easier to trace the function's error path.
+Because the error code may be rewritten on return, print error code here.
+
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/exynos-bus.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/devfreq/exynos-bus.c b/drivers/devfreq/exynos-bus.c
+index 1259a0da7db7..8fa8eb541373 100644
+--- a/drivers/devfreq/exynos-bus.c
++++ b/drivers/devfreq/exynos-bus.c
+@@ -126,6 +126,7 @@ static int exynos_bus_get_dev_status(struct device *dev,
+ 
+ 	ret = exynos_bus_get_event(bus, &edata);
+ 	if (ret < 0) {
++		dev_err(dev, "failed to get event from devfreq-event devices\n");
+ 		stat->total_time = stat->busy_time = 0;
+ 		goto err;
+ 	}
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 10800fec619d56acd04b1de86b6c3473bb04c2a8 Mon Sep 17 00:00:00 2001
+From: YueHaibing <yuehaibing@huawei.com>
+Date: Mon, 30 Dec 2019 16:47:31 +0800
+Subject: PM / devfreq: imx8m-ddrc: Fix inconsistent IS_ERR and PTR_ERR
+
+Fix inconsistent IS_ERR and PTR_ERR in imx8m_ddrc_probe().
+Detected using Coccinelle.
+
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/imx8m-ddrc.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/devfreq/imx8m-ddrc.c b/drivers/devfreq/imx8m-ddrc.c
+index 53df7923d893..bc82d3653bff 100644
+--- a/drivers/devfreq/imx8m-ddrc.c
++++ b/drivers/devfreq/imx8m-ddrc.c
+@@ -395,15 +395,27 @@ static int imx8m_ddrc_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	priv->dram_core = devm_clk_get(dev, "core");
++	if (IS_ERR(priv->dram_core)) {
++		ret = PTR_ERR(priv->dram_core);
++		dev_err(dev, "failed to fetch core clock: %d\n", ret);
++		return ret;
++	}
+ 	priv->dram_pll = devm_clk_get(dev, "pll");
++	if (IS_ERR(priv->dram_pll)) {
++		ret = PTR_ERR(priv->dram_pll);
++		dev_err(dev, "failed to fetch pll clock: %d\n", ret);
++		return ret;
++	}
+ 	priv->dram_alt = devm_clk_get(dev, "alt");
++	if (IS_ERR(priv->dram_alt)) {
++		ret = PTR_ERR(priv->dram_alt);
++		dev_err(dev, "failed to fetch alt clock: %d\n", ret);
++		return ret;
++	}
+ 	priv->dram_apb = devm_clk_get(dev, "apb");
+-	if (IS_ERR(priv->dram_core) ||
+-		IS_ERR(priv->dram_pll) ||
+-		IS_ERR(priv->dram_alt) ||
+-		IS_ERR(priv->dram_apb)) {
+-		ret = PTR_ERR(priv->devfreq);
+-		dev_err(dev, "failed to fetch clocks: %d\n", ret);
++	if (IS_ERR(priv->dram_apb)) {
++		ret = PTR_ERR(priv->dram_apb);
++		dev_err(dev, "failed to fetch apb clock: %d\n", ret);
+ 		return ret;
+ 	}
+ 
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 91d7f3f8f1346ac5899c7e25a0dbd409212cdf53 Mon Sep 17 00:00:00 2001
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Date: Sat, 4 Jan 2020 16:21:00 +0100
+Subject: PM / devfreq: exynos: Rename Exynos to lowercase
+
+Fix up inconsistent usage of upper and lowercase letters in "Exynos"
+name.
+
+"EXYNOS" is not an abbreviation but a regular trademarked name.
+Therefore it should be written with lowercase letters starting with
+capital letter.
+
+The lowercase "Exynos" name is promoted by its manufacturer Samsung
+Electronics Co., Ltd., in advertisement materials and on website.
+
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/Kconfig             | 2 +-
+ drivers/devfreq/event/Kconfig       | 4 ++--
+ drivers/devfreq/event/exynos-nocp.c | 2 +-
+ drivers/devfreq/event/exynos-nocp.h | 2 +-
+ drivers/devfreq/event/exynos-ppmu.c | 2 +-
+ drivers/devfreq/event/exynos-ppmu.h | 2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/devfreq/Kconfig b/drivers/devfreq/Kconfig
+index 1526f758daeb..0b1df12e0f21 100644
+--- a/drivers/devfreq/Kconfig
++++ b/drivers/devfreq/Kconfig
+@@ -77,7 +77,7 @@ config DEVFREQ_GOV_PASSIVE
+ comment "DEVFREQ Drivers"
+ 
+ config ARM_EXYNOS_BUS_DEVFREQ
+-	tristate "ARM EXYNOS Generic Memory Bus DEVFREQ Driver"
++	tristate "ARM Exynos Generic Memory Bus DEVFREQ Driver"
+ 	depends on ARCH_EXYNOS || COMPILE_TEST
+ 	select DEVFREQ_GOV_SIMPLE_ONDEMAND
+ 	select DEVFREQ_GOV_PASSIVE
+diff --git a/drivers/devfreq/event/Kconfig b/drivers/devfreq/event/Kconfig
+index a53e0a6ffdfe..878825372f6f 100644
+--- a/drivers/devfreq/event/Kconfig
++++ b/drivers/devfreq/event/Kconfig
+@@ -15,7 +15,7 @@ menuconfig PM_DEVFREQ_EVENT
+ if PM_DEVFREQ_EVENT
+ 
+ config DEVFREQ_EVENT_EXYNOS_NOCP
+-	tristate "EXYNOS NoC (Network On Chip) Probe DEVFREQ event Driver"
++	tristate "Exynos NoC (Network On Chip) Probe DEVFREQ event Driver"
+ 	depends on ARCH_EXYNOS || COMPILE_TEST
+ 	select PM_OPP
+ 	select REGMAP_MMIO
+@@ -24,7 +24,7 @@ config DEVFREQ_EVENT_EXYNOS_NOCP
+ 	  (Network on Chip) Probe counters to measure the bandwidth of AXI bus.
+ 
+ config DEVFREQ_EVENT_EXYNOS_PPMU
+-	tristate "EXYNOS PPMU (Platform Performance Monitoring Unit) DEVFREQ event Driver"
++	tristate "Exynos PPMU (Platform Performance Monitoring Unit) DEVFREQ event Driver"
+ 	depends on ARCH_EXYNOS || COMPILE_TEST
+ 	select PM_OPP
+ 	help
+diff --git a/drivers/devfreq/event/exynos-nocp.c b/drivers/devfreq/event/exynos-nocp.c
+index 1c565926db9f..ccc531ee6938 100644
+--- a/drivers/devfreq/event/exynos-nocp.c
++++ b/drivers/devfreq/event/exynos-nocp.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /*
+- * exynos-nocp.c - EXYNOS NoC (Network On Chip) Probe support
++ * exynos-nocp.c - Exynos NoC (Network On Chip) Probe support
+  *
+  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+  * Author : Chanwoo Choi <cw00.choi@samsung.com>
+diff --git a/drivers/devfreq/event/exynos-nocp.h b/drivers/devfreq/event/exynos-nocp.h
+index 55cc96284a36..2d6f08cfd0c5 100644
+--- a/drivers/devfreq/event/exynos-nocp.h
++++ b/drivers/devfreq/event/exynos-nocp.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+- * exynos-nocp.h - EXYNOS NoC (Network on Chip) Probe header file
++ * exynos-nocp.h - Exynos NoC (Network on Chip) Probe header file
+  *
+  * Copyright (c) 2016 Samsung Electronics Co., Ltd.
+  * Author : Chanwoo Choi <cw00.choi@samsung.com>
+diff --git a/drivers/devfreq/event/exynos-ppmu.c b/drivers/devfreq/event/exynos-ppmu.c
+index 055deea42c37..17ed980d9099 100644
+--- a/drivers/devfreq/event/exynos-ppmu.c
++++ b/drivers/devfreq/event/exynos-ppmu.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /*
+- * exynos_ppmu.c - EXYNOS PPMU (Platform Performance Monitoring Unit) support
++ * exynos_ppmu.c - Exynos PPMU (Platform Performance Monitoring Unit) support
+  *
+  * Copyright (c) 2014-2015 Samsung Electronics Co., Ltd.
+  * Author : Chanwoo Choi <cw00.choi@samsung.com>
+diff --git a/drivers/devfreq/event/exynos-ppmu.h b/drivers/devfreq/event/exynos-ppmu.h
+index 284420047455..97f667d0cbdd 100644
+--- a/drivers/devfreq/event/exynos-ppmu.h
++++ b/drivers/devfreq/event/exynos-ppmu.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+ /*
+- * exynos_ppmu.h - EXYNOS PPMU header file
++ * exynos_ppmu.h - Exynos PPMU header file
+  *
+  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+  * Author : Chanwoo Choi <cw00.choi@samsung.com>
+-- 
+cgit 1.2-0.3.lf.el7
+
+
+From 490a421bc575d1bf391a6ad5b582dcfbd0037724 Mon Sep 17 00:00:00 2001
+From: Chanwoo Choi <cw00.choi@samsung.com>
+Date: Thu, 26 Dec 2019 14:23:49 +0900
+Subject: PM / devfreq: Add debugfs support with devfreq_summary file
+
+Add debugfs interface to provide debugging information of devfreq device.
+It contains 'devfreq_summary' entry to show the summary of registered
+devfreq devices as following and the additional debugfs file will be added.
+- /sys/kernel/debug/devfreq/devfreq_summary
+
+[Detailed description of each field of 'devfreq_summary' debugfs file]
+- dev_name	: Device name of h/w
+- dev		: Device name made by devfreq core
+- parent_dev	: If devfreq device uses the passive governor,
+		  show parent devfreq device name. Otherwise, show 'null'.
+- governor	: Devfreq governor name
+- polling_ms	: If devfreq device uses the simple_ondemand governor,
+		  polling_ms is necessary for the period. (unit: millisecond)
+- cur_freq_Hz	: Current frequency (unit: Hz)
+- min_freq_Hz	: Minimum frequency (unit: Hz)
+- max_freq_Hz	: Maximum frequency (unit: Hz)
+
+[For example on Exynos5422-based Odroid-XU3 board]
+$ cat /sys/kernel/debug/devfreq/devfreq_summary
+dev_name                       dev        parent_dev governor        polling_ms  cur_freq_Hz  min_freq_Hz  max_freq_Hz
+------------------------------ ---------- ---------- --------------- ---------- ------------ ------------ ------------
+10c20000.memory-controller     devfreq0   null       simple_ondemand          0    165000000    165000000    825000000
+soc:bus_wcore                  devfreq1   null       simple_ondemand         50    532000000     88700000    532000000
+soc:bus_noc                    devfreq2   devfreq1   passive                  0    111000000     66600000    111000000
+soc:bus_fsys_apb               devfreq3   devfreq1   passive                  0    222000000    111000000    222000000
+soc:bus_fsys                   devfreq4   devfreq1   passive                  0    200000000     75000000    200000000
+soc:bus_fsys2                  devfreq5   devfreq1   passive                  0    200000000     75000000    200000000
+soc:bus_mfc                    devfreq6   devfreq1   passive                  0    333000000     83250000    333000000
+soc:bus_gen                    devfreq7   devfreq1   passive                  0    266000000     88700000    266000000
+soc:bus_peri                   devfreq8   devfreq1   passive                  0     66600000     66600000     66600000
+soc:bus_g2d                    devfreq9   devfreq1   passive                  0    333000000     83250000    333000000
+soc:bus_g2d_acp                devfreq10  devfreq1   passive                  0    266000000     66500000    266000000
+soc:bus_jpeg                   devfreq11  devfreq1   passive                  0    300000000     75000000    300000000
+soc:bus_jpeg_apb               devfreq12  devfreq1   passive                  0    166500000     83250000    166500000
+soc:bus_disp1_fimd             devfreq13  devfreq1   passive                  0    200000000    120000000    200000000
+soc:bus_disp1                  devfreq14  devfreq1   passive                  0    300000000    120000000    300000000
+soc:bus_gscl_scaler            devfreq15  devfreq1   passive                  0    300000000    150000000    300000000
+soc:bus_mscl                   devfreq16  devfreq1   passive                  0    666000000     84000000    666000000
+
+[lkp: Reported the build error]
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Chanwoo Choi <cw00.choi@samsung.com>
+---
+ drivers/devfreq/devfreq.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
+
+diff --git a/drivers/devfreq/devfreq.c b/drivers/devfreq/devfreq.c
+index 89260b17598f..cceee8bc3c2f 100644
+--- a/drivers/devfreq/devfreq.c
++++ b/drivers/devfreq/devfreq.c
+@@ -10,6 +10,7 @@
+ #include <linux/kernel.h>
+ #include <linux/kmod.h>
+ #include <linux/sched.h>
++#include <linux/debugfs.h>
+ #include <linux/errno.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+@@ -33,6 +34,7 @@
+ #define HZ_PER_KHZ	1000
+ 
+ static struct class *devfreq_class;
++static struct dentry *devfreq_debugfs;
+ 
+ /*
+  * devfreq core provides delayed work based load monitoring helper
+@@ -1643,6 +1645,81 @@ static struct attribute *devfreq_attrs[] = {
+ };
+ ATTRIBUTE_GROUPS(devfreq);
+ 
++/**
++ * devfreq_summary_show() - Show the summary of the devfreq devices
++ * @s:		seq_file instance to show the summary of devfreq devices
++ * @data:	not used
++ *
++ * Show the summary of the devfreq devices via 'devfreq_summary' debugfs file.
++ * It helps that user can know the detailed information of the devfreq devices.
++ *
++ * Return 0 always because it shows the information without any data change.
++ */
++static int devfreq_summary_show(struct seq_file *s, void *data)
++{
++	struct devfreq *devfreq;
++	struct devfreq *p_devfreq = NULL;
++	unsigned long cur_freq, min_freq, max_freq;
++	unsigned int polling_ms;
++
++	seq_printf(s, "%-30s %-10s %-10s %-15s %10s %12s %12s %12s\n",
++			"dev_name",
++			"dev",
++			"parent_dev",
++			"governor",
++			"polling_ms",
++			"cur_freq_Hz",
++			"min_freq_Hz",
++			"max_freq_Hz");
++	seq_printf(s, "%30s %10s %10s %15s %10s %12s %12s %12s\n",
++			"------------------------------",
++			"----------",
++			"----------",
++			"---------------",
++			"----------",
++			"------------",
++			"------------",
++			"------------");
++
++	mutex_lock(&devfreq_list_lock);
++
++	list_for_each_entry_reverse(devfreq, &devfreq_list, node) {
++#if IS_ENABLED(CONFIG_DEVFREQ_GOV_PASSIVE)
++		if (!strncmp(devfreq->governor_name, DEVFREQ_GOV_PASSIVE,
++							DEVFREQ_NAME_LEN)) {
++			struct devfreq_passive_data *data = devfreq->data;
++
++			if (data)
++				p_devfreq = data->parent;
++		} else {
++			p_devfreq = NULL;
++		}
++#endif
++
++		mutex_lock(&devfreq->lock);
++		cur_freq = devfreq->previous_freq,
++		get_freq_range(devfreq, &min_freq, &max_freq);
++		polling_ms = devfreq->profile->polling_ms,
++		mutex_unlock(&devfreq->lock);
++
++		seq_printf(s,
++			"%-30s %-10s %-10s %-15s %10d %12ld %12ld %12ld\n",
++			dev_name(devfreq->dev.parent),
++			dev_name(&devfreq->dev),
++			p_devfreq ? dev_name(&p_devfreq->dev) : "null",
++			devfreq->governor_name,
++			polling_ms,
++			cur_freq,
++			min_freq,
++			max_freq);
++	}
++
++	mutex_unlock(&devfreq_list_lock);
++
++	return 0;
++}
++DEFINE_SHOW_ATTRIBUTE(devfreq_summary);
++
+ static int __init devfreq_init(void)
+ {
+ 	devfreq_class = class_create(THIS_MODULE, "devfreq");
+@@ -1659,6 +1736,11 @@ static int __init devfreq_init(void)
+ 	}
+ 	devfreq_class->dev_groups = devfreq_groups;
+ 
++	devfreq_debugfs = debugfs_create_dir("devfreq", NULL);
++	debugfs_create_file("devfreq_summary", 0444,
++				devfreq_debugfs, NULL,
++				&devfreq_summary_fops);
++
+ 	return 0;
+ }
+ subsys_initcall(devfreq_init);
+-- 
+cgit 1.2-0.3.lf.el7
+

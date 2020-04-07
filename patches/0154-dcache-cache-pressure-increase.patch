@@ -1,0 +1,21 @@
+commit 6fb4d5312aab15d66c6a67aa96b39e49c98af792
+Author: Alexandre Frade <admfrade@gmail.com>
+Date:   Mon Jan 29 16:59:22 2018 +0000
+
+    dcache: cache_pressure = 50 decreases the rate at which VFS caches are reclaimed
+    
+    Signed-off-by: Alexandre Frade <admfrade@gmail.com>
+
+diff --git a/fs/dcache.c b/fs/dcache.c
+index b280e07e162b..74e90f940792 100644
+--- a/fs/dcache.c
++++ b/fs/dcache.c
+@@ -71,7 +71,7 @@
+  * If no ancestor relationship:
+  * arbitrary, since it's serialized on rename_lock
+  */
+-int sysctl_vfs_cache_pressure __read_mostly = 100;
++int sysctl_vfs_cache_pressure __read_mostly = 50;
+ EXPORT_SYMBOL_GPL(sysctl_vfs_cache_pressure);
+ 
+ __cacheline_aligned_in_smp DEFINE_SEQLOCK(rename_lock);

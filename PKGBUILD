@@ -61,7 +61,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ck
-pkgver=5.5.15
+pkgver=5.6.2
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -106,19 +106,29 @@ prepare() {
   echo "${pkgbase#linux}" > localversion.20-pkgname
 
 
-  echo "Applying huge patches..."
-  for file in ../../patches/hugepatches/*.patch;
-  do
-      echo -e "\e[32m$file\e[39m"
-      patch -Np1 < "$file"
-  done
+  if [ $(ls -A ../../patches/hugepatches/*.patch 2>/dev/null | wc -l) -gt 0 ]
+  then
+    echo "Applying huge patches..."
+    for file in ../../patches/hugepatches/*.patch;
+    do
+       echo -e "\e[32m$file\e[39m"
+       patch -Np1 < "$file"
+    done
+  else
+    echo -e "\e[31mNo huge patches...\e[39m"
+  fi
 
-  echo "Applying patches..."
-  for file in ../../patches/*.patch;
-  do
-      echo -e "\e[32m$file\e[39m"
-      patch -Np1 < "$file"
-  done
+  if [ $(ls -A ../../patches/*.patch 2>/dev/null | wc -l) -gt 0 ]
+  then  
+    echo "Applying patches..."
+    for file in ../../patches/*.patch;
+    do
+        echo -e "\e[32m$file\e[39m"
+        patch -Np1 < "$file"
+    done
+  else
+    echo -e "\e[31mNo patches...\e[39m"
+  fi
 
 
 

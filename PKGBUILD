@@ -5,7 +5,7 @@
 # Set these variables to ANYTHING that is not null to enable them
 
 # Tweak kernel options prior to a build via nconfig
-_makenconfig=v
+_makenconfig=
 
 # Optionally select a sub architecture by number if building in a clean chroot
 # Leaving this entry blank will require user interaction during the build
@@ -46,7 +46,7 @@ _makenconfig=v
 #  29. Intel Cascade Lake (MCASCADELAKE)
 #  30. Generic-x86-64 (GENERIC_CPU)
 #  31. Native optimizations autodetected by GCC (MNATIVE)
-_subarch=11
+_subarch=
 
 # Compile ONLY used modules to VASTLYreduce the number of modules built
 # and the build time.

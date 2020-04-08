@@ -1,0 +1,30 @@
+commit 1a3c0509ce83ce48104907207423c6eb929caa59
+Author: Namjae Jeon <namjae.jeon@samsung.com>
+Date:   Mon Mar 2 15:21:44 2020 +0900
+
+    staging: exfat: make staging/exfat and fs/exfat mutually exclusive
+    
+    Make staging/exfat and fs/exfat mutually exclusive to select the one
+    between two same filesystem.
+    
+    Suggested-by: Amir Goldstein <amir73il@gmail.com>
+    Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
+    Signed-off-by: Sungjong Seo <sj1557.seo@samsung.com>
+    Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Reviewed-by: Pali Rohár <pali.rohar@gmail.com>
+    Reviewed-by: Christoph Hellwig <hch@lst.de>
+    Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+
+diff --git a/drivers/staging/exfat/Kconfig b/drivers/staging/exfat/Kconfig
+index 292a19dfcaf5..9a0fccec65d9 100644
+--- a/drivers/staging/exfat/Kconfig
++++ b/drivers/staging/exfat/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ config STAGING_EXFAT_FS
+ 	tristate "exFAT fs support"
+-	depends on BLOCK
++	depends on BLOCK && !EXFAT_FS
+ 	select NLS
+ 	help
+ 	  This adds support for the exFAT file system.

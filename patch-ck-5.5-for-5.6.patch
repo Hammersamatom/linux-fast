@@ -1,0 +1,100 @@
+--- a/patch-5.5-ck1	2020-04-07 18:16:09.006734000 -0400
++++ b/patch-5.5-ck1	2020-04-07 19:03:20.964029625 -0400
+@@ -938,10 +938,10 @@
+  CONFIG_TASKSTATS=y
+  CONFIG_TASK_DELAY_ACCT=y
+  CONFIG_TASK_XACCT=y
+-@@ -27,6 +27,11 @@ CONFIG_MODVERSIONS=y
++@@ -27,6 +27,11 @@ CONFIG_MODULE_UNLOAD=y
++ CONFIG_MODULE_FORCE_UNLOAD=y
++ CONFIG_MODVERSIONS=y 
+  CONFIG_BLK_DEV_INTEGRITY=y
+- # CONFIG_IOSCHED_DEADLINE is not set
+- # CONFIG_IOSCHED_CFQ is not set
+ +# CONFIG_ARCH_MULTI_V7 is not set
+ +CONFIG_ARCH_MXS=y
+ +# CONFIG_ARM_THUMB is not set
+@@ -1111,45 +1111,30 @@
+  CONFIG_BSD_PROCESS_ACCT=y
+  CONFIG_IKCONFIG=y
+  CONFIG_IKCONFIG_PROC=y
+-diff --git a/arch/parisc/configs/712_defconfig b/arch/parisc/configs/712_defconfig
+-index d3e3d94e90c3..578524f80cc4 100644
+---- a/arch/parisc/configs/712_defconfig
+-+++ b/arch/parisc/configs/712_defconfig
+-@@ -13,7 +13,7 @@ CONFIG_MODULES=y
+- CONFIG_MODULE_UNLOAD=y
+- CONFIG_MODULE_FORCE_UNLOAD=y
+- CONFIG_PA7100LC=y
+--CONFIG_PREEMPT_VOLUNTARY=y
+-+CONFIG_PREEMPT=y
+- CONFIG_GSC_LASI=y
+- # CONFIG_PDC_CHASSIS is not set
+- CONFIG_BINFMT_MISC=m
+-diff --git a/arch/parisc/configs/c3000_defconfig b/arch/parisc/configs/c3000_defconfig
++diff --git a/arch/parisc/configs/generic-32bit_defconfig b/arch/parisc/configs/generic-32bit_defconfig
+ index 64d45a8b6ca0..d1bdfad94048 100644
+---- a/arch/parisc/configs/c3000_defconfig
+-+++ b/arch/parisc/configs/c3000_defconfig
+-@@ -13,7 +13,7 @@ CONFIG_MODULES=y
++--- a/arch/parisc/configs/generic-32bit_defconfig
+++++ b/arch/parisc/configs/generic_32bit_defconfig
++@@ -19,6 +19,7 @@
++ CONFIG_GSC_DINO=y
++ CONFIG_PCI_LBA=y
++ # CONFIG_PDC_CHASSIS is not set
+++CONFIG_PREEMPT=y
++ CONFIG_MODULES=y
+  CONFIG_MODULE_UNLOAD=y
+  CONFIG_MODULE_FORCE_UNLOAD=y
+- CONFIG_PA8X00=y
+--CONFIG_PREEMPT_VOLUNTARY=y
+-+CONFIG_PREEMPT=y
+- # CONFIG_GSC is not set
+- CONFIG_PCI=y
+- CONFIG_PCI_LBA=y
+-diff --git a/arch/parisc/configs/defconfig b/arch/parisc/configs/defconfig
++diff --git a/arch/parisc/configs/generic-64bit_defconfig b/arch/parisc/configs/generic-64bit_defconfig
+ index 5b877ca34ebf..0d976614934c 100644
+---- a/arch/parisc/configs/defconfig
+-+++ b/arch/parisc/configs/defconfig
+-@@ -14,7 +14,7 @@ CONFIG_MODULE_UNLOAD=y
+- CONFIG_MODULE_FORCE_UNLOAD=y
+- # CONFIG_BLK_DEV_BSG is not set
+- CONFIG_PA7100LC=y
+--CONFIG_PREEMPT_VOLUNTARY=y
+-+CONFIG_PREEMPT=y
+- CONFIG_IOMMU_CCIO=y
+- CONFIG_GSC_LASI=y
++--- a/arch/parisc/configs/generic-64bit_defconfig
+++++ b/arch/parisc/configs/generic_64bit_defconfig
++@@ -26,6 +26,7 @@
+  CONFIG_GSC_WAX=y
++ CONFIG_GSC_DINO=y
++ CONFIG_PCI_LBA=y
+++CONFIG_PREEMPT=y
++ CONFIG_MODULES=y
++ CONFIG_MODULE_FORCE_LOAD=y
++ CONFIG_MODULE_UNLOAD=y
+ diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+ index e2a412113359..a8fa2e3c05a6 100644
+ --- a/arch/powerpc/Kconfig
+@@ -11632,14 +11617,15 @@
+ index 7dc20a3232e7..e733a0a53b0a 100644
+ --- a/kernel/sched/cpupri.h
+ +++ b/kernel/sched/cpupri.h
+-@@ -17,9 +17,11 @@ struct cpupri {
++@@ -17,6 +17,7 @@
+  	int			*cpu_to_pri;
+  };
+  
+ +#ifndef CONFIG_SCHED_MUQSS
+  #ifdef CONFIG_SMP
+- int  cpupri_find(struct cpupri *cp, struct task_struct *p, struct cpumask *lowest_mask);
+- void cpupri_set(struct cpupri *cp, int cpu, int pri);
++ int  cpupri_find(struct cpupri *cp, struct task_struct *p,
++ 		 struct cpumask *lowest_mask,
++@@ -25,3 +26,4 @@
+  int  cpupri_init(struct cpupri *cp);
+  void cpupri_cleanup(struct cpupri *cp);
+  #endif

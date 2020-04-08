@@ -78,6 +78,8 @@ source=(
   config         # the main kernel config file
   "enable_additional_cpu_optimizations-$_gcc_more_v.tar.gz::https://github.com/graysky2/kernel_gcc_patch/archive/$_gcc_more_v.tar.gz"
   "http://ck.kolivas.org/patches/5.0/5.5/5.5-ck${_ckpatchversion}/$_ckpatch.xz"
+  "patch-ck-5.5-for-5.6.patch"
+  "patch-fix-schedutil-for-ck.patch"
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
@@ -87,7 +89,9 @@ sha256sums=('SKIP'
             'SKIP'
             'SKIP'
             '7a4a209de815f4bae49c7c577c0584c77257e3953ac4324d2aa425859ba657f5'
-            '37a9d61e8a0b5a73992e1397c3a9cc947d39e715f205f3c665eb157b96d58f98')
+            'SKIP'
+            'SKIP'
+            'SKIP')
 
 export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
@@ -130,7 +134,16 @@ prepare() {
     echo -e "\e[31mNo patches...\e[39m"
   fi
 
-
+  echo -e "\e[32mPatching the CK patchet itself\e[39m"
+  cd ..
+  
+  patch -Np1 -i patch-ck-5.5-for-5.6.patch
+  
+  cd linux-${pkgver}
+  
+  echo -e "\e[32mPatching schedutil for 5.6 changes\e[39m"
+  patch -Np1 -i ../patch-fix-schedutil-for-ck.patch
+  
 
 
 

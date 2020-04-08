@@ -1,0 +1,15 @@
+--- a/kernel/sched/cpufreq_schedutil.c	2020-04-02 02:02:32.000000000 -0400
++++ b/kernel/sched/cpufreq_schedutil.c	2020-04-07 23:22:46.945567681 -0400
+@@ -238,7 +238,11 @@
+ 	 */
+ 	util = util_cfs + cpu_util_rt(rq);
+ 	if (type == FREQUENCY_UTIL)
+-		util = uclamp_rq_util_with(rq, util, p);
++#ifdef CONFIG_SCHED_MUQSS
++        util = uclamp_util_with(rq, util, p);
++#else
++        util = uclamp_rq_util_with(rq, util, p);
++#endif
+ 
+ 	dl_util = cpu_util_dl(rq);
+ 

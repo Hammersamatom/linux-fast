@@ -5,7 +5,7 @@
 # Set these variables to ANYTHING that is not null to enable them
 
 # Tweak kernel options prior to a build via nconfig
-_makenconfig=n
+_makenconfig=
 
 # Optionally select a sub architecture by number if building in a clean chroot
 # Leaving this entry blank will require user interaction during the build
@@ -60,7 +60,7 @@ _localmodcfg=
 
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
-pkgbase=linux-ck
+pkgbase=linux-ft
 pkgver=5.6.3
 pkgrel=1
 _ckpatchversion=1
@@ -220,7 +220,7 @@ _package() {
   depends=(coreutils kmod initramfs)
   optdepends=('crda: to set the correct wireless channels of your country'
               'linux-firmware: firmware images needed for some devices')
-  provides=("linux-ck=${pkgver}")
+  provides=("linux-fk=${pkgver}")
   #groups=('ck-generic')
 
   cd linux-${pkgver}
@@ -252,8 +252,8 @@ _package() {
 
 _package-headers() {
   pkgdesc="Headers and scripts for building modules for ${pkgbase/linux/Linux} kernel"
-  depends=('linux-ck') # added to keep kernel and headers packages matched
-  provides=("linux-ck-headers=${pkgver}" "linux-headers=${pkgver}")
+  depends=('linux-ft') # added to keep kernel and headers packages matched
+  provides=("linux-ft-headers=${pkgver}" "linux-headers=${pkgver}")
   #groups=('ck-generic')
 
   cd linux-${pkgver}

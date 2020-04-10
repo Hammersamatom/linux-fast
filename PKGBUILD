@@ -46,7 +46,7 @@ _makenconfig=
 #  29. Intel Cascade Lake (MCASCADELAKE)
 #  30. Generic-x86-64 (GENERIC_CPU)
 #  31. Native optimizations autodetected by GCC (MNATIVE)
-_subarch=
+_subarch=11
 
 # Compile ONLY used modules to VASTLYreduce the number of modules built
 # and the build time.
@@ -109,7 +109,6 @@ prepare() {
   echo "-$pkgrel" > localversion.10-pkgrel
   echo "${pkgbase#linux}" > localversion.20-pkgname
 
-
   if [ $(ls -A ../../patches/hugepatches/*.patch 2>/dev/null | wc -l) -gt 0 ]
   then
     echo "Applying huge patches..."
@@ -127,8 +126,8 @@ prepare() {
     echo "Applying patches..."
     for file in ../../patches/*.patch;
     do
-        echo -e "\e[32m$file\e[39m"
-        patch -Np1 < "$file"
+      echo -e "\e[32m$file\e[39m"
+      patch -Np1 < "$file"
     done
   else
     echo -e "\e[31mNo patches...\e[39m"
@@ -136,7 +135,7 @@ prepare() {
 
   echo -e "\e[32mPatching the CK patchet itself\e[39m"
   cd ..
-  
+
   patch -Np1 -i patch-ck-5.5-for-5.6.patch
   
   cd linux-${pkgver}
@@ -156,7 +155,7 @@ prepare() {
   # https://bbs.archlinux.org/viewtopic.php?pid=1863567#p1863567
   sed -i -e '/CONFIG_LATENCYTOP=/ s,y,n,' \
       -i -e '/CONFIG_SCHED_DEBUG=/ s,y,n,' ./.config
-
+  
   # fix naming schema in EXTRAVERSION of ck patch set
   sed -i -re "s/^(.EXTRAVERSION).*$/\1 = /" "../${_ckpatch}"
 
@@ -186,21 +185,21 @@ prepare() {
 
   ### Optionally load needed modules for the make localmodconfig
   # See https://aur.archlinux.org/packages/modprobed-db
-    if [ -n "$_localmodcfg" ]; then
-      if [ -f $HOME/.config/modprobed.db ]; then
-        echo "Running Steven Rostedt's make localmodconfig now"
-        make LSMOD=$HOME/.config/modprobed.db localmodconfig
-      else
-        echo "No modprobed.db data found"
-        exit
-      fi
+  if [ -n "$_localmodcfg" ]; then
+    if [ -f $HOME/.config/modprobed.db ]; then
+      echo "Running Steven Rostedt's make localmodconfig now"
+      make LSMOD=$HOME/.config/modprobed.db localmodconfig
+    else
+      echo "No modprobed.db data found"
+      exit
     fi
+  fi
 
   make -s kernelrelease > version
   echo "Prepared $pkgbase version $(<version)"
-
+ 
   [[ -z "$_makenconfig" ]] || make nconfig
-
+  
   # save configuration for later reuse
   cat .config > "${startdir}/config.last"
 
@@ -220,7 +219,7 @@ _package() {
   depends=(coreutils kmod initramfs)
   optdepends=('crda: to set the correct wireless channels of your country'
               'linux-firmware: firmware images needed for some devices')
-  provides=("linux-fk=${pkgver}")
+  provides=("linux-ft=${pkgver}")
   #groups=('ck-generic')
 
   cd linux-${pkgver}
@@ -245,6 +244,30 @@ _package() {
 
   # remove build and source links
   rm "$modulesdir"/{source,build}
+
+
+  # Set a couple of common variables
+  local mkinit='mkinitcpio-ft.conf'
+  local preset='linux-ft.preset'
+
+  # Custom MKINITCPIO config file.
+  grep -i MODULES=  /etc/mkinitcpio.conf | grep -v "#" >  $mkinit
+  grep -i BINARIES= /etc/mkinitcpio.conf | grep -v "#" >> $mkinit
+  grep -i FILES=    /etc/mkinitcpio.conf | grep -v "#" >> $mkinit
+  grep -i HOOKS=    /etc/mkinitcpio.conf | grep -v "#" >> $mkinit
+  echo 'COMPRESSION="zstd"' >> $mkinit
+
+# Custom MKINITCPIO preset file.
+  cat /etc/mkinitcpio.d/linux.preset > $preset
+  sed -i "s@ALL_config=\"/etc/mkinitcpio.conf\"@ALL_config=\"/etc/$mkinit\"@" $preset
+  sed -i "s@ALL_kver=\"/boot/vmlinuz-linux\"@ALL_kver=\"/boot/vmlinuz-$pkgbase\"@" $preset
+  sed -i "s@default_image=\"/boot/initramfs-linux.img\"@default_image=\"/boot/initramfs-$pkgbase.img\"@" $preset
+  sed -i "s@fallback_image=\"/boot/initramfs-linux-fallback.img\"@fallback_image=\"/boot/initramfs-$pkgbase-fallback.img\"@" $preset
+
+  # Install the MKINITCPIO files
+  install -Dm644 $mkinit "$pkgdir/etc/$mkinit"
+  install -Dm644 $preset "$pkgdir/etc/mkinitcpio.d/$preset"
+
 
   echo "Fixing permissions..."
   chmod -Rc u=rwX,go=rX "$pkgdir"

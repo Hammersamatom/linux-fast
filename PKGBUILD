@@ -133,15 +133,15 @@ prepare() {
     echo -e "\e[31mNo patches...\e[39m"
   fi
 
-  echo -e "\e[32mPatching the CK patchet itself\e[39m"
-  cd ..
-
-  patch -Np1 -i patch-ck-5.5-for-5.6.patch
-  
-  cd linux-${pkgver}
-  
-  echo -e "\e[32mPatching schedutil for 5.6 changes\e[39m"
-  patch -Np1 -i ../patch-fix-schedutil-for-ck.patch
+#  echo -e "\e[32mPatching the CK patchet itself\e[39m"
+#  cd ..
+#
+#  patch -Np1 -i patch-ck-5.5-for-5.6.patch
+#  
+#  cd linux-${pkgver}
+#  
+#  echo -e "\e[32mPatching schedutil for 5.6 changes\e[39m"
+#  patch -Np1 -i ../patch-fix-schedutil-for-ck.patch
   
 
 
@@ -162,10 +162,10 @@ prepare() {
 
 
 
-  echo "Patching with ck patchset..."
-
-  # ck patchset itself
-  patch -Np1 -i ../"${_ckpatch}"
+#  echo "Patching with ck patchset..."
+#
+#  # ck patchset itself
+#  patch -Np1 -i ../"${_ckpatch}"
 
   # non-interactively apply ck1 default options
   # this isn't redundant if we want a clean selection of subarch below

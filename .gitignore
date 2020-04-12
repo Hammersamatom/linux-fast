@@ -6,3 +6,4 @@ pkg
 *.xz
 *.sign
 *.last
+*.old

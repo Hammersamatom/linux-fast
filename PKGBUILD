@@ -61,7 +61,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.6.3
+pkgver=5.6.4
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -133,15 +133,15 @@ prepare() {
     echo -e "\e[31mNo patches...\e[39m"
   fi
 
-#  echo -e "\e[32mPatching the CK patchet itself\e[39m"
-#  cd ..
-#
-#  patch -Np1 -i patch-ck-5.5-for-5.6.patch
-#  
-#  cd linux-${pkgver}
-#  
-#  echo -e "\e[32mPatching schedutil for 5.6 changes\e[39m"
-#  patch -Np1 -i ../patch-fix-schedutil-for-ck.patch
+  echo -e "\e[32mPatching the CK patchet itself\e[39m"
+  cd ..
+
+  patch -Np1 -i patch-ck-5.5-for-5.6.patch
+  
+  cd linux-${pkgver}
+  
+  echo -e "\e[32mPatching schedutil for 5.6 changes\e[39m"
+  patch -Np1 -i ../patch-fix-schedutil-for-ck.patch
   
 
 

@@ -46,7 +46,7 @@ _makenconfig=
 #  29. Intel Cascade Lake (MCASCADELAKE)
 #  30. Generic-x86-64 (GENERIC_CPU)
 #  31. Native optimizations autodetected by GCC (MNATIVE)
-_subarch=11
+_subarch=
 
 # Compile ONLY used modules to VASTLYreduce the number of modules built
 # and the build time.
@@ -61,7 +61,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.6.4
+pkgver=5.6.5
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)

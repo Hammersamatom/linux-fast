@@ -61,7 +61,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.6.5
+pkgver=5.6.12
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -101,7 +101,7 @@ prepare() {
   cd linux-${pkgver}
 
   ### Some homegrown stuff to check for things and add things
-  export CFLAGS="$CFLAGS $ECFLAGS"
+  export CFLAGS="$CFLAGS $ECFLAGS -flto"
   export CXXFLAGS="$CFLAGS"
 
   echo "Setting version..."

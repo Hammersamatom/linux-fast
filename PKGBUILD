@@ -46,7 +46,7 @@ _makenconfig=
 #  29. Intel Cascade Lake (MCASCADELAKE)
 #  30. Generic-x86-64 (GENERIC_CPU)
 #  31. Native optimizations autodetected by GCC (MNATIVE)
-_subarch=
+_subarch=11
 
 # Compile ONLY used modules to VASTLYreduce the number of modules built
 # and the build time.
@@ -61,7 +61,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.6.12
+pkgver=5.6.13
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -71,15 +71,13 @@ makedepends=(
   bc kmod libelf
 )
 options=('!strip')
-_ckpatch="patch-5.5-ck${_ckpatchversion}"
-_gcc_more_v='20191217'
+_ckpatch="patch-5.6-ck${_ckpatchversion}"
+_gcc_more_v='20200428'
 source=(
   "https://www.kernel.org/pub/linux/kernel/v5.x/linux-$pkgver.tar".{xz,sign}
   config         # the main kernel config file
   "enable_additional_cpu_optimizations-$_gcc_more_v.tar.gz::https://github.com/graysky2/kernel_gcc_patch/archive/$_gcc_more_v.tar.gz"
-  "http://ck.kolivas.org/patches/5.0/5.5/5.5-ck${_ckpatchversion}/$_ckpatch.xz"
-  "patch-ck-5.5-for-5.6.patch"
-  "patch-fix-schedutil-for-ck.patch"
+  "http://ck.kolivas.org/patches/5.0/5.6/5.6-ck${_ckpatchversion}/$_ckpatch.xz"
 )
 validpgpkeys=(
   'ABAF11C65A2970B130ABE3C479BE3E4300411886'  # Linus Torvalds
@@ -87,8 +85,6 @@ validpgpkeys=(
 )
 sha256sums=('SKIP'
             'SKIP'
-            'SKIP'
-            '7a4a209de815f4bae49c7c577c0584c77257e3953ac4324d2aa425859ba657f5'
             'SKIP'
             'SKIP'
             'SKIP')
@@ -101,7 +97,7 @@ prepare() {
   cd linux-${pkgver}
 
   ### Some homegrown stuff to check for things and add things
-  export CFLAGS="$CFLAGS $ECFLAGS -flto"
+  export CFLAGS="$CFLAGS $ECFLAGS"
   export CXXFLAGS="$CFLAGS"
 
   echo "Setting version..."
@@ -133,18 +129,6 @@ prepare() {
     echo -e "\e[31mNo patches...\e[39m"
   fi
 
-  echo -e "\e[32mPatching the CK patchet itself\e[39m"
-  cd ..
-
-  patch -Np1 -i patch-ck-5.5-for-5.6.patch
-  
-  cd linux-${pkgver}
-  
-  echo -e "\e[32mPatching schedutil for 5.6 changes\e[39m"
-  patch -Np1 -i ../patch-fix-schedutil-for-ck.patch
-  
-
-
 
   echo "Setting config..."
   cp ../config .config
@@ -155,17 +139,21 @@ prepare() {
   # https://bbs.archlinux.org/viewtopic.php?pid=1863567#p1863567
   sed -i -e '/CONFIG_LATENCYTOP=/ s,y,n,' \
       -i -e '/CONFIG_SCHED_DEBUG=/ s,y,n,' ./.config
-  
+ 
+  # FS#66613
+  # https://bugzilla.kernel.org/show_bug.cgi?id=207173#c6
+  sed -i -e 's/CONFIG_KVM_WERROR=y/# CONFIG_KVM_WERROR is not set/' ./.config
+
   # fix naming schema in EXTRAVERSION of ck patch set
   sed -i -re "s/^(.EXTRAVERSION).*$/\1 = /" "../${_ckpatch}"
 
 
 
 
-#  echo "Patching with ck patchset..."
-#
-#  # ck patchset itself
-#  patch -Np1 -i ../"${_ckpatch}"
+  echo "Patching with ck patchset..."
+
+  # ck patchset itself
+  patch -Np1 -i ../"${_ckpatch}"
 
   # non-interactively apply ck1 default options
   # this isn't redundant if we want a clean selection of subarch below

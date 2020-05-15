@@ -65,10 +65,10 @@ pkgver=5.6.13
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
-url="https://wiki.archlinux.org/index.php/Linux-ck"
+url="https://github.com/Hammersamatom/linux-fast"
 license=(GPL2)
 makedepends=(
-  bc kmod libelf
+  bc kmod libelf zstd
 )
 options=('!strip')
 _ckpatch="patch-5.6-ck${_ckpatchversion}"
@@ -118,7 +118,7 @@ prepare() {
   fi
 
   if [ $(ls -A ../../patches/*.patch 2>/dev/null | wc -l) -gt 0 ]
-  then  
+  then
     echo "Applying patches..."
     for file in ../../patches/*.patch;
     do
@@ -139,7 +139,7 @@ prepare() {
   # https://bbs.archlinux.org/viewtopic.php?pid=1863567#p1863567
   sed -i -e '/CONFIG_LATENCYTOP=/ s,y,n,' \
       -i -e '/CONFIG_SCHED_DEBUG=/ s,y,n,' ./.config
- 
+
   # FS#66613
   # https://bugzilla.kernel.org/show_bug.cgi?id=207173#c6
   sed -i -e 's/CONFIG_KVM_WERROR=y/# CONFIG_KVM_WERROR is not set/' ./.config
@@ -185,16 +185,12 @@ prepare() {
 
   make -s kernelrelease > version
   echo "Prepared $pkgbase version $(<version)"
- 
+
   [[ -z "$_makenconfig" ]] || make nconfig
-  
-  # save configuration for later reuse
-  cat .config > "${startdir}/config.last"
 
   ### Checking for some more stuff
   echo $CFLAGS
   echo $CXXFLAGS
-
 }
 
 build() {

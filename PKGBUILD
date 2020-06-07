@@ -5,7 +5,7 @@
 # Set these variables to ANYTHING that is not null to enable them
 
 # Tweak kernel options prior to a build via nconfig
-_makenconfig=
+_makenconfig=y
 
 # Optionally select a sub architecture by number if building in a clean chroot
 # Leaving this entry blank will require user interaction during the build
@@ -46,7 +46,7 @@ _makenconfig=
 #  29. Intel Cascade Lake (MCASCADELAKE)
 #  30. Generic-x86-64 (GENERIC_CPU)
 #  31. Native optimizations autodetected by GCC (MNATIVE)
-_subarch=11
+_subarch=
 
 # Compile ONLY used modules to VASTLYreduce the number of modules built
 # and the build time.
@@ -61,7 +61,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.6.13
+pkgver=5.6.16
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -72,7 +72,7 @@ makedepends=(
 )
 options=('!strip')
 _ckpatch="patch-5.6-ck${_ckpatchversion}"
-_gcc_more_v='20200428'
+_gcc_more_v='20200527'
 source=(
   "https://www.kernel.org/pub/linux/kernel/v5.x/linux-$pkgver.tar".{xz,sign}
   config         # the main kernel config file

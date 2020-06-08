@@ -5,7 +5,7 @@
 # Set these variables to ANYTHING that is not null to enable them
 
 # Tweak kernel options prior to a build via nconfig
-_makenconfig=y
+_makenconfig=
 
 # Optionally select a sub architecture by number if building in a clean chroot
 # Leaving this entry blank will require user interaction during the build
@@ -44,8 +44,10 @@ _makenconfig=y
 #  27. Intel Cannon Lake (MCANNONLAKE)
 #  28. Intel Ice Lake (MICELAKE)
 #  29. Intel Cascade Lake (MCASCADELAKE)
-#  30. Generic-x86-64 (GENERIC_CPU)
-#  31. Native optimizations autodetected by GCC (MNATIVE)
+#  30. Intel Cooper Lake (MCOOPERLAKE) (NEW)
+#  31. Intel Tiger Lake (MTIGERLAKE) (NEW)
+#  32. Generic-x86-64 (GENERIC_CPU)
+#  33. Native optimizations autodetected by GCC (MNATIVE)
 _subarch=
 
 # Compile ONLY used modules to VASTLYreduce the number of modules built
@@ -61,7 +63,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.6.16
+pkgver=5.7.1
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -150,18 +152,18 @@ prepare() {
 
 
 
-  echo "Patching with ck patchset..."
+#  echo "Patching with ck patchset..."
 
   # ck patchset itself
-  patch -Np1 -i ../"${_ckpatch}"
+#  patch -Np1 -i ../"${_ckpatch}"
 
   # non-interactively apply ck1 default options
   # this isn't redundant if we want a clean selection of subarch below
   make olddefconfig
 
   # https://github.com/graysky2/kernel_gcc_patch
-  echo "Applying enable_additional_cpu_optimizations_for_gcc_v9.1+_kernel_v5.5+.patch"
-  patch -Np1 -i "$srcdir/kernel_gcc_patch-$_gcc_more_v/enable_additional_cpu_optimizations_for_gcc_v9.1+_kernel_v5.5+.patch"
+  echo "Applying enable_additional_cpu_optimizations_for_gcc_v10.1+_kernel_v5.7+.patch"
+  patch -Np1 -i "$srcdir/kernel_gcc_patch-$_gcc_more_v/enable_additional_cpu_optimizations_for_gcc_v10.1+_kernel_v5.7+.patch"
 
   if [ -n "$_subarch" ]; then
     # user wants a subarch so apply choice defined above interactively via 'yes'

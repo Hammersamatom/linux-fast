@@ -63,7 +63,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.7.1
+pkgver=5.7.4
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -74,7 +74,7 @@ makedepends=(
 )
 options=('!strip')
 _ckpatch="patch-5.6-ck${_ckpatchversion}"
-_gcc_more_v='20200527'
+_gcc_more_v='20200615'
 source=(
   "https://www.kernel.org/pub/linux/kernel/v5.x/linux-$pkgver.tar".{xz,sign}
   config         # the main kernel config file

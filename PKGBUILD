@@ -63,7 +63,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.7.4
+pkgver=5.7.9
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -236,8 +236,10 @@ _package() {
   local mkinit='mkinitcpio-ft.conf'
   local preset='linux-ft.preset'
 
-  # Custom MKINITCPIO config file.
-  grep -i MODULES=  /etc/mkinitcpio.conf | grep -v "#" >  $mkinit
+  # Custom MKINITCPIO config file. 
+  # TODO: Include new modules with generation (vfio, etc)
+  #grep -i MODULES=  /etc/mkinitcpio.conf | grep -v "#" >  $mkinit
+  echo "MODULES=( vfio_pci vfio vfio_iommu_type1 vfio_virqfd )" > $mkinit
   grep -i BINARIES= /etc/mkinitcpio.conf | grep -v "#" >> $mkinit
   grep -i FILES=    /etc/mkinitcpio.conf | grep -v "#" >> $mkinit
   grep -i HOOKS=    /etc/mkinitcpio.conf | grep -v "#" >> $mkinit

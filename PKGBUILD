@@ -5,7 +5,7 @@
 # Set these variables to ANYTHING that is not null to enable them
 
 # Tweak kernel options prior to a build via nconfig
-_makenconfig=
+_makenconfig=1
 
 # Optionally select a sub architecture by number if building in a clean chroot
 # Leaving this entry blank will require user interaction during the build
@@ -63,7 +63,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.7.16
+pkgver=5.8.3
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)
@@ -78,7 +78,7 @@ _gcc_more_v='20200615'
 source=(
   "https://www.kernel.org/pub/linux/kernel/v5.x/linux-$pkgver.tar".{xz,sign}
   config         # the main kernel config file
-  "enable_additional_cpu_optimizations-$_gcc_more_v.tar.gz::https://github.com/graysky2/kernel_gcc_patch/archive/$_gcc_more_v.tar.gz"
+  enable_additional_cpu_optimizations_for_gcc_v9.1+_kernel_v5.8+.patch
   "http://ck.kolivas.org/patches/5.0/5.6/5.6-ck${_ckpatchversion}/$_ckpatch.xz"
 )
 validpgpkeys=(
@@ -163,7 +163,7 @@ prepare() {
 
   # https://github.com/graysky2/kernel_gcc_patch
   echo "Applying enable_additional_cpu_optimizations_for_gcc_v10.1+_kernel_v5.7+.patch"
-  patch -Np1 -i "$srcdir/kernel_gcc_patch-$_gcc_more_v/enable_additional_cpu_optimizations_for_gcc_v10.1+_kernel_v5.7+.patch"
+  patch -Np1 -i "$srcdir/enable_additional_cpu_optimizations_for_gcc_v9.1+_kernel_v5.8+.patch"
 
   if [ -n "$_subarch" ]; then
     # user wants a subarch so apply choice defined above interactively via 'yes'

@@ -1,0 +1,43 @@
+From: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+To: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Cc: "Pali Rohár" <pali@kernel.org>
+Subject: [PATCH v2 09/10] fs/ntfs3: Add NTFS3 in fs/Kconfig and fs/Makefile
+Date: Fri, 21 Aug 2020 16:25:42 +0000
+Message-ID: <35de976db78443cc9ed18bcd410e6f4a@paragon-software.com> (raw)
+
+This adds NTFS3 in fs/Kconfig and fs/Makefile
+
+Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+---
+ fs/Kconfig  | 1 +
+ fs/Makefile | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/fs/Kconfig b/fs/Kconfig
+index aa4c12282301..eae96d55ab67 100644
+--- a/fs/Kconfig
++++ b/fs/Kconfig
+@@ -145,6 +145,7 @@ menu "DOS/FAT/EXFAT/NT Filesystems"
+ source "fs/fat/Kconfig"
+ source "fs/exfat/Kconfig"
+ source "fs/ntfs/Kconfig"
++source "fs/ntfs3/Kconfig"
+ 
+ endmenu
+ endif # BLOCK
+diff --git a/fs/Makefile b/fs/Makefile
+index 1c7b0e3f6daa..b0b4ad8affa0 100644
+--- a/fs/Makefile
++++ b/fs/Makefile
+@@ -100,6 +100,7 @@ obj-$(CONFIG_SYSV_FS)		+= sysv/
+ obj-$(CONFIG_CIFS)		+= cifs/
+ obj-$(CONFIG_HPFS_FS)		+= hpfs/
+ obj-$(CONFIG_NTFS_FS)		+= ntfs/
++obj-$(CONFIG_NTFS3_FS)		+= ntfs3/
+ obj-$(CONFIG_UFS_FS)		+= ufs/
+ obj-$(CONFIG_EFS_FS)		+= efs/
+ obj-$(CONFIG_JFFS2_FS)		+= jffs2/
+-- 
+2.25.2

@@ -1,19 +1,76 @@
-From: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-To: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Cc: "Pali Rohár" <pali@kernel.org>
-Subject: [PATCH v2 01/10] fs/ntfs3: Add headers and misc files
-Date: Fri, 21 Aug 2020 16:24:57 +0000
-Message-ID: <0911041fee4649f5bbd76cca7cb225cc@paragon-software.com> (raw)
+From mboxrd@z Thu Jan  1 00:00:00 1970
+Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
+	aws-us-west-2-korg-lkml-1.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CB4C433E7
+	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:42:39 +0000 (UTC)
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by mail.kernel.org (Postfix) with ESMTP id DC917207DF
+	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:42:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="sgZW9nbB"
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1728161AbgH1Omf (ORCPT
+        <rfc822;linux-kernel@archiver.kernel.org>);
+        Fri, 28 Aug 2020 10:42:35 -0400
+Received: from relaydlg-01.paragon-software.com ([81.5.88.159]:49826 "EHLO
+        relaydlg-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727957AbgH1Okh (ORCPT
+        <rfc822;linux-kernel@vger.kernel.org>);
+        Fri, 28 Aug 2020 10:40:37 -0400
+Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
+        by relaydlg-01.paragon-software.com (Postfix) with ESMTPS id 4A39F82040;
+        Fri, 28 Aug 2020 17:40:15 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paragon-software.com; s=mail; t=1598625615;
+        bh=CuXwGA0MkObc5Qsav619OwalyrJr+uJfxc31FbSI1HU=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References;
+        b=sgZW9nbBCRn7Gbqd0CQm10bmyvjMwVEwSK6m0YW3DRIKXt344hnFfnKtsyrSjLZsC
+         +l3dIN565TkD/cL5UY1CkJTDrPYl33PNzD6mX+e5dn0m15ESsLPBNrIuIlBxFLrpXx
+         tWd6bn+J6hyHW/1gyB99hQJg/lE2ma1qnSmsrahE=
+Received: from localhost.localdomain (172.30.8.44) by
+ vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1847.3; Fri, 28 Aug 2020 17:40:14 +0300
+From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+To:     <linux-fsdevel@vger.kernel.org>
+CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
+        <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
+        <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
+        <mark@harmstone.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v3 01/10] fs/ntfs3: Add headers and misc files
+Date:   Fri, 28 Aug 2020 07:39:29 -0700
+Message-ID: <20200828143938.102889-2-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [172.30.8.44]
+X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+ vdlg-exch-02.paragon-software.com (172.30.1.105)
+Sender: linux-kernel-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-kernel.vger.kernel.org>
+X-Mailing-List: linux-kernel@vger.kernel.org
+Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-2-almaz.alexandrovich@paragon-software.com/>
+List-Archive: <https://lore.kernel.org/lkml/>
+List-Post: <mailto:linux-kernel@vger.kernel.org>
 
-This adds fs/ntfs3 headers and misc files
+This adds headers and misc files
 
 Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 ---
- fs/ntfs3/debug.h   |   77 +++
- fs/ntfs3/ntfs.h    | 1253 ++++++++++++++++++++++++++++++++++++++++++++
- fs/ntfs3/ntfs_fs.h |  965 ++++++++++++++++++++++++++++++++++
+ fs/ntfs3/debug.h   |   45 ++
+ fs/ntfs3/ntfs.h    | 1249 ++++++++++++++++++++++++++++++++++++++++++++
+ fs/ntfs3/ntfs_fs.h | 1001 +++++++++++++++++++++++++++++++++++
  fs/ntfs3/upcase.c  |   78 +++
  4 files changed, 2373 insertions(+)
  create mode 100644 fs/ntfs3/debug.h
@@ -23,10 +80,10 @@ Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 
 diff --git a/fs/ntfs3/debug.h b/fs/ntfs3/debug.h
 new file mode 100644
-index 000000000000..ee348daeb7a9
+index 000000000000..eff8e52b1560
 --- /dev/null
 +++ b/fs/ntfs3/debug.h
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,45 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + *  linux/fs/ntfs3/debug.h
@@ -52,64 +109,32 @@ index 000000000000..ee348daeb7a9
 +#define WordAlign(n) (((n) + 1u) & (~1u))
 +#define IsWordAligned(n) (!((size_t)(n)&1u))
 +
-+__printf(3, 4) void __ntfs_trace(const struct super_block *sb,
-+				 const char *level, const char *fmt, ...);
-+__printf(3, 4) void __ntfs_fs_error(struct super_block *sb, int report,
-+				    const char *fmt, ...);
-+__printf(3, 4) void __ntfs_inode_trace(struct inode *inode, const char *level,
-+				       const char *fmt, ...);
-+
-+#define ntfs_trace(sb, fmt, args...) __ntfs_trace(sb, KERN_NOTICE, fmt, ##args)
-+#define ntfs_error(sb, fmt, args...) __ntfs_trace(sb, KERN_ERR, fmt, ##args)
-+#define ntfs_warning(sb, fmt, args...)                                         \
-+	__ntfs_trace(sb, KERN_WARNING, fmt, ##args)
-+
-+#define ntfs_fs_error(sb, fmt, args...) __ntfs_fs_error(sb, 1, fmt, ##args)
-+#define ntfs_inode_error(inode, fmt, args...)                                  \
-+	__ntfs_inode_trace(inode, KERN_ERR, fmt, ##args)
-+#define ntfs_inode_warning(inode, fmt, args...)                                \
-+	__ntfs_inode_trace(inode, KERN_WARNING, fmt, ##args)
-+
-+static inline void *ntfs_alloc(size_t size, int zero)
-+{
-+	void *p = kmalloc(size, zero ? (GFP_NOFS | __GFP_ZERO) : GFP_NOFS);
-+
-+	return p;
-+}
-+
-+static inline void ntfs_free(void *p)
-+{
-+	if (!p)
-+		return;
-+	kfree(p);
-+}
-+
-+static inline void trace_mem_report(int on_exit)
++#ifdef CONFIG_PRINTK
++__printf(2, 3) void ntfs_printk(const struct super_block *sb, const char *fmt,
++				...);
++__printf(2, 3) void ntfs_inode_printk(struct inode *inode, const char *fmt,
++				      ...);
++#else
++static inline __printf(2, 3) void ntfs_printk(const struct super_block *sb,
++					      const char *fmt, ...)
 +{
 +}
 +
-+static inline void ntfs_init_trace_file(void)
++static inline __printf(2, 3) void ntfs_inode_printk(struct inode *inode,
++						    const char *fmt, ...)
 +{
 +}
++#endif
 +
-+static inline void ntfs_close_trace_file(void)
-+{
-+}
-+
-+static inline void *ntfs_memdup(const void *src, size_t len)
-+{
-+	void *p = ntfs_alloc(len, 0);
-+
-+	if (p)
-+		memcpy(p, src, len);
-+	return p;
-+}
++#define ntfs_alloc(s, z) kmalloc(s, z ? (GFP_NOFS | __GFP_ZERO) : GFP_NOFS)
++#define ntfs_free(p) kfree(p)
++#define ntfs_memdup(src, len) kmemdup(src, len, GFP_NOFS)
 diff --git a/fs/ntfs3/ntfs.h b/fs/ntfs3/ntfs.h
 new file mode 100644
-index 000000000000..b9735129f45b
+index 000000000000..d7fac44adfa3
 --- /dev/null
 +++ b/fs/ntfs3/ntfs.h
-@@ -0,0 +1,1253 @@
+@@ -0,0 +1,1249 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + *  linux/fs/ntfs3/ntfs.h
@@ -133,11 +158,6 @@ index 000000000000..b9735129f45b
 + */
 +#define NTFS3_CHECK_FREE_CLST
 +
-+/*
-+ * Activate this define to activate preallocate
-+ */
-+//#define NTFS3_PREALLOCATE
-+
 +#define NTFS_NAME_LEN 255
 +
 +/*
@@ -157,15 +177,12 @@ index 000000000000..b9735129f45b
 +#define NTFS_LZNT_MAX_CLUSTER 4096
 +#define NTFS_LZNT_CUNIT 4
 +
-+#ifndef GUID_DEFINED
-+#define GUID_DEFINED
-+typedef struct {
++struct GUID {
 +	__le32 Data1;
 +	__le16 Data2;
 +	__le16 Data3;
 +	u8 Data4[8];
-+} GUID;
-+#endif
++};
 +
 +struct le_str {
 +	u8 len;
@@ -215,7 +232,7 @@ index 000000000000..b9735129f45b
 +	MFT_REC_USER = 24,
 +};
 +
-+typedef enum {
++enum ATTR_TYPE {
 +	ATTR_ZERO = cpu_to_le32(0x00),
 +	ATTR_STD = cpu_to_le32(0x10),
 +	ATTR_LIST = cpu_to_le32(0x20),
@@ -236,11 +253,11 @@ index 000000000000..b9735129f45b
 +	ATTR_PROPERTYSET = cpu_to_le32(0xF0),
 +	ATTR_LOGGED_UTILITY_STREAM = cpu_to_le32(0x100),
 +	ATTR_END = cpu_to_le32(0xFFFFFFFF)
-+} ATTR_TYPE;
++};
 +
-+static_assert(sizeof(ATTR_TYPE) == 4);
++static_assert(sizeof(enum ATTR_TYPE) == 4);
 +
-+typedef enum {
++enum FILE_ATTRIBUTE {
 +	FILE_ATTRIBUTE_READONLY = cpu_to_le32(0x00000001),
 +	FILE_ATTRIBUTE_HIDDEN = cpu_to_le32(0x00000002),
 +	FILE_ATTRIBUTE_SYSTEM = cpu_to_le32(0x00000004),
@@ -259,9 +276,9 @@ index 000000000000..b9735129f45b
 +	FILE_ATTRIBUTE_VALID_FLAGS = cpu_to_le32(0x00007fb7),
 +
 +	FILE_ATTRIBUTE_DIRECTORY = cpu_to_le32(0x10000000),
-+} FILE_ATTRIBUTE;
++};
 +
-+static_assert(sizeof(FILE_ATTRIBUTE) == 4);
++static_assert(sizeof(enum FILE_ATTRIBUTE) == 4);
 +
 +extern const struct cpu_str NAME_MFT; // L"$MFT"
 +extern const struct cpu_str NAME_MIRROR; // L"$MFTMirr"
@@ -296,15 +313,15 @@ index 000000000000..b9735129f45b
 +extern const __le16 MAX_NAME[4]; // L"$Max"
 +
 +/* MFT record number structure */
-+typedef struct {
++struct MFT_REF {
 +	__le32 low; // The low part of the number
 +	__le16 high; // The high part of the number
 +	__le16 seq; // The sequence number of MFT record
-+} MFT_REF;
++};
 +
-+static_assert(sizeof(__le64) == sizeof(MFT_REF));
++static_assert(sizeof(__le64) == sizeof(struct MFT_REF));
 +
-+static inline CLST ino_get(const MFT_REF *ref)
++static inline CLST ino_get(const struct MFT_REF *ref)
 +{
 +#ifdef NTFS3_64BIT_CLUSTER
 +	return le32_to_cpu(ref->low) | ((u64)le16_to_cpu(ref->high) << 32);
@@ -351,7 +368,7 @@ index 000000000000..b9735129f45b
 +
 +static_assert(sizeof(struct NTFS_BOOT) == 0x200);
 +
-+typedef enum {
++enum NTFS_SIGNATURE {
 +	NTFS_FILE_SIGNATURE = cpu_to_le32(0x454C4946), // 'FILE'
 +	NTFS_INDX_SIGNATURE = cpu_to_le32(0x58444E49), // 'INDX'
 +	NTFS_CHKD_SIGNATURE = cpu_to_le32(0x444B4843), // 'CHKD'
@@ -360,37 +377,37 @@ index 000000000000..b9735129f45b
 +	NTFS_BAAD_SIGNATURE = cpu_to_le32(0x44414142), // 'BAAD'
 +	NTFS_HOLE_SIGNATURE = cpu_to_le32(0x454C4F48), // 'HOLE'
 +	NTFS_FFFF_SIGNATURE = cpu_to_le32(0xffffffff),
-+} NTFS_SIGNATURE;
++};
 +
-+static_assert(sizeof(NTFS_SIGNATURE) == 4);
++static_assert(sizeof(enum NTFS_SIGNATURE) == 4);
 +
 +/* MFT Record header structure */
-+typedef struct {
++struct NTFS_RECORD_HEADER {
 +	/* Record magic number, equals 'FILE'/'INDX'/'RSTR'/'RCRD' */
-+	__le32 sign; // 0x00:
++	enum NTFS_SIGNATURE sign; // 0x00:
 +	__le16 fix_off; // 0x04:
 +	__le16 fix_num; // 0x06:
 +	__le64 lsn; // 0x08: Log file sequence number
-+} NTFS_RECORD_HEADER;
++};
 +
-+static_assert(sizeof(NTFS_RECORD_HEADER) == 0x10);
++static_assert(sizeof(struct NTFS_RECORD_HEADER) == 0x10);
 +
-+static inline int is_baad(const NTFS_RECORD_HEADER *hdr)
++static inline int is_baad(const struct NTFS_RECORD_HEADER *hdr)
 +{
 +	return hdr->sign == NTFS_BAAD_SIGNATURE;
 +}
 +
-+/* Possible bits in MFT_REC.flags */
-+typedef enum {
++/* Possible bits in struct MFT_REC.flags */
++enum RECORD_FLAG {
 +	RECORD_FLAG_IN_USE = cpu_to_le16(0x0001),
 +	RECORD_FLAG_DIR = cpu_to_le16(0x0002),
 +	RECORD_FLAG_SYSTEM = cpu_to_le16(0x0004),
 +	RECORD_FLAG_UNKNOWN = cpu_to_le16(0x0008),
-+} RECORD_FLAG;
++};
 +
 +/* MFT Record structure */
-+typedef struct {
-+	NTFS_RECORD_HEADER rhdr; // 'FILE'
++struct MFT_REC {
++	struct NTFS_RECORD_HEADER rhdr; // 'FILE'
 +
 +	__le16 seq; // 0x10: Sequence number for this record
 +	__le16 hard_links; // 0x12: The number of hard links to record
@@ -399,7 +416,7 @@ index 000000000000..b9735129f45b
 +	__le32 used; // 0x18: The size of used part
 +	__le32 total; // 0x1C: Total record size
 +
-+	MFT_REF parent_ref; // 0x20: Parent MFT record
++	struct MFT_REF parent_ref; // 0x20: Parent MFT record
 +	__le16 next_attr_id; // 0x28: The next attribute Id
 +
 +	//
@@ -409,33 +426,33 @@ index 000000000000..b9735129f45b
 +	__le16 Res; // 0x2A: ? High part of MftRecord
 +	__le32 MftRecord; // 0x2C: Current record number
 +	__le16 Fixups[1]; // 0x30:
++};
 +
-+} MFT_REC;
-+
-+#define MFTRECORD_FIXUP_OFFSET_1 offsetof(MFT_REC, Res)
-+#define MFTRECORD_FIXUP_OFFSET_3 offsetof(MFT_REC, Fixups)
++#define MFTRECORD_FIXUP_OFFSET_1 offsetof(struct MFT_REC, Res)
++#define MFTRECORD_FIXUP_OFFSET_3 offsetof(struct MFT_REC, Fixups)
 +
 +static_assert(MFTRECORD_FIXUP_OFFSET_1 == 0x2A);
 +static_assert(MFTRECORD_FIXUP_OFFSET_3 == 0x30);
 +
-+static inline bool is_rec_base(const MFT_REC *rec)
++static inline bool is_rec_base(const struct MFT_REC *rec)
 +{
-+	const MFT_REF *r = &rec->parent_ref;
++	const struct MFT_REF *r = &rec->parent_ref;
 +
 +	return !r->low && !r->high && !r->seq;
 +}
 +
-+static inline bool is_mft_rec5(const MFT_REC *rec)
++static inline bool is_mft_rec5(const struct MFT_REC *rec)
 +{
-+	return le16_to_cpu(rec->rhdr.fix_off) >= offsetof(MFT_REC, Fixups);
++	return le16_to_cpu(rec->rhdr.fix_off) >=
++	       offsetof(struct MFT_REC, Fixups);
 +}
 +
-+static inline bool is_rec_inuse(const MFT_REC *rec)
++static inline bool is_rec_inuse(const struct MFT_REC *rec)
 +{
 +	return rec->flags & RECORD_FLAG_IN_USE;
 +}
 +
-+static inline bool clear_rec_inuse(MFT_REC *rec)
++static inline bool clear_rec_inuse(struct MFT_REC *rec)
 +{
 +	return rec->flags &= ~RECORD_FLAG_IN_USE;
 +}
@@ -443,14 +460,14 @@ index 000000000000..b9735129f45b
 +/* Possible values of ATTR_RESIDENT.flags */
 +#define RESIDENT_FLAG_INDEXED 0x01
 +
-+typedef struct {
++struct ATTR_RESIDENT {
 +	__le32 data_size; // 0x10: The size of data
 +	__le16 data_off; // 0x14: Offset to data
 +	u8 flags; // 0x16: resident flags ( 1 - indexed )
 +	u8 res; // 0x17:
-+} ATTR_RESIDENT; // sizeof() = 0x18
++}; // sizeof() = 0x18
 +
-+typedef struct {
++struct ATTR_NONRESIDENT {
 +	__le64 svcn; // 0x10: Starting VCN of this segment
 +	__le64 evcn; // 0x18: End VCN of this segment
 +	__le16 run_off; // 0x20: Offset to packed runs
@@ -476,7 +493,7 @@ index 000000000000..b9735129f45b
 +		// (present only for the first segment (0 == vcn)
 +		// of compressed attribute)
 +
-+} ATTR_NONRESIDENT; // sizeof()=0x40 or 0x48 (if compressed)
++}; // sizeof()=0x40 or 0x48 (if compressed)
 +
 +/* Possible values of ATTRIB.flags: */
 +#define ATTR_FLAG_COMPRESSED cpu_to_le16(0x0001)
@@ -484,8 +501,8 @@ index 000000000000..b9735129f45b
 +#define ATTR_FLAG_ENCRYPTED cpu_to_le16(0x4000)
 +#define ATTR_FLAG_SPARSED cpu_to_le16(0x8000)
 +
-+typedef struct {
-+	ATTR_TYPE type; // 0x00: The type of this attribute
++struct ATTRIB {
++	enum ATTR_TYPE type; // 0x00: The type of this attribute
 +	__le32 size; // 0x04: The size of this attribute
 +	u8 non_res; // 0x08: Is this attribute non-resident ?
 +	u8 name_len; // 0x09: This attribute name length
@@ -494,10 +511,10 @@ index 000000000000..b9735129f45b
 +	__le16 id; // 0x0E: unique id (per record)
 +
 +	union {
-+		ATTR_RESIDENT res; // 0x10
-+		ATTR_NONRESIDENT nres; // 0x10
++		struct ATTR_RESIDENT res; // 0x10
++		struct ATTR_NONRESIDENT nres; // 0x10
 +	};
-+} ATTRIB;
++};
 +
 +/* Define attribute sizes */
 +#define SIZEOF_RESIDENT 0x18
@@ -508,7 +525,7 @@ index 000000000000..b9735129f45b
 +#define SIZEOF_NONRESIDENT_EX_LE cpu_to_le16(0x48)
 +#define SIZEOF_NONRESIDENT_LE cpu_to_le16(0x40)
 +
-+static inline u64 attr_ondisk_size(const ATTRIB *attr)
++static inline u64 attr_ondisk_size(const struct ATTRIB *attr)
 +{
 +	return attr->non_res ? ((attr->flags &
 +				 (ATTR_FLAG_COMPRESSED | ATTR_FLAG_SPARSED)) ?
@@ -517,43 +534,43 @@ index 000000000000..b9735129f45b
 +			       QuadAlign(le32_to_cpu(attr->res.data_size));
 +}
 +
-+static inline u64 attr_size(const ATTRIB *attr)
++static inline u64 attr_size(const struct ATTRIB *attr)
 +{
 +	return attr->non_res ? le64_to_cpu(attr->nres.data_size) :
 +			       le32_to_cpu(attr->res.data_size);
 +}
 +
-+static inline bool is_attr_encrypted(const ATTRIB *attr)
++static inline bool is_attr_encrypted(const struct ATTRIB *attr)
 +{
 +	return attr->flags & ATTR_FLAG_ENCRYPTED;
 +}
 +
-+static inline bool is_attr_sparsed(const ATTRIB *attr)
++static inline bool is_attr_sparsed(const struct ATTRIB *attr)
 +{
 +	return attr->flags & ATTR_FLAG_SPARSED;
 +}
 +
-+static inline bool is_attr_compressed(const ATTRIB *attr)
++static inline bool is_attr_compressed(const struct ATTRIB *attr)
 +{
 +	return attr->flags & ATTR_FLAG_COMPRESSED;
 +}
 +
-+static inline bool is_attr_ext(const ATTRIB *attr)
++static inline bool is_attr_ext(const struct ATTRIB *attr)
 +{
 +	return attr->flags & (ATTR_FLAG_SPARSED | ATTR_FLAG_COMPRESSED);
 +}
 +
-+static inline bool is_attr_indexed(const ATTRIB *attr)
++static inline bool is_attr_indexed(const struct ATTRIB *attr)
 +{
 +	return !attr->non_res && (attr->res.flags & RESIDENT_FLAG_INDEXED);
 +}
 +
-+static inline const __le16 *attr_name(const ATTRIB *attr)
++static inline const __le16 *attr_name(const struct ATTRIB *attr)
 +{
 +	return Add2Ptr(attr, le16_to_cpu(attr->name_off));
 +}
 +
-+static inline u64 attr_svcn(const ATTRIB *attr)
++static inline u64 attr_svcn(const struct ATTRIB *attr)
 +{
 +	return attr->non_res ? le64_to_cpu(attr->nres.svcn) : 0;
 +}
@@ -561,11 +578,11 @@ index 000000000000..b9735129f45b
 +/* the size of resident attribute by its resident size */
 +#define BYTES_PER_RESIDENT(b) (0x18 + (b))
 +
-+static_assert(sizeof(ATTRIB) == 0x48);
-+static_assert(sizeof(((ATTRIB *)NULL)->res) == 0x08);
-+static_assert(sizeof(((ATTRIB *)NULL)->nres) == 0x38);
++static_assert(sizeof(struct ATTRIB) == 0x48);
++static_assert(sizeof(((struct ATTRIB *)NULL)->res) == 0x08);
++static_assert(sizeof(((struct ATTRIB *)NULL)->nres) == 0x38);
 +
-+static inline void *resident_data_ex(const ATTRIB *attr, u32 datasize)
++static inline void *resident_data_ex(const struct ATTRIB *attr, u32 datasize)
 +{
 +	u32 asize, rsize;
 +	u16 off;
@@ -586,39 +603,39 @@ index 000000000000..b9735129f45b
 +	return Add2Ptr(attr, off);
 +}
 +
-+static inline void *resident_data(const ATTRIB *attr)
++static inline void *resident_data(const struct ATTRIB *attr)
 +{
 +	return Add2Ptr(attr, le16_to_cpu(attr->res.data_off));
 +}
 +
-+static inline void *attr_run(const ATTRIB *attr)
++static inline void *attr_run(const struct ATTRIB *attr)
 +{
 +	return Add2Ptr(attr, le16_to_cpu(attr->nres.run_off));
 +}
 +
 +/* Standard information attribute (0x10) */
-+typedef struct {
++struct ATTR_STD_INFO {
 +	__le64 cr_time; // 0x00: File creation file
 +	__le64 m_time; // 0x08: File modification time
 +	__le64 c_time; // 0x10: Last time any attribute was modified.
 +	__le64 a_time; // 0x18: File last access time
-+	FILE_ATTRIBUTE fa; // 0x20: Standard DOS attributes & more
++	enum FILE_ATTRIBUTE fa; // 0x20: Standard DOS attributes & more
 +	__le32 max_ver_num; // 0x24: Maximum Number of Versions
 +	__le32 ver_num; // 0x28: Version Number
 +	__le32 class_id; // 0x2C: Class Id from bidirectional Class Id index
-+} ATTR_STD_INFO;
++};
 +
-+static_assert(sizeof(ATTR_STD_INFO) == 0x30);
++static_assert(sizeof(struct ATTR_STD_INFO) == 0x30);
 +
 +#define SECURITY_ID_INVALID 0x00000000
 +#define SECURITY_ID_FIRST 0x00000100
 +
-+typedef struct {
++struct ATTR_STD_INFO5 {
 +	__le64 cr_time; // 0x00: File creation file
 +	__le64 m_time; // 0x08: File modification time
 +	__le64 c_time; // 0x10: Last time any attribute was modified.
 +	__le64 a_time; // 0x18: File last access time
-+	FILE_ATTRIBUTE fa; // 0x20: Standard DOS attributes & more
++	enum FILE_ATTRIBUTE fa; // 0x20: Standard DOS attributes & more
 +	__le32 max_ver_num; // 0x24: Maximum Number of Versions
 +	__le32 ver_num; // 0x28: Version Number
 +	__le32 class_id; // 0x2C: Class Id from bidirectional Class Id index
@@ -634,33 +651,34 @@ index 000000000000..b9735129f45b
 +	__le64 usn; // 0x40: Last Update Sequence Number of the file. This is a direct
 +		// index into the file $UsnJrnl. If zero, the USN Journal is
 +		// disabled.
-+} ATTR_STD_INFO5;
++};
 +
-+static_assert(sizeof(ATTR_STD_INFO5) == 0x48);
++static_assert(sizeof(struct ATTR_STD_INFO5) == 0x48);
 +
 +/* attribute list entry structure (0x20) */
-+typedef struct {
-+	ATTR_TYPE type; // 0x00: The type of attribute
++struct ATTR_LIST_ENTRY {
++	enum ATTR_TYPE type; // 0x00: The type of attribute
 +	__le16 size; // 0x04: The size of this record
 +	u8 name_len; // 0x06: The length of attribute name
 +	u8 name_off; // 0x07: The offset to attribute name
 +	__le64 vcn; // 0x08: Starting VCN of this attribute
-+	MFT_REF ref; // 0x10: MFT record number with attribute
-+	__le16 id; // 0x18: ATTRIB ID
++	struct MFT_REF ref; // 0x10: MFT record number with attribute
++	__le16 id; // 0x18: struct ATTRIB ID
 +	__le16 name[3]; // 0x1A: Just to align. To get real name can use bNameOffset
 +
-+} ATTR_LIST_ENTRY; // sizeof(0x20)
++}; // sizeof(0x20)
 +
-+static_assert(sizeof(ATTR_LIST_ENTRY) == 0x20);
++static_assert(sizeof(struct ATTR_LIST_ENTRY) == 0x20);
 +
 +static inline u32 le_size(u8 name_len)
 +{
-+	return QuadAlign(offsetof(ATTR_LIST_ENTRY, name) +
++	return QuadAlign(offsetof(struct ATTR_LIST_ENTRY, name) +
 +			 name_len * sizeof(short));
 +}
 +
 +/* returns 0 if 'attr' has the same type and name */
-+static inline int le_cmp(const ATTR_LIST_ENTRY *le, const ATTRIB *attr)
++static inline int le_cmp(const struct ATTR_LIST_ENTRY *le,
++			 const struct ATTRIB *attr)
 +{
 +	return le->type != attr->type || le->name_len != attr->name_len ||
 +	       (!le->name_len &&
@@ -669,52 +687,53 @@ index 000000000000..b9735129f45b
 +		       le->name_len * sizeof(short)));
 +}
 +
-+static inline const __le16 *le_name(const ATTR_LIST_ENTRY *le)
++static inline const __le16 *le_name(const struct ATTR_LIST_ENTRY *le)
 +{
 +	return Add2Ptr(le, le->name_off);
 +}
 +
-+/* File name types (the field type in ATTR_FILE_NAME ) */
++/* File name types (the field type in struct ATTR_FILE_NAME ) */
 +#define FILE_NAME_POSIX 0
 +#define FILE_NAME_UNICODE 1
 +#define FILE_NAME_DOS 2
 +#define FILE_NAME_UNICODE_AND_DOS (FILE_NAME_DOS | FILE_NAME_UNICODE)
 +
 +/* Filename attribute structure (0x30) */
-+typedef struct {
++struct NTFS_DUP_INFO {
 +	__le64 cr_time; // 0x00: File creation file
 +	__le64 m_time; // 0x08: File modification time
 +	__le64 c_time; // 0x10: Last time any attribute was modified
 +	__le64 a_time; // 0x18: File last access time
 +	__le64 alloc_size; // 0x20: Data attribute allocated size, multiple of cluster size
 +	__le64 data_size; // 0x28: Data attribute size <= Dataalloc_size
-+	FILE_ATTRIBUTE fa; // 0x30: Standard DOS attributes & more
++	enum FILE_ATTRIBUTE fa; // 0x30: Standard DOS attributes & more
 +	__le16 ea_size; // 0x34: Packed EAs
 +	__le16 reparse; // 0x36: Used by Reparse
 +
-+} NTFS_DUP_INFO; // 0x38
++}; // 0x38
 +
-+typedef struct {
-+	MFT_REF home; // 0x00: MFT record for directory
-+	NTFS_DUP_INFO dup; // 0x08
++struct ATTR_FILE_NAME {
++	struct MFT_REF home; // 0x00: MFT record for directory
++	struct NTFS_DUP_INFO dup; // 0x08
 +	u8 name_len; // 0x40: File name length in words
 +	u8 type; // 0x41: File name type
 +	__le16 name[1]; // 0x42: File name
-+} ATTR_FILE_NAME;
++};
 +
-+static_assert(sizeof(((ATTR_FILE_NAME *)NULL)->dup) == 0x38);
-+static_assert(offsetof(ATTR_FILE_NAME, name) == 0x42);
++static_assert(sizeof(((struct ATTR_FILE_NAME *)NULL)->dup) == 0x38);
++static_assert(offsetof(struct ATTR_FILE_NAME, name) == 0x42);
 +#define SIZEOF_ATTRIBUTE_FILENAME 0x44
 +#define SIZEOF_ATTRIBUTE_FILENAME_MAX (0x42 + 255 * 2)
 +
-+static inline ATTRIB *attr_from_name(ATTR_FILE_NAME *fname)
++static inline struct ATTRIB *attr_from_name(struct ATTR_FILE_NAME *fname)
 +{
-+	return (ATTRIB *)((char *)fname - SIZEOF_RESIDENT);
++	return (struct ATTRIB *)((char *)fname - SIZEOF_RESIDENT);
 +}
 +
-+static inline u16 fname_full_size(const ATTR_FILE_NAME *fname)
++static inline u16 fname_full_size(const struct ATTR_FILE_NAME *fname)
 +{
-+	return offsetof(ATTR_FILE_NAME, name) + fname->name_len * sizeof(short);
++	return offsetof(struct ATTR_FILE_NAME, name) +
++	       fname->name_len * sizeof(short);
 +}
 +
 +static inline u8 paired_name(u8 type)
@@ -731,9 +750,9 @@ index 000000000000..b9735129f45b
 +#define NTFS_IE_LAST cpu_to_le16(2)
 +
 +/* Directory entry structure */
-+typedef struct {
++struct NTFS_DE {
 +	union {
-+		MFT_REF ref; // 0x00: MFT record number with this file
++		struct MFT_REF ref; // 0x00: MFT record number with this file
 +		struct {
 +			__le16 data_off; // 0x00:
 +			__le16 data_size; // 0x02:
@@ -747,7 +766,7 @@ index 000000000000..b9735129f45b
 +
 +	// Here any indexed attribute can be placed
 +	// One of them is:
-+	// ATTR_FILE_NAME AttrFileName;
++	// struct ATTR_FILE_NAME AttrFileName;
 +	//
 +
 +	// The last 8 bytes of this structure contains
@@ -755,60 +774,59 @@ index 000000000000..b9735129f45b
 +	// !!! Note !!!
 +	// This field is presented only if (flags & NTFS_IE_HAS_SUBNODES)
 +	// __le64 vbn;
++};
 +
-+} NTFS_DE;
++static_assert(sizeof(struct NTFS_DE) == 0x10);
 +
-+static_assert(sizeof(NTFS_DE) == 0x10);
-+
-+static inline void de_set_vbn_le(NTFS_DE *e, __le64 vcn)
++static inline void de_set_vbn_le(struct NTFS_DE *e, __le64 vcn)
 +{
 +	__le64 *v = Add2Ptr(e, le16_to_cpu(e->size) - sizeof(__le64));
 +
 +	*v = vcn;
 +}
 +
-+static inline void de_set_vbn(NTFS_DE *e, CLST vcn)
++static inline void de_set_vbn(struct NTFS_DE *e, CLST vcn)
 +{
 +	__le64 *v = Add2Ptr(e, le16_to_cpu(e->size) - sizeof(__le64));
 +
 +	*v = cpu_to_le64(vcn);
 +}
 +
-+static inline __le64 de_get_vbn_le(const NTFS_DE *e)
++static inline __le64 de_get_vbn_le(const struct NTFS_DE *e)
 +{
 +	return *(__le64 *)Add2Ptr(e, le16_to_cpu(e->size) - sizeof(__le64));
 +}
 +
-+static inline CLST de_get_vbn(const NTFS_DE *e)
++static inline CLST de_get_vbn(const struct NTFS_DE *e)
 +{
 +	__le64 *v = Add2Ptr(e, le16_to_cpu(e->size) - sizeof(__le64));
 +
 +	return le64_to_cpu(*v);
 +}
 +
-+static inline NTFS_DE *de_get_next(const NTFS_DE *e)
++static inline struct NTFS_DE *de_get_next(const struct NTFS_DE *e)
 +{
 +	return Add2Ptr(e, le16_to_cpu(e->size));
 +}
 +
-+static inline ATTR_FILE_NAME *de_get_fname(const NTFS_DE *e)
++static inline struct ATTR_FILE_NAME *de_get_fname(const struct NTFS_DE *e)
 +{
 +	return le16_to_cpu(e->key_size) >= SIZEOF_ATTRIBUTE_FILENAME ?
-+		       Add2Ptr(e, sizeof(NTFS_DE)) :
++		       Add2Ptr(e, sizeof(struct NTFS_DE)) :
 +		       NULL;
 +}
 +
-+static inline bool de_is_last(const NTFS_DE *e)
++static inline bool de_is_last(const struct NTFS_DE *e)
 +{
 +	return e->flags & NTFS_IE_LAST;
 +}
 +
-+static inline bool de_has_vcn(const NTFS_DE *e)
++static inline bool de_has_vcn(const struct NTFS_DE *e)
 +{
 +	return e->flags & NTFS_IE_HAS_SUBNODES;
 +}
 +
-+static inline bool de_has_vcn_ex(const NTFS_DE *e)
++static inline bool de_has_vcn_ex(const struct NTFS_DE *e)
 +{
 +	return (e->flags & NTFS_IE_HAS_SUBNODES) &&
 +	       (u64)(-1) != *((u64 *)Add2Ptr(e, le16_to_cpu(e->size) -
@@ -816,10 +834,11 @@ index 000000000000..b9735129f45b
 +}
 +
 +#define MAX_BYTES_PER_NAME_ENTRY                                               \
-+	QuadAlign(sizeof(NTFS_DE) + offsetof(ATTR_FILE_NAME, name) +           \
++	QuadAlign(sizeof(struct NTFS_DE) +                                     \
++		  offsetof(struct ATTR_FILE_NAME, name) +                      \
 +		  NTFS_NAME_LEN * sizeof(short))
 +
-+typedef struct {
++struct INDEX_HDR {
 +	// The offset from the start of this structure to the first NtfsDirEntry
 +	__le32 de_off; // 0x00:
 +	// The size of this structure plus all entries (quad-word aligned)
@@ -833,29 +852,29 @@ index 000000000000..b9735129f45b
 +	//
 +	// de_off + used <= total
 +	//
++};
 +
-+} INDEX_HDR;
++static_assert(sizeof(struct INDEX_HDR) == 0x10);
 +
-+static_assert(sizeof(INDEX_HDR) == 0x10);
-+
-+static inline NTFS_DE *hdr_first_de(const INDEX_HDR *hdr)
++static inline struct NTFS_DE *hdr_first_de(const struct INDEX_HDR *hdr)
 +{
 +	u32 de_off = le32_to_cpu(hdr->de_off);
 +	u32 used = le32_to_cpu(hdr->used);
-+	NTFS_DE *e = Add2Ptr(hdr, de_off);
++	struct NTFS_DE *e = Add2Ptr(hdr, de_off);
 +	u16 esize;
 +
 +	if (de_off >= used || de_off >= le32_to_cpu(hdr->total))
 +		return NULL;
 +
 +	esize = le16_to_cpu(e->size);
-+	if (esize < sizeof(NTFS_DE) || de_off + esize > used)
++	if (esize < sizeof(struct NTFS_DE) || de_off + esize > used)
 +		return NULL;
 +
 +	return e;
 +}
 +
-+static inline NTFS_DE *hdr_next_de(const INDEX_HDR *hdr, const NTFS_DE *e)
++static inline struct NTFS_DE *hdr_next_de(const struct INDEX_HDR *hdr,
++					  const struct NTFS_DE *e)
 +{
 +	size_t off = PtrOffset(hdr, e);
 +	u32 used = le32_to_cpu(hdr->used);
@@ -866,40 +885,40 @@ index 000000000000..b9735129f45b
 +
 +	esize = le16_to_cpu(e->size);
 +
-+	if (esize < sizeof(NTFS_DE) || off + esize + sizeof(NTFS_DE) > used)
++	if (esize < sizeof(struct NTFS_DE) ||
++	    off + esize + sizeof(struct NTFS_DE) > used)
 +		return NULL;
 +
 +	return Add2Ptr(e, esize);
 +}
 +
-+static inline bool hdr_has_subnode(const INDEX_HDR *hdr)
++static inline bool hdr_has_subnode(const struct INDEX_HDR *hdr)
 +{
 +	return hdr->flags & 1;
 +}
 +
-+typedef struct {
-+	NTFS_RECORD_HEADER rhdr; // 'INDX'
++struct INDEX_BUFFER {
++	struct NTFS_RECORD_HEADER rhdr; // 'INDX'
 +	__le64 vbn; // 0x10: vcn if index >= cluster or vsn id index < cluster
-+	INDEX_HDR ihdr; // 0x18:
++	struct INDEX_HDR ihdr; // 0x18:
++};
 +
-+} INDEX_BUFFER;
++static_assert(sizeof(struct INDEX_BUFFER) == 0x28);
 +
-+static_assert(sizeof(INDEX_BUFFER) == 0x28);
-+
-+static inline bool ib_is_empty(const INDEX_BUFFER *ib)
++static inline bool ib_is_empty(const struct INDEX_BUFFER *ib)
 +{
-+	const NTFS_DE *first = hdr_first_de(&ib->ihdr);
++	const struct NTFS_DE *first = hdr_first_de(&ib->ihdr);
 +
 +	return !first || de_is_last(first);
 +}
 +
-+static inline bool ib_is_leaf(const INDEX_BUFFER *ib)
++static inline bool ib_is_leaf(const struct INDEX_BUFFER *ib)
 +{
 +	return !(ib->ihdr.flags & 1);
 +}
 +
 +/* Index root structure ( 0x90 ) */
-+typedef enum {
++enum COLLATION_RULE {
 +	NTFS_COLLATION_TYPE_BINARY = cpu_to_le32(0),
 +	NTFS_COLLATION_TYPE_FILENAME = cpu_to_le32(0x01),
 +	// $SII of $Secure / $Q of Quota
@@ -910,34 +929,33 @@ index 000000000000..b9735129f45b
 +	NTFS_COLLATION_TYPE_SECURITY_HASH = cpu_to_le32(0x12),
 +	// $O of ObjId and "$R" for Reparse
 +	NTFS_COLLATION_TYPE_UINTS = cpu_to_le32(0x13)
-+} COLLATION_RULE;
++};
 +
-+static_assert(sizeof(COLLATION_RULE) == 4);
++static_assert(sizeof(enum COLLATION_RULE) == 4);
 +
 +//
-+typedef struct {
-+	ATTR_TYPE type; // 0x00: The type of attribute to index on
-+	COLLATION_RULE rule; // 0x04: The rule
++struct INDEX_ROOT {
++	enum ATTR_TYPE type; // 0x00: The type of attribute to index on
++	enum COLLATION_RULE rule; // 0x04: The rule
 +	__le32 index_block_size; // 0x08: The size of index record
 +	u8 index_block_clst; // 0x0C: The number of clusters per index
 +	u8 res[3];
-+	INDEX_HDR ihdr; // 0x10:
++	struct INDEX_HDR ihdr; // 0x10:
++};
 +
-+} INDEX_ROOT;
-+
-+static_assert(sizeof(INDEX_ROOT) == 0x20);
-+static_assert(offsetof(INDEX_ROOT, ihdr) == 0x10);
++static_assert(sizeof(struct INDEX_ROOT) == 0x20);
++static_assert(offsetof(struct INDEX_ROOT, ihdr) == 0x10);
 +
 +#define VOLUME_FLAG_DIRTY cpu_to_le16(0x0001)
 +#define VOLUME_FLAG_RESIZE_LOG_FILE cpu_to_le16(0x0002)
 +
-+typedef struct {
++struct VOLUME_INFO {
 +	__le64 res1; // 0x00
 +	u8 major_ver; // 0x08: NTFS major version number (before .)
 +	u8 minor_ver; // 0x09: NTFS minor version number (after .)
 +	__le16 flags; // 0x0A: Volume flags, see VOLUME_FLAG_XXX
 +
-+} VOLUME_INFO; // sizeof=0xC
++}; // sizeof=0xC
 +
 +#define SIZEOF_ATTRIBUTE_VOLUME_INFO 0xc
 +
@@ -950,68 +968,76 @@ index 000000000000..b9735129f45b
 +#define NTFS_ATTR_LOG_ALWAYS cpu_to_le32(0x00000080)
 +
 +/* $AttrDef file entry */
-+typedef struct {
++struct ATTR_DEF_ENTRY {
 +	__le16 name[0x40]; // 0x00: Attr name
-+	ATTR_TYPE type; // 0x80: ATTRIB type
++	enum ATTR_TYPE type; // 0x80: struct ATTRIB type
 +	__le32 res; // 0x84:
-+	COLLATION_RULE rule; // 0x88:
++	enum COLLATION_RULE rule; // 0x88:
 +	__le32 flags; // 0x8C: NTFS_ATTR_XXX (see above)
 +	__le64 min_sz; // 0x90: Minimum attribute data size
 +	__le64 max_sz; // 0x98: Maximum attribute data size
-+} ATTR_DEF_ENTRY;
++};
 +
-+static_assert(sizeof(ATTR_DEF_ENTRY) == 0xa0);
++static_assert(sizeof(struct ATTR_DEF_ENTRY) == 0xa0);
 +
 +/* Object ID (0x40) */
-+typedef struct {
-+	GUID ObjId; // 0x00: Unique Id assigned to file
-+	GUID BirthVolumeId; // 0x10: Birth Volume Id is the Object Id of the Volume on
-+		// which the Object Id was allocated. It never changes
-+	GUID BirthObjectId; // 0x20: Birth Object Id is the first Object Id that was
-+		// ever assigned to this MFT Record. I.e. If the Object Id
-+		// is changed for some reason, this field will reflect the
-+		// original value of the Object Id.
-+	GUID DomainId; // 0x30: Domain Id is currently unused but it is intended to be
-+		// used in a network environment where the local machine is
-+		// part of a Windows 2000 Domain. This may be used in a Windows
-+		// 2000 Advanced Server managed domain.
-+} OBJECT_ID;
++struct OBJECT_ID {
++	struct GUID ObjId; // 0x00: Unique Id assigned to file
++	struct GUID
++		BirthVolumeId; // 0x10: Birth Volume Id is the Object Id of the Volume on
++	// which the Object Id was allocated. It never changes
++	struct GUID
++		BirthObjectId; // 0x20: Birth Object Id is the first Object Id that was
++	// ever assigned to this MFT Record. I.e. If the Object Id
++	// is changed for some reason, this field will reflect the
++	// original value of the Object Id.
++	struct GUID
++		DomainId; // 0x30: Domain Id is currently unused but it is intended to be
++	// used in a network environment where the local machine is
++	// part of a Windows 2000 Domain. This may be used in a Windows
++	// 2000 Advanced Server managed domain.
++};
 +
-+static_assert(sizeof(OBJECT_ID) == 0x40);
++static_assert(sizeof(struct OBJECT_ID) == 0x40);
 +
 +/* O Directory entry structure ( rule = 0x13 ) */
-+typedef struct {
-+	NTFS_DE de;
-+	// See OBJECT_ID (0x40) for details
-+	GUID ObjId; // 0x10: Unique Id assigned to file
-+	MFT_REF ref; // 0x20: MFT record number with this file
-+	GUID BirthVolumeId; // 0x28: Birth Volume Id is the Object Id of the Volume on
-+		// which the Object Id was allocated. It never changes
-+	GUID BirthObjectId; // 0x38: Birth Object Id is the first Object Id that was
-+		// ever assigned to this MFT Record. I.e. If the Object Id
-+		// is changed for some reason, this field will reflect the
-+		// original value of the Object Id.
++struct NTFS_DE_O {
++	struct NTFS_DE de;
++	// See struct OBJECT_ID (0x40) for details
++	struct GUID ObjId; // 0x10: Unique Id assigned to file
++	struct MFT_REF ref; // 0x20: MFT record number with this file
++	struct GUID
++		BirthVolumeId; // 0x28: Birth Volume Id is the Object Id of the Volume on
++	// which the Object Id was allocated. It never changes
++	struct GUID
++		BirthObjectId; // 0x38: Birth Object Id is the first Object Id that was
++	// ever assigned to this MFT Record. I.e. If the Object Id
++	// is changed for some reason, this field will reflect the
++	// original value of the Object Id.
 +	// This field is valid if data_size == 0x48
-+	GUID BirthDomainId; // 0x48: Domain Id is currently unused but it is intended
-+		// to be used in a network environment where the local
-+		// machine is part of a Windows 2000 Domain. This may be
-+		// used in a Windows 2000 Advanced Server managed domain.
++	struct GUID
++		BirthDomainId; // 0x48: Domain Id is currently unused but it is intended
++	// to be used in a network environment where the local
++	// machine is part of a Windows 2000 Domain. This may be
++	// used in a Windows 2000 Advanced Server managed domain.
 +
 +	// The last 8 bytes of this structure contains
 +	// the VCN of subnode
 +	// !!! Note !!!
 +	// This field is presented only if (flags & 0x1)
 +	// __le64             SubnodesVCN;
-+} NTFS_DE_O;
++};
 +
-+static_assert(sizeof(NTFS_DE_O) == 0x58);
++static_assert(sizeof(struct NTFS_DE_O) == 0x58);
 +
-+#define NTFS_OBJECT_ENTRY_DATA_SIZE1 0x38 // NTFS_DE_O.BirthDomainId is not used
-+#define NTFS_OBJECT_ENTRY_DATA_SIZE2 0x48 // NTFS_DE_O.BirthDomainId is used
++#define NTFS_OBJECT_ENTRY_DATA_SIZE1                                           \
++	0x38 // struct NTFS_DE_O.BirthDomainId is not used
++#define NTFS_OBJECT_ENTRY_DATA_SIZE2                                           \
++	0x48 // struct NTFS_DE_O.BirthDomainId is used
 +
 +/* Q Directory entry structure ( rule = 0x11 ) */
-+typedef struct {
-+	NTFS_DE de;
++struct NTFS_DE_Q {
++	struct NTFS_DE de;
 +	__le32 owner_id; // 0x10: Unique Id assigned to file
 +	__le32 Version; // 0x14: 0x02
 +	__le32 flags2; // 0x18: Quota flags, see above
@@ -1029,7 +1055,7 @@ index 000000000000..b9735129f45b
 +	// This field is presented only if (flags & 0x1)
 +	// __le64             SubnodesVCN;
 +
-+} NTFS_DE_Q; // __attribute__ ((packed)); // sizeof() = 0x44
++}; // __attribute__ ((packed)); // sizeof() = 0x44
 +
 +#define SIZEOF_NTFS_DE_Q 0x44
 +
@@ -1037,14 +1063,14 @@ index 000000000000..b9735129f45b
 +#define SecurityDescriptorMaxSize 0x20000 // 128K
 +#define Log2OfSecurityDescriptorsBlockSize 18
 +
-+typedef struct {
++struct SECURITY_KEY {
 +	__le32 hash; //  Hash value for descriptor
 +	__le32 sec_id; //  Security Id (guaranteed unique)
-+} SECURITY_KEY;
++};
 +
 +/* Security descriptors (the content of $Secure::SDS data stream) */
-+typedef struct {
-+	SECURITY_KEY key; // 0x00: Security Key
++struct SECURITY_HDR {
++	struct SECURITY_KEY key; // 0x00: Security Key
 +	__le64 off; // 0x08: Offset of this entry in the file
 +	__le32 size; // 0x10: Size of this entry, 8 byte aligned
 +	//
@@ -1052,44 +1078,43 @@ index 000000000000..b9735129f45b
 +	// Total size is 16 byte aligned
 +	//
 +
-+} __packed SECURITY_HDR;
++} __packed;
 +
 +#define SIZEOF_SECURITY_HDR 0x14
 +
 +/* SII Directory entry structure */
-+typedef struct {
-+	NTFS_DE de;
++struct NTFS_DE_SII {
++	struct NTFS_DE de;
 +	__le32 sec_id; // 0x10: Key: sizeof(security_id) = wKeySize
-+	SECURITY_HDR sec_hdr; // 0x14:
++	struct SECURITY_HDR sec_hdr; // 0x14:
 +
-+} __packed NTFS_DE_SII;
++} __packed;
 +
 +#define SIZEOF_SII_DIRENTRY 0x28
 +
 +/* SDH Directory entry structure */
-+typedef struct {
-+	NTFS_DE de;
-+	SECURITY_KEY key; // 0x10: Key
-+	SECURITY_HDR sec_hdr; // 0x18: Data
++struct NTFS_DE_SDH {
++	struct NTFS_DE de;
++	struct SECURITY_KEY key; // 0x10: Key
++	struct SECURITY_HDR sec_hdr; // 0x18: Data
 +	__le16 magic[2]; // 0x2C: 0x00490049 "I I"
-+
-+} NTFS_DE_SDH; // __attribute__ ((packed));
++};
 +
 +#define SIZEOF_SDH_DIRENTRY 0x30
 +
-+typedef struct {
++struct REPARSE_KEY {
 +	__le32 ReparseTag; // 0x00: Reparse Tag
-+	MFT_REF ref; // 0x04: MFT record number with this file
++	struct MFT_REF ref; // 0x04: MFT record number with this file
 +
-+} REPARSE_KEY; // sizeof() = 0x0C
++}; // sizeof() = 0x0C
 +
-+static_assert(offsetof(REPARSE_KEY, ref) == 0x04);
++static_assert(offsetof(struct REPARSE_KEY, ref) == 0x04);
 +#define SIZEOF_REPARSE_KEY 0x0C
 +
 +/* Reparse Directory entry structure */
-+typedef struct {
-+	NTFS_DE de;
-+	REPARSE_KEY Key; // 0x10: Reparse Key (Tag + MFT_REF)
++struct NTFS_DE_R {
++	struct NTFS_DE de;
++	struct REPARSE_KEY Key; // 0x10: Reparse Key (Tag + struct MFT_REF)
 +
 +	// The last 8 bytes of this structure contains
 +	// the VCN of subnode
@@ -1097,7 +1122,7 @@ index 000000000000..b9735129f45b
 +	// This field is presented only if (flags & 0x1)
 +	// __le64             SubnodesVCN;
 +
-+} NTFS_DE_R; // sizeof() = 0x1C
++}; // sizeof() = 0x1C
 +
 +#define SIZEOF_R_DIRENTRY 0x1C
 +
@@ -1118,25 +1143,25 @@ index 000000000000..b9735129f45b
 +/*
 + * ATTR_REPARSE (0xC0)
 + *
-+ * The reparse GUID structure is used by all 3rd party layered drivers to
-+ * store data in a reparse point. For non-Microsoft tags, The GUID field
++ * The reparse struct GUID structure is used by all 3rd party layered drivers to
++ * store data in a reparse point. For non-Microsoft tags, The struct GUID field
 + * cannot be GUID_NULL.
 + * The constraints on reparse tags are defined below.
 + * Microsoft tags can also be used with this format of the reparse point buffer.
 + */
-+typedef struct {
++struct REPARSE_POINT {
 +	__le32 ReparseTag; // 0x00:
 +	__le16 ReparseDataLength; // 0x04:
 +	__le16 Reserved;
 +
-+	GUID Guid; // 0x08:
++	struct GUID Guid; // 0x08:
 +
 +	//
 +	// Here GenericReparseBuffer is placed
 +	//
-+} REPARSE_POINT;
++};
 +
-+static_assert(sizeof(REPARSE_POINT) == 0x18);
++static_assert(sizeof(struct REPARSE_POINT) == 0x18);
 +
 +//
 +// Maximum allowed size of the reparse data.
@@ -1202,7 +1227,7 @@ index 000000000000..b9735129f45b
 +// Microsoft tags for reparse points.
 +//
 +
-+typedef enum {
++enum IO_REPARSE_TAG {
 +	IO_REPARSE_TAG_SYMBOLIC_LINK = cpu_to_le32(0),
 +	IO_REPARSE_TAG_NAME_SURROGATE = cpu_to_le32(0x20000000),
 +	IO_REPARSE_TAG_MICROSOFT = cpu_to_le32(0x80000000),
@@ -1270,12 +1295,10 @@ index 000000000000..b9735129f45b
 +	IO_REPARSE_TAG_CLOUD_E = cpu_to_le32(0x9000E01A),
 +	IO_REPARSE_TAG_CLOUD_F = cpu_to_le32(0x9000F01A),
 +
-+} NTFS_IO_REPARSE_TAG;
-+
-+static_assert(sizeof(NTFS_IO_REPARSE_TAG) == 4);
++};
 +
 +/* Microsoft reparse buffer. (see DDK for details) */
-+typedef struct {
++struct REPARSE_DATA_BUFFER {
 +	__le32 ReparseTag; // 0x00:
 +	__le16 ReparseDataLength; // 0x04:
 +	__le16 Reserved;
@@ -1326,13 +1349,12 @@ index 000000000000..b9735129f45b
 +			u8 DataBuffer[1]; // 0x08
 +		} GenericReparseBuffer;
 +	};
-+
-+} REPARSE_DATA_BUFFER;
++};
 +
 +static inline u32 ntfs_reparse_bytes(u32 uni_len)
 +{
 +	return sizeof(short) * (2 * uni_len + 4) +
-+	       offsetof(REPARSE_DATA_BUFFER,
++	       offsetof(struct REPARSE_DATA_BUFFER,
 +			SymbolicLink2ReparseBuffer.PathBuffer);
 +}
 +
@@ -1342,33 +1364,32 @@ index 000000000000..b9735129f45b
 +/* FILE_NEED_EA, indicates that the file to which the EA belongs cannot be
 + * interpreted without understanding the associated extended attributes.
 + */
-+typedef struct {
++struct EA_INFO {
 +	__le16 size_pack; // 0x00: Size of buffer to hold in packed form
 +	__le16 count; // 0x02: Count of EA's with FILE_NEED_EA bit set
 +	__le32 size; // 0x04: Size of buffer to hold in unpacked form
-+} EA_INFO;
++};
 +
-+static_assert(sizeof(EA_INFO) == 8);
++static_assert(sizeof(struct EA_INFO) == 8);
 +
 +/* ATTR_EA (0xE0) */
-+typedef struct {
++struct EA_FULL {
 +	__le32 size; // 0x00: (not in packed)
 +	u8 flags; // 0x04
 +	u8 name_len; // 0x05
 +	__le16 elength; // 0x06
 +	u8 name[1]; // 0x08
++};
 +
-+} EA_FULL;
-+
-+static_assert(offsetof(EA_FULL, name) == 8);
++static_assert(offsetof(struct EA_FULL, name) == 8);
 +
 +#define MAX_EA_DATA_SIZE (256 * 1024)
 diff --git a/fs/ntfs3/ntfs_fs.h b/fs/ntfs3/ntfs_fs.h
 new file mode 100644
-index 000000000000..0024fcad3b89
+index 000000000000..a28ccc36b288
 --- /dev/null
 +++ b/fs/ntfs3/ntfs_fs.h
-@@ -0,0 +1,965 @@
+@@ -0,0 +1,1001 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + *  linux/fs/ntfs3/ntfs_fs.h
@@ -1398,28 +1419,28 @@ index 000000000000..0024fcad3b89
 +#define MAXIMUM_BYTES_PER_INDEX 4096 // ??
 +#define NTFS_BLOCKS_PER_INODE (MAXIMUM_BYTES_PER_INDEX / 512)
 +
-+typedef struct ntfs_inode ntfs_inode;
-+typedef struct ntfs_sb_info ntfs_sb_info;
++struct ntfs_inode;
++struct ntfs_sb_info;
 +struct lznt;
 +
 +struct mount_options {
 +	kuid_t fs_uid;
 +	kgid_t fs_gid;
-+	u16 fs_fmask;
-+	u16 fs_dmask;
-+	unsigned quiet : 1, /* set = fake successful chmods and chowns */
-+		sys_immutable : 1, /* set = system files are immutable */
-+		discard : 1, /* Issue discard requests on deletions */
-+		uid : 1, /* uid was set */
++	u16 fs_fmask_inv;
++	u16 fs_dmask_inv;
++
++	unsigned uid : 1, /* uid was set */
 +		gid : 1, /* gid was set */
 +		fmask : 1, /* fmask was set */
 +		dmask : 1, /*dmask was set*/
++		sys_immutable : 1, /* set = system files are immutable */
++		discard : 1, /* issue discard requests on deletions */
 +		sparse : 1, /*create sparse files*/
 +		showmeta : 1, /*show meta files*/
-+		nohidden : 1, /*do not shot hidden files*/
-+		acl : 1, /*create acl*/
++		nohidden : 1, /*do not show hidden files*/
 +		force : 1, /*rw mount dirty volume*/
-+		no_acs_rules : 1 /*exclude acs rules*/
++		no_acs_rules : 1, /*exclude acs rules*/
++		prealloc : 1 /*preallocate space when file is growing*/
 +		;
 +};
 +
@@ -1454,7 +1475,7 @@ index 000000000000..0024fcad3b89
 +	BITMAP_MUTEX_MFT = 1,
 +};
 +
-+typedef struct {
++struct wnd_bitmap {
 +	struct super_block *sb;
 +	struct rw_semaphore rw_lock;
 +
@@ -1483,8 +1504,7 @@ index 000000000000..0024fcad3b89
 +	/* Zone [bit, end) */
 +	size_t zone_bit;
 +	size_t zone_end;
-+
-+} wnd_bitmap;
++};
 +
 +typedef int (*NTFS_CMP_FUNC)(const void *key1, size_t len1, const void *key2,
 +			     size_t len2, const void *param);
@@ -1500,7 +1520,7 @@ index 000000000000..0024fcad3b89
 +};
 +
 +/* This struct works with indexes */
-+typedef struct {
++struct ntfs_index {
 +	struct runs_tree bitmap_run;
 +	struct runs_tree alloc_run;
 +
@@ -1512,8 +1532,7 @@ index 000000000000..0024fcad3b89
 +	u8 vbn2vbo_bits; // index_block_size < cluster? 9 : cluster_bits
 +	u8 changed; // set when tree is changed
 +	u8 type; // index_mutex_classed
-+
-+} ntfs_index;
++};
 +
 +/* Set when $LogFile is replaying */
 +#define NTFS_FLAGS_LOG_REPLAING 0x00000008
@@ -1542,7 +1561,7 @@ index 000000000000..0024fcad3b89
 +};
 +
 +/* ntfs file system in-core superblock data */
-+typedef struct ntfs_sb_info {
++struct ntfs_sb_info {
 +	struct super_block *sb;
 +
 +	u32 discard_granularity;
@@ -1578,19 +1597,19 @@ index 000000000000..0024fcad3b89
 +	CLST reparse_no;
 +	CLST usn_jrnl_no;
 +
-+	ATTR_DEF_ENTRY *def_table; // attribute definition table
++	struct ATTR_DEF_ENTRY *def_table; // attribute definition table
 +	u32 def_entries;
 +
-+	MFT_REC *new_rec;
++	struct MFT_REC *new_rec;
 +
 +	u16 *upcase;
 +
-+	struct nls_table *nls;
++	struct nls_table *nls; /*use utf8 if nls==NULL*/
 +
 +	struct {
 +		u64 lbo, lbo2;
-+		ntfs_inode *ni;
-+		wnd_bitmap bitmap; // $MFT::Bitmap
++		struct ntfs_inode *ni;
++		struct wnd_bitmap bitmap; // $MFT::Bitmap
 +		ulong reserved_bitmap;
 +		size_t next_free; // The next record to allocate from
 +		size_t used;
@@ -1600,7 +1619,7 @@ index 000000000000..0024fcad3b89
 +	} mft;
 +
 +	struct {
-+		wnd_bitmap bitmap; // $Bitmap::Data
++		struct wnd_bitmap bitmap; // $Bitmap::Data
 +		CLST next_free_lcn;
 +	} used;
 +
@@ -1608,7 +1627,7 @@ index 000000000000..0024fcad3b89
 +		u64 size; // in bytes
 +		u64 blocks; // in blocks
 +		u64 ser_num;
-+		ntfs_inode *ni;
++		struct ntfs_inode *ni;
 +		__le16 flags; // see VOLUME_FLAG_XXX
 +		u8 major_ver;
 +		u8 minor_ver;
@@ -1617,9 +1636,9 @@ index 000000000000..0024fcad3b89
 +	} volume;
 +
 +	struct {
-+		ntfs_index index_sii;
-+		ntfs_index index_sdh;
-+		ntfs_inode *ni;
++		struct ntfs_index index_sii;
++		struct ntfs_index index_sdh;
++		struct ntfs_inode *ni;
 +		u32 next_id;
 +		u64 next_off;
 +
@@ -1628,14 +1647,14 @@ index 000000000000..0024fcad3b89
 +	} security;
 +
 +	struct {
-+		ntfs_index index_r;
-+		ntfs_inode *ni;
++		struct ntfs_index index_r;
++		struct ntfs_inode *ni;
 +		u64 max_size; // 16K
 +	} reparse;
 +
 +	struct {
-+		ntfs_index index_o;
-+		ntfs_inode *ni;
++		struct ntfs_index index_o;
++		struct ntfs_inode *ni;
 +	} objid;
 +
 +	struct {
@@ -1646,20 +1665,19 @@ index 000000000000..0024fcad3b89
 +	} compress;
 +
 +	struct mount_options options;
-+	struct ratelimit_state ratelimit;
++	struct ratelimit_state msg_ratelimit;
++};
 +
-+} ntfs_sb_info;
-+
-+typedef struct {
++struct mft_inode {
 +	struct rb_node node;
-+	ntfs_sb_info *sbi;
++	struct ntfs_sb_info *sbi;
 +
 +	CLST rno;
-+	MFT_REC *mrec;
++	struct MFT_REC *mrec;
 +	struct ntfs_buffers nb;
 +
 +	bool dirty;
-+} mft_inode;
++};
 +
 +#define NI_FLAG_DIR 0x00000001
 +#define NI_FLAG_RESIDENT 0x00000002
@@ -1672,8 +1690,8 @@ index 000000000000..0024fcad3b89
 +#define NI_FLAG_EA 0x00002000
 +
 +/* ntfs file system inode data memory */
-+typedef struct ntfs_inode {
-+	mft_inode mi; // base record
++struct ntfs_inode {
++	struct mft_inode mi; // base record
 +
 +	loff_t i_valid; /* valid size */
 +	struct timespec64 i_crtime;
@@ -1681,14 +1699,14 @@ index 000000000000..0024fcad3b89
 +	struct mutex ni_lock;
 +
 +	/* file attributes from std */
-+	FILE_ATTRIBUTE std_fa;
++	enum FILE_ATTRIBUTE std_fa;
 +	__le32 std_security_id;
 +
 +	// subrecords tree
 +	struct rb_root mi_tree;
 +
 +	union {
-+		ntfs_index dir;
++		struct ntfs_index dir;
 +		struct {
 +			struct rw_semaphore run_lock;
 +			struct runs_tree run;
@@ -1705,18 +1723,18 @@ index 000000000000..0024fcad3b89
 +	size_t ni_flags; // NI_FLAG_XXX
 +
 +	struct inode vfs_inode;
-+} ntfs_inode;
++};
 +
 +struct indx_node {
 +	struct ntfs_buffers nb;
-+	INDEX_BUFFER *index;
++	struct INDEX_BUFFER *index;
 +};
 +
 +struct ntfs_fnd {
 +	int level;
 +	struct indx_node *nodes[20];
-+	NTFS_DE *de[20];
-+	NTFS_DE *root_de;
++	struct NTFS_DE *de[20];
++	struct NTFS_DE *root_de;
 +};
 +
 +enum REPARSE_SIGN {
@@ -1727,39 +1745,47 @@ index 000000000000..0024fcad3b89
 +};
 +
 +/* functions from attrib.c*/
-+int attr_load_runs(ATTRIB *attr, ntfs_inode *ni, struct runs_tree *run);
-+int attr_allocate_clusters(ntfs_sb_info *sbi, struct runs_tree *run, CLST vcn,
-+			   CLST lcn, CLST len, CLST *pre_alloc,
++int attr_load_runs(struct ATTRIB *attr, struct ntfs_inode *ni,
++		   struct runs_tree *run);
++int attr_allocate_clusters(struct ntfs_sb_info *sbi, struct runs_tree *run,
++			   CLST vcn, CLST lcn, CLST len, CLST *pre_alloc,
 +			   enum ALLOCATE_OPT opt, CLST *alen, const size_t fr,
 +			   CLST *new_lcn);
-+int attr_set_size(ntfs_inode *ni, ATTR_TYPE type, const __le16 *name,
-+		  u8 name_len, struct runs_tree *run, u64 new_size,
-+		  const u64 *new_valid, bool keep_prealloc, ATTRIB **ret);
-+int attr_data_get_block(ntfs_inode *ni, CLST vcn, CLST *lcn, CLST *len,
++int attr_set_size(struct ntfs_inode *ni, enum ATTR_TYPE type,
++		  const __le16 *name, u8 name_len, struct runs_tree *run,
++		  u64 new_size, const u64 *new_valid, bool keep_prealloc,
++		  struct ATTRIB **ret);
++int attr_data_get_block(struct ntfs_inode *ni, CLST vcn, CLST *lcn, CLST *len,
 +			bool *new);
-+int attr_load_runs_vcn(ntfs_inode *ni, ATTR_TYPE type, const __le16 *name,
-+		       u8 name_len, struct runs_tree *run, CLST vcn);
-+int attr_is_frame_compressed(ntfs_inode *ni, ATTRIB *attr, CLST frame,
-+			     CLST *clst_data, bool *is_compr);
-+int attr_allocate_frame(ntfs_inode *ni, CLST frame, size_t compr_size,
++int attr_load_runs_vcn(struct ntfs_inode *ni, enum ATTR_TYPE type,
++		       const __le16 *name, u8 name_len, struct runs_tree *run,
++		       CLST vcn);
++int attr_is_frame_compressed(struct ntfs_inode *ni, struct ATTRIB *attr,
++			     CLST frame, CLST *clst_data, bool *is_compr);
++int attr_allocate_frame(struct ntfs_inode *ni, CLST frame, size_t compr_size,
 +			u64 new_valid);
 +
 +/* functions from attrlist.c*/
-+void al_destroy(ntfs_inode *ni);
-+bool al_verify(ntfs_inode *ni);
-+int ntfs_load_attr_list(ntfs_inode *ni, ATTRIB *attr);
-+ATTR_LIST_ENTRY *al_enumerate(ntfs_inode *ni, ATTR_LIST_ENTRY *le);
-+ATTR_LIST_ENTRY *al_find_le(ntfs_inode *ni, ATTR_LIST_ENTRY *le,
-+			    const ATTRIB *attr);
-+ATTR_LIST_ENTRY *al_find_ex(ntfs_inode *ni, ATTR_LIST_ENTRY *le, ATTR_TYPE type,
-+			    const __le16 *name, u8 name_len, const CLST *vcn);
-+int al_add_le(ntfs_inode *ni, ATTR_TYPE type, const __le16 *name, u8 name_len,
-+	      CLST svcn, __le16 id, const MFT_REF *ref,
-+	      ATTR_LIST_ENTRY **new_le);
-+bool al_remove_le(ntfs_inode *ni, ATTR_LIST_ENTRY *le);
-+bool al_delete_le(ntfs_inode *ni, ATTR_TYPE type, CLST vcn, const __le16 *name,
-+		  size_t name_len, const MFT_REF *ref);
-+int al_update(ntfs_inode *ni);
++void al_destroy(struct ntfs_inode *ni);
++bool al_verify(struct ntfs_inode *ni);
++int ntfs_load_attr_list(struct ntfs_inode *ni, struct ATTRIB *attr);
++struct ATTR_LIST_ENTRY *al_enumerate(struct ntfs_inode *ni,
++				     struct ATTR_LIST_ENTRY *le);
++struct ATTR_LIST_ENTRY *al_find_le(struct ntfs_inode *ni,
++				   struct ATTR_LIST_ENTRY *le,
++				   const struct ATTRIB *attr);
++struct ATTR_LIST_ENTRY *al_find_ex(struct ntfs_inode *ni,
++				   struct ATTR_LIST_ENTRY *le,
++				   enum ATTR_TYPE type, const __le16 *name,
++				   u8 name_len, const CLST *vcn);
++int al_add_le(struct ntfs_inode *ni, enum ATTR_TYPE type, const __le16 *name,
++	      u8 name_len, CLST svcn, __le16 id, const struct MFT_REF *ref,
++	      struct ATTR_LIST_ENTRY **new_le);
++bool al_remove_le(struct ntfs_inode *ni, struct ATTR_LIST_ENTRY *le);
++bool al_delete_le(struct ntfs_inode *ni, enum ATTR_TYPE type, CLST vcn,
++		  const __le16 *name, size_t name_len,
++		  const struct MFT_REF *ref);
++int al_update(struct ntfs_inode *ni);
 +static inline size_t al_aligned(size_t size)
 +{
 +	return (size + 1023) & ~(size_t)1023;
@@ -1771,10 +1797,11 @@ index 000000000000..0024fcad3b89
 +size_t get_set_bits_ex(const ulong *map, size_t bit, size_t nbits);
 +
 +/* globals from dir.c */
-+int uni_to_x8(ntfs_sb_info *sbi, const struct le_str *uni, u8 *buf,
-+	      int buf_len);
-+int x8_to_uni(ntfs_sb_info *sbi, const u8 *name, u32 name_len,
-+	      struct cpu_str *uni, u32 max_ulen, enum utf16_endian endian);
++int ntfs_utf16_to_nls(struct ntfs_sb_info *sbi, const struct le_str *uni,
++		      u8 *buf, int buf_len);
++int ntfs_nls_to_utf16(struct ntfs_sb_info *sbi, const u8 *name, u32 name_len,
++		      struct cpu_str *uni, u32 max_ulen,
++		      enum utf16_endian endian);
 +struct inode *dir_search_u(struct inode *dir, const struct cpu_str *uni,
 +			   struct ntfs_fnd *fnd);
 +struct inode *dir_search(struct inode *dir, const struct qstr *name,
@@ -1791,138 +1818,160 @@ index 000000000000..0024fcad3b89
 +void ntfs_truncate_blocks(struct inode *inode, loff_t offset);
 +int ntfs_setattr(struct dentry *dentry, struct iattr *attr);
 +int ntfs_file_open(struct inode *inode, struct file *file);
++int ntfs_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
++		__u64 start, __u64 len);
 +extern const struct inode_operations ntfs_special_inode_operations;
 +extern const struct inode_operations ntfs_file_inode_operations;
 +extern const struct file_operations ntfs_file_operations;
 +
 +/* globals from frecord.c */
-+void ni_remove_mi(ntfs_inode *ni, mft_inode *mi);
-+ATTR_STD_INFO *ni_std(ntfs_inode *ni);
-+void ni_clear(ntfs_inode *ni);
-+int ni_load_mi_ex(ntfs_inode *ni, CLST rno, mft_inode **mi);
-+int ni_load_mi(ntfs_inode *ni, ATTR_LIST_ENTRY *le, mft_inode **mi);
-+ATTRIB *ni_find_attr(ntfs_inode *ni, ATTRIB *attr, ATTR_LIST_ENTRY **entry_o,
-+		     ATTR_TYPE type, const __le16 *name, u8 name_len,
-+		     const CLST *vcn, mft_inode **mi);
-+ATTRIB *ni_enum_attr_ex(ntfs_inode *ni, ATTRIB *attr, ATTR_LIST_ENTRY **le);
-+ATTRIB *ni_load_attr(ntfs_inode *ni, ATTR_TYPE type, const __le16 *name,
-+		     u8 name_len, CLST vcn, mft_inode **pmi);
-+int ni_load_all_mi(ntfs_inode *ni);
-+bool ni_add_subrecord(ntfs_inode *ni, CLST rno, mft_inode **mi);
-+int ni_remove_attr(ntfs_inode *ni, ATTR_TYPE type, const __le16 *name,
-+		   size_t name_len, bool base_only, const __le16 *id);
-+int ni_create_attr_list(ntfs_inode *ni);
-+int ni_expand_list(ntfs_inode *ni);
-+int ni_insert_nonresident(ntfs_inode *ni, ATTR_TYPE type, const __le16 *name,
-+			  u8 name_len, const struct runs_tree *run, CLST svcn,
-+			  CLST len, __le16 flags, ATTRIB **new_attr,
-+			  mft_inode **mi);
-+int ni_insert_resident(ntfs_inode *ni, u32 data_size, ATTR_TYPE type,
-+		       const __le16 *name, u8 name_len, ATTRIB **new_attr,
-+		       mft_inode **mi);
-+int ni_remove_attr_le(ntfs_inode *ni, ATTRIB *attr, ATTR_LIST_ENTRY *le);
-+int ni_delete_all(ntfs_inode *ni);
-+ATTR_FILE_NAME *ni_fname_name(ntfs_inode *ni, const struct cpu_str *uni,
-+			      const MFT_REF *home, ATTR_LIST_ENTRY **entry);
-+ATTR_FILE_NAME *ni_fname_type(ntfs_inode *ni, u8 name_type,
-+			      ATTR_LIST_ENTRY **entry);
-+u16 ni_fnames_count(ntfs_inode *ni);
-+int ni_init_compress(ntfs_inode *ni, struct COMPRESS_CTX *ctx);
-+enum REPARSE_SIGN ni_parse_reparse(ntfs_inode *ni, ATTRIB *attr, void *buffer);
++void ni_remove_mi(struct ntfs_inode *ni, struct mft_inode *mi);
++struct ATTR_STD_INFO *ni_std(struct ntfs_inode *ni);
++void ni_clear(struct ntfs_inode *ni);
++int ni_load_mi_ex(struct ntfs_inode *ni, CLST rno, struct mft_inode **mi);
++int ni_load_mi(struct ntfs_inode *ni, struct ATTR_LIST_ENTRY *le,
++	       struct mft_inode **mi);
++struct ATTRIB *ni_find_attr(struct ntfs_inode *ni, struct ATTRIB *attr,
++			    struct ATTR_LIST_ENTRY **entry_o,
++			    enum ATTR_TYPE type, const __le16 *name,
++			    u8 name_len, const CLST *vcn,
++			    struct mft_inode **mi);
++struct ATTRIB *ni_enum_attr_ex(struct ntfs_inode *ni, struct ATTRIB *attr,
++			       struct ATTR_LIST_ENTRY **le);
++struct ATTRIB *ni_load_attr(struct ntfs_inode *ni, enum ATTR_TYPE type,
++			    const __le16 *name, u8 name_len, CLST vcn,
++			    struct mft_inode **pmi);
++int ni_load_all_mi(struct ntfs_inode *ni);
++bool ni_add_subrecord(struct ntfs_inode *ni, CLST rno, struct mft_inode **mi);
++int ni_remove_attr(struct ntfs_inode *ni, enum ATTR_TYPE type,
++		   const __le16 *name, size_t name_len, bool base_only,
++		   const __le16 *id);
++int ni_create_attr_list(struct ntfs_inode *ni);
++int ni_expand_list(struct ntfs_inode *ni);
++int ni_insert_nonresident(struct ntfs_inode *ni, enum ATTR_TYPE type,
++			  const __le16 *name, u8 name_len,
++			  const struct runs_tree *run, CLST svcn, CLST len,
++			  __le16 flags, struct ATTRIB **new_attr,
++			  struct mft_inode **mi);
++int ni_insert_resident(struct ntfs_inode *ni, u32 data_size,
++		       enum ATTR_TYPE type, const __le16 *name, u8 name_len,
++		       struct ATTRIB **new_attr, struct mft_inode **mi);
++int ni_remove_attr_le(struct ntfs_inode *ni, struct ATTRIB *attr,
++		      struct ATTR_LIST_ENTRY *le);
++int ni_delete_all(struct ntfs_inode *ni);
++struct ATTR_FILE_NAME *ni_fname_name(struct ntfs_inode *ni,
++				     const struct cpu_str *uni,
++				     const struct MFT_REF *home,
++				     struct ATTR_LIST_ENTRY **entry);
++struct ATTR_FILE_NAME *ni_fname_type(struct ntfs_inode *ni, u8 name_type,
++				     struct ATTR_LIST_ENTRY **entry);
++u16 ni_fnames_count(struct ntfs_inode *ni);
++int ni_init_compress(struct ntfs_inode *ni, struct COMPRESS_CTX *ctx);
++enum REPARSE_SIGN ni_parse_reparse(struct ntfs_inode *ni, struct ATTRIB *attr,
++				   void *buffer);
 +int ni_write_inode(struct inode *inode, int sync, const char *hint);
 +#define _ni_write_inode(i, w) ni_write_inode(i, w, __func__)
-+
-+/* globals from compress.c */
-+int ni_readpage_cmpr(ntfs_inode *ni, struct page *page);
++int ni_fiemap(struct ntfs_inode *ni, struct fiemap_extent_info *fieinfo,
++	      __u64 vbo, __u64 len);
++int ni_readpage_cmpr(struct ntfs_inode *ni, struct page *page);
 +int ni_writepage_cmpr(struct page *page, int sync);
 +
 +/* globals from fslog.c */
-+int log_replay(ntfs_inode *ni);
++int log_replay(struct ntfs_inode *ni);
 +
 +/* globals from fsntfs.c */
-+bool ntfs_fix_pre_write(NTFS_RECORD_HEADER *rhdr, size_t bytes);
-+int ntfs_fix_post_read(NTFS_RECORD_HEADER *rhdr, size_t bytes, bool simple);
-+int ntfs_extend_init(ntfs_sb_info *sbi);
-+int ntfs_loadlog_and_replay(ntfs_inode *ni, ntfs_sb_info *sbi);
-+const ATTR_DEF_ENTRY *ntfs_query_def(ntfs_sb_info *sbi, ATTR_TYPE Type);
-+int ntfs_look_for_free_space(ntfs_sb_info *sbi, CLST lcn, CLST len,
++bool ntfs_fix_pre_write(struct NTFS_RECORD_HEADER *rhdr, size_t bytes);
++int ntfs_fix_post_read(struct NTFS_RECORD_HEADER *rhdr, size_t bytes,
++		       bool simple);
++int ntfs_extend_init(struct ntfs_sb_info *sbi);
++int ntfs_loadlog_and_replay(struct ntfs_inode *ni, struct ntfs_sb_info *sbi);
++const struct ATTR_DEF_ENTRY *ntfs_query_def(struct ntfs_sb_info *sbi,
++					    enum ATTR_TYPE Type);
++int ntfs_look_for_free_space(struct ntfs_sb_info *sbi, CLST lcn, CLST len,
 +			     CLST *new_lcn, CLST *new_len,
 +			     enum ALLOCATE_OPT opt);
-+int ntfs_look_free_mft(ntfs_sb_info *sbi, CLST *rno, bool mft, ntfs_inode *ni,
-+		       mft_inode **mi);
-+void ntfs_mark_rec_free(ntfs_sb_info *sbi, CLST nRecord);
-+int ntfs_clear_mft_tail(ntfs_sb_info *sbi, size_t from, size_t to);
-+int ntfs_refresh_zone(ntfs_sb_info *sbi);
-+int ntfs_update_mftmirr(ntfs_sb_info *sbi, int wait);
++int ntfs_look_free_mft(struct ntfs_sb_info *sbi, CLST *rno, bool mft,
++		       struct ntfs_inode *ni, struct mft_inode **mi);
++void ntfs_mark_rec_free(struct ntfs_sb_info *sbi, CLST nRecord);
++int ntfs_clear_mft_tail(struct ntfs_sb_info *sbi, size_t from, size_t to);
++int ntfs_refresh_zone(struct ntfs_sb_info *sbi);
++int ntfs_update_mftmirr(struct ntfs_sb_info *sbi, int wait);
 +enum NTFS_DIRTY_FLAGS {
 +	NTFS_DIRTY_DIRTY = 0,
 +	NTFS_DIRTY_CLEAR = 1,
 +	NTFS_DIRTY_ERROR = 2,
 +};
-+int ntfs_set_state(ntfs_sb_info *sbi, enum NTFS_DIRTY_FLAGS dirty);
++int ntfs_set_state(struct ntfs_sb_info *sbi, enum NTFS_DIRTY_FLAGS dirty);
 +int ntfs_sb_read(struct super_block *sb, u64 lbo, size_t bytes, void *buffer);
 +int ntfs_sb_write(struct super_block *sb, u64 lbo, size_t bytes,
 +		  const void *buffer, int wait);
-+int ntfs_sb_write_run(ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
++int ntfs_sb_write_run(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
 +		      const void *buf, size_t bytes);
-+struct buffer_head *ntfs_bread_run(ntfs_sb_info *sbi, struct runs_tree *run,
-+				   u64 vbo);
-+int ntfs_read_run_nb(ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
++struct buffer_head *ntfs_bread_run(struct ntfs_sb_info *sbi,
++				   struct runs_tree *run, u64 vbo);
++int ntfs_read_run_nb(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
 +		     void *buf, u32 bytes, struct ntfs_buffers *nb);
-+int ntfs_read_bh_ex(ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
-+		    NTFS_RECORD_HEADER *rhdr, u32 bytes,
++int ntfs_read_bh_ex(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
++		    struct NTFS_RECORD_HEADER *rhdr, u32 bytes,
 +		    struct ntfs_buffers *nb);
-+int ntfs_get_bh(ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo, u32 bytes,
-+		struct ntfs_buffers *nb);
-+int ntfs_write_bh_ex(ntfs_sb_info *sbi, NTFS_RECORD_HEADER *rhdr,
++int ntfs_get_bh(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
++		u32 bytes, struct ntfs_buffers *nb);
++int ntfs_write_bh_ex(struct ntfs_sb_info *sbi, struct NTFS_RECORD_HEADER *rhdr,
 +		     struct ntfs_buffers *nb, int sync);
-+int ntfs_vbo_to_pbo(ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo, u64 *pbo,
-+		    u64 *bytes);
-+ntfs_inode *ntfs_new_inode(ntfs_sb_info *sbi, CLST nRec, bool dir);
++int ntfs_vbo_to_lbo(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
++		    u64 *lbo, u64 *bytes);
++struct ntfs_inode *ntfs_new_inode(struct ntfs_sb_info *sbi, CLST nRec,
++				  bool dir);
 +extern const u8 s_dir_security[0x50];
 +extern const u8 s_file_security[0x58];
-+int ntfs_security_init(ntfs_sb_info *sbi);
-+int ntfs_get_security_by_id(ntfs_sb_info *sbi, u32 security_id, void **sd,
-+			    size_t *size);
-+int ntfs_insert_security(ntfs_sb_info *sbi, const void *sd, u32 size,
++int ntfs_security_init(struct ntfs_sb_info *sbi);
++int ntfs_get_security_by_id(struct ntfs_sb_info *sbi, u32 security_id,
++			    void **sd, size_t *size);
++int ntfs_insert_security(struct ntfs_sb_info *sbi, const void *sd, u32 size,
 +			 __le32 *security_id, bool *inserted);
-+int ntfs_reparse_init(ntfs_sb_info *sbi);
-+int ntfs_objid_init(ntfs_sb_info *sbi);
-+int ntfs_objid_remove(ntfs_sb_info *sbi, GUID *guid);
-+int ntfs_insert_reparse(ntfs_sb_info *sbi, __le32 rtag, const MFT_REF *ref);
-+int ntfs_remove_reparse(ntfs_sb_info *sbi, __le32 rtag, const MFT_REF *ref);
-+void mark_as_free_ex(ntfs_sb_info *sbi, CLST lcn, CLST len, bool trim);
-+int run_deallocate(ntfs_sb_info *sbi, struct runs_tree *run, bool trim);
++int ntfs_reparse_init(struct ntfs_sb_info *sbi);
++int ntfs_objid_init(struct ntfs_sb_info *sbi);
++int ntfs_objid_remove(struct ntfs_sb_info *sbi, struct GUID *guid);
++int ntfs_insert_reparse(struct ntfs_sb_info *sbi, __le32 rtag,
++			const struct MFT_REF *ref);
++int ntfs_remove_reparse(struct ntfs_sb_info *sbi, __le32 rtag,
++			const struct MFT_REF *ref);
++void mark_as_free_ex(struct ntfs_sb_info *sbi, CLST lcn, CLST len, bool trim);
++int run_deallocate(struct ntfs_sb_info *sbi, struct runs_tree *run, bool trim);
 +
 +/* globals from index.c */
-+int indx_used_bit(ntfs_index *indx, ntfs_inode *ni, size_t *bit);
++int indx_used_bit(struct ntfs_index *indx, struct ntfs_inode *ni, size_t *bit);
 +void fnd_clear(struct ntfs_fnd *fnd);
-+struct ntfs_fnd *fnd_get(ntfs_index *indx);
++struct ntfs_fnd *fnd_get(struct ntfs_index *indx);
 +void fnd_put(struct ntfs_fnd *fnd);
-+void indx_clear(ntfs_index *idx);
-+int indx_init(ntfs_index *indx, ntfs_sb_info *sbi, const ATTRIB *attr,
-+	      enum index_mutex_classed type);
-+INDEX_ROOT *indx_get_root(ntfs_index *indx, ntfs_inode *ni, ATTRIB **attr,
-+			  mft_inode **mi);
-+int indx_read(ntfs_index *idx, ntfs_inode *ni, CLST vbn,
++void indx_clear(struct ntfs_index *idx);
++int indx_init(struct ntfs_index *indx, struct ntfs_sb_info *sbi,
++	      const struct ATTRIB *attr, enum index_mutex_classed type);
++struct INDEX_ROOT *indx_get_root(struct ntfs_index *indx, struct ntfs_inode *ni,
++				 struct ATTRIB **attr, struct mft_inode **mi);
++int indx_read(struct ntfs_index *idx, struct ntfs_inode *ni, CLST vbn,
 +	      struct indx_node **node);
-+int indx_find(ntfs_index *indx, ntfs_inode *dir, const INDEX_ROOT *root,
-+	      const void *Key, size_t KeyLen, const void *param, int *diff,
-+	      NTFS_DE **entry, struct ntfs_fnd *fnd);
-+int indx_find_sort(ntfs_index *indx, ntfs_inode *ni, const INDEX_ROOT *root,
-+		   NTFS_DE **entry, struct ntfs_fnd *fnd);
-+int indx_find_raw(ntfs_index *indx, ntfs_inode *ni, const INDEX_ROOT *root,
-+		  NTFS_DE **entry, size_t *off, struct ntfs_fnd *fnd);
-+int indx_insert_entry(ntfs_index *indx, ntfs_inode *ni, const NTFS_DE *new_de,
-+		      const void *param, struct ntfs_fnd *fnd);
-+int indx_delete_entry(ntfs_index *indx, ntfs_inode *ni, const void *key,
-+		      u32 key_len, const void *param);
-+int indx_update_dup(ntfs_inode *ni, ntfs_sb_info *sbi,
-+		    const ATTR_FILE_NAME *fname, const NTFS_DUP_INFO *dup,
-+		    int sync);
++int indx_find(struct ntfs_index *indx, struct ntfs_inode *dir,
++	      const struct INDEX_ROOT *root, const void *Key, size_t KeyLen,
++	      const void *param, int *diff, struct NTFS_DE **entry,
++	      struct ntfs_fnd *fnd);
++int indx_find_sort(struct ntfs_index *indx, struct ntfs_inode *ni,
++		   const struct INDEX_ROOT *root, struct NTFS_DE **entry,
++		   struct ntfs_fnd *fnd);
++int indx_find_raw(struct ntfs_index *indx, struct ntfs_inode *ni,
++		  const struct INDEX_ROOT *root, struct NTFS_DE **entry,
++		  size_t *off, struct ntfs_fnd *fnd);
++int indx_insert_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
++		      const struct NTFS_DE *new_de, const void *param,
++		      struct ntfs_fnd *fnd);
++int indx_delete_entry(struct ntfs_index *indx, struct ntfs_inode *ni,
++		      const void *key, u32 key_len, const void *param);
++int indx_update_dup(struct ntfs_inode *ni, struct ntfs_sb_info *sbi,
++		    const struct ATTR_FILE_NAME *fname,
++		    const struct NTFS_DUP_INFO *dup, int sync);
 +
 +/* globals from inode.c */
-+struct inode *ntfs_iget5(struct super_block *sb, const MFT_REF *ref,
++struct inode *ntfs_iget5(struct super_block *sb, const struct MFT_REF *ref,
 +			 const struct cpu_str *name);
 +int ntfs_set_size(struct inode *inode, u64 new_size);
 +int reset_log_file(struct inode *inode);
@@ -1946,36 +1995,41 @@ index 000000000000..0024fcad3b89
 +extern const struct address_space_operations ntfs_aops_cmpr;
 +
 +/* globals from name_i.c*/
-+int fill_name_de(ntfs_sb_info *sbi, void *buf, const struct qstr *name);
++int fill_name_de(struct ntfs_sb_info *sbi, void *buf, const struct qstr *name);
 +struct dentry *ntfs_get_parent(struct dentry *child);
 +
 +extern const struct inode_operations ntfs_dir_inode_operations;
 +
 +/* globals from record.c */
-+int mi_get(ntfs_sb_info *sbi, CLST rno, mft_inode **mi);
-+void mi_put(mft_inode *mi);
-+int mi_init(mft_inode *mi, ntfs_sb_info *sbi, CLST rno);
-+int mi_read(mft_inode *mi, bool is_mft);
-+ATTRIB *mi_enum_attr(mft_inode *mi, ATTRIB *attr);
++int mi_get(struct ntfs_sb_info *sbi, CLST rno, struct mft_inode **mi);
++void mi_put(struct mft_inode *mi);
++int mi_init(struct mft_inode *mi, struct ntfs_sb_info *sbi, CLST rno);
++int mi_read(struct mft_inode *mi, bool is_mft);
++struct ATTRIB *mi_enum_attr(struct mft_inode *mi, struct ATTRIB *attr);
 +// TODO: id?
-+ATTRIB *mi_find_attr(mft_inode *mi, ATTRIB *attr, ATTR_TYPE type,
-+		     const __le16 *name, size_t name_len, const __le16 *id);
-+static inline ATTRIB *rec_find_attr_le(mft_inode *rec, ATTR_LIST_ENTRY *le)
++struct ATTRIB *mi_find_attr(struct mft_inode *mi, struct ATTRIB *attr,
++			    enum ATTR_TYPE type, const __le16 *name,
++			    size_t name_len, const __le16 *id);
++static inline struct ATTRIB *rec_find_attr_le(struct mft_inode *rec,
++					      struct ATTR_LIST_ENTRY *le)
 +{
 +	return mi_find_attr(rec, NULL, le->type, le_name(le), le->name_len,
 +			    &le->id);
 +}
-+int mi_write(mft_inode *mi, int wait);
-+int mi_format_new(mft_inode *mi, ntfs_sb_info *sbi, CLST rno, __le16 flags,
-+		  bool is_mft);
-+void mi_mark_free(mft_inode *mi);
-+ATTRIB *mi_insert_attr(mft_inode *mi, ATTR_TYPE type, const __le16 *name,
-+		       u8 name_len, u32 asize, u16 name_off);
++int mi_write(struct mft_inode *mi, int wait);
++int mi_format_new(struct mft_inode *mi, struct ntfs_sb_info *sbi, CLST rno,
++		  __le16 flags, bool is_mft);
++void mi_mark_free(struct mft_inode *mi);
++struct ATTRIB *mi_insert_attr(struct mft_inode *mi, enum ATTR_TYPE type,
++			      const __le16 *name, u8 name_len, u32 asize,
++			      u16 name_off);
 +
-+bool mi_remove_attr(mft_inode *mi, ATTRIB *attr);
-+bool mi_resize_attr(mft_inode *mi, ATTRIB *attr, int bytes);
-+int mi_pack_runs(mft_inode *mi, ATTRIB *attr, struct runs_tree *run, CLST len);
-+static inline bool mi_is_ref(const mft_inode *mi, const MFT_REF *ref)
++bool mi_remove_attr(struct mft_inode *mi, struct ATTRIB *attr);
++bool mi_resize_attr(struct mft_inode *mi, struct ATTRIB *attr, int bytes);
++int mi_pack_runs(struct mft_inode *mi, struct ATTRIB *attr,
++		 struct runs_tree *run, CLST len);
++static inline bool mi_is_ref(const struct mft_inode *mi,
++			     const struct MFT_REF *ref)
 +{
 +	if (le32_to_cpu(ref->low) != mi->rno)
 +		return false;
@@ -2002,12 +2056,12 @@ index 000000000000..0024fcad3b89
 +
 +int run_pack(const struct runs_tree *run, CLST svcn, CLST len, u8 *run_buf,
 +	     u32 run_buf_size, CLST *packed_vcns);
-+int run_unpack(struct runs_tree *run, ntfs_sb_info *sbi, CLST ino, CLST svcn,
-+	       CLST evcn, const u8 *run_buf, u32 run_buf_size);
++int run_unpack(struct runs_tree *run, struct ntfs_sb_info *sbi, CLST ino,
++	       CLST svcn, CLST evcn, const u8 *run_buf, u32 run_buf_size);
 +
 +#ifdef NTFS3_CHECK_FREE_CLST
-+int run_unpack_ex(struct runs_tree *run, ntfs_sb_info *sbi, CLST ino, CLST svcn,
-+		  CLST evcn, const u8 *run_buf, u32 run_buf_size);
++int run_unpack_ex(struct runs_tree *run, struct ntfs_sb_info *sbi, CLST ino,
++		  CLST svcn, CLST evcn, const u8 *run_buf, u32 run_buf_size);
 +#else
 +#define run_unpack_ex run_unpack
 +#endif
@@ -2017,30 +2071,30 @@ index 000000000000..0024fcad3b89
 +void *ntfs_set_shared(void *ptr, u32 bytes);
 +void *ntfs_put_shared(void *ptr);
 +void ntfs_unmap_meta(struct super_block *sb, CLST lcn, CLST len);
-+int ntfs_discard(ntfs_sb_info *sbi, CLST Lcn, CLST Len);
++int ntfs_discard(struct ntfs_sb_info *sbi, CLST Lcn, CLST Len);
 +
 +/* globals from ubitmap.c*/
-+void wnd_close(wnd_bitmap *wnd);
-+static inline size_t wnd_zeroes(const wnd_bitmap *wnd)
++void wnd_close(struct wnd_bitmap *wnd);
++static inline size_t wnd_zeroes(const struct wnd_bitmap *wnd)
 +{
 +	return wnd->total_zeroes;
 +}
-+void wnd_trace(wnd_bitmap *wnd);
-+void wnd_trace_tree(wnd_bitmap *wnd, u32 nExtents, const char *Hint);
-+int wnd_init(wnd_bitmap *wnd, struct super_block *sb, size_t nBits);
-+int wnd_set_free(wnd_bitmap *wnd, size_t FirstBit, size_t Bits);
-+int wnd_set_used(wnd_bitmap *wnd, size_t FirstBit, size_t Bits);
-+bool wnd_is_free(wnd_bitmap *wnd, size_t FirstBit, size_t Bits);
-+bool wnd_is_used(wnd_bitmap *wnd, size_t FirstBit, size_t Bits);
++void wnd_trace(struct wnd_bitmap *wnd);
++void wnd_trace_tree(struct wnd_bitmap *wnd, u32 nExtents, const char *Hint);
++int wnd_init(struct wnd_bitmap *wnd, struct super_block *sb, size_t nBits);
++int wnd_set_free(struct wnd_bitmap *wnd, size_t FirstBit, size_t Bits);
++int wnd_set_used(struct wnd_bitmap *wnd, size_t FirstBit, size_t Bits);
++bool wnd_is_free(struct wnd_bitmap *wnd, size_t FirstBit, size_t Bits);
++bool wnd_is_used(struct wnd_bitmap *wnd, size_t FirstBit, size_t Bits);
 +
 +/* Possible values for 'flags' 'wnd_find' */
 +#define BITMAP_FIND_MARK_AS_USED 0x01
 +#define BITMAP_FIND_FULL 0x02
-+size_t wnd_find(wnd_bitmap *wnd, size_t to_alloc, size_t hint, size_t flags,
-+		size_t *allocated);
-+int wnd_extend(wnd_bitmap *wnd, size_t new_bits);
-+void wnd_zone_set(wnd_bitmap *wnd, size_t Lcn, size_t Len);
-+int ntfs_trim_fs(ntfs_sb_info *sbi, struct fstrim_range *range);
++size_t wnd_find(struct wnd_bitmap *wnd, size_t to_alloc, size_t hint,
++		size_t flags, size_t *allocated);
++int wnd_extend(struct wnd_bitmap *wnd, size_t new_bits);
++void wnd_zone_set(struct wnd_bitmap *wnd, size_t Lcn, size_t Len);
++int ntfs_trim_fs(struct ntfs_sb_info *sbi, struct fstrim_range *range);
 +
 +/* globals from upcase.c */
 +int ntfs_cmp_names(const __le16 *s1, size_t l1, const __le16 *s2, size_t l2,
@@ -2054,6 +2108,7 @@ index 000000000000..0024fcad3b89
 +int ntfs_acl_chmod(struct inode *inode);
 +int ntfs_permission(struct inode *inode, int mask);
 +ssize_t ntfs_listxattr(struct dentry *dentry, char *buffer, size_t size);
++int ntfs_init_acl(struct inode *inode, struct inode *dir);
 +extern const struct xattr_handler *ntfs_xattr_handlers[];
 +
 +/* globals from lznt.c */
@@ -2064,20 +2119,20 @@ index 000000000000..0024fcad3b89
 +ssize_t decompress_lznt(const void *compressed, size_t compressed_size,
 +			void *uncompressed, size_t uncompressed_size);
 +
-+char *attr_str(const ATTRIB *attr, char *buf, size_t buf_len);
++char *attr_str(const struct ATTRIB *attr, char *buf, size_t buf_len);
 +
-+static inline bool is_nt5(ntfs_sb_info *sbi)
++static inline bool is_nt5(struct ntfs_sb_info *sbi)
 +{
 +	return sbi->volume.major_ver >= 3;
 +}
 +
 +/*(sb->s_flags & SB_ACTIVE)*/
-+static inline bool is_mounted(ntfs_sb_info *sbi)
++static inline bool is_mounted(struct ntfs_sb_info *sbi)
 +{
 +	return !!sbi->sb->s_root;
 +}
 +
-+static inline bool ntfs_is_meta_file(ntfs_sb_info *sbi, CLST rno)
++static inline bool ntfs_is_meta_file(struct ntfs_sb_info *sbi, CLST rno)
 +{
 +	return rno < MFT_REC_FREE || rno == sbi->objid_no ||
 +	       rno == sbi->quota_no || rno == sbi->reparse_no ||
@@ -2105,12 +2160,12 @@ index 000000000000..0024fcad3b89
 +	return page;
 +}
 +
-+static inline size_t wnd_zone_bit(const wnd_bitmap *wnd)
++static inline size_t wnd_zone_bit(const struct wnd_bitmap *wnd)
 +{
 +	return wnd->zone_bit;
 +}
 +
-+static inline size_t wnd_zone_len(const wnd_bitmap *wnd)
++static inline size_t wnd_zone_len(const struct wnd_bitmap *wnd)
 +{
 +	return wnd->zone_end - wnd->zone_bit;
 +}
@@ -2184,13 +2239,13 @@ index 000000000000..0024fcad3b89
 +	ts->tv_sec = t;
 +}
 +
-+static inline ntfs_sb_info *ntfs_sb(struct super_block *sb)
++static inline struct ntfs_sb_info *ntfs_sb(struct super_block *sb)
 +{
 +	return sb->s_fs_info;
 +}
 +
 +/* Align up on cluster boundary */
-+static inline u64 ntfs_up_cluster(const ntfs_sb_info *sbi, u64 size)
++static inline u64 ntfs_up_cluster(const struct ntfs_sb_info *sbi, u64 size)
 +{
 +	return (size + sbi->cluster_mask) & ~((u64)sbi->cluster_mask);
 +}
@@ -2201,7 +2256,7 @@ index 000000000000..0024fcad3b89
 +	return (size + sb->s_blocksize - 1) & ~(u64)(sb->s_blocksize - 1);
 +}
 +
-+static inline CLST bytes_to_cluster(const ntfs_sb_info *sbi, u64 size)
++static inline CLST bytes_to_cluster(const struct ntfs_sb_info *sbi, u64 size)
 +{
 +	return (size + sbi->cluster_mask) >> sbi->cluster_bits;
 +}
@@ -2212,7 +2267,8 @@ index 000000000000..0024fcad3b89
 +}
 +
 +/* calculates ((bytes + frame_size - 1)/frame_size)*frame_size; */
-+static inline u64 ntfs_up_frame(const ntfs_sb_info *sbi, u64 bytes, u8 c_unit)
++static inline u64 ntfs_up_frame(const struct ntfs_sb_info *sbi, u64 bytes,
++				u8 c_unit)
 +{
 +	u32 bytes_per_frame = 1u << (c_unit + sbi->cluster_bits);
 +
@@ -2228,8 +2284,8 @@ index 000000000000..0024fcad3b89
 +	if (bh)
 +		return bh;
 +
-+	__ntfs_trace(sb, KERN_ERR, "failed to read volume at offset 0x%llx",
-+		     (u64)block << sb->s_blocksize_bits);
++	ntfs_printk(sb, KERN_ERR "failed to read volume at offset 0x%llx",
++		    (u64)block << sb->s_blocksize_bits);
 +	return NULL;
 +}
 +
@@ -2238,28 +2294,28 @@ index 000000000000..0024fcad3b89
 +	return v && !(v & (v - 1));
 +}
 +
-+static inline ntfs_inode *ntfs_i(struct inode *inode)
++static inline struct ntfs_inode *ntfs_i(struct inode *inode)
 +{
-+	return container_of(inode, ntfs_inode, vfs_inode);
++	return container_of(inode, struct ntfs_inode, vfs_inode);
 +}
 +
-+static inline bool is_compressed(const ntfs_inode *ni)
++static inline bool is_compressed(const struct ntfs_inode *ni)
 +{
 +	return (ni->std_fa & FILE_ATTRIBUTE_COMPRESSED) ||
 +	       (ni->ni_flags & NI_FLAG_COMPRESSED_MASK);
 +}
 +
-+static inline bool is_dedup(const ntfs_inode *ni)
++static inline bool is_dedup(const struct ntfs_inode *ni)
 +{
 +	return ni->ni_flags & NI_FLAG_DEDUPLICATED;
 +}
 +
-+static inline bool is_encrypted(const ntfs_inode *ni)
++static inline bool is_encrypted(const struct ntfs_inode *ni)
 +{
 +	return ni->std_fa & FILE_ATTRIBUTE_ENCRYPTED;
 +}
 +
-+static inline bool is_sparsed(const ntfs_inode *ni)
++static inline bool is_sparsed(const struct ntfs_inode *ni)
 +{
 +	return ni->std_fa & FILE_ATTRIBUTE_SPARSE_FILE;
 +}
@@ -2296,34 +2352,35 @@ index 000000000000..0024fcad3b89
 +	ntfs_free(in);
 +}
 +
-+static inline void mi_clear(mft_inode *mi)
++static inline void mi_clear(struct mft_inode *mi)
 +{
 +	nb_put(&mi->nb);
 +	ntfs_free(mi->mrec);
 +	mi->mrec = NULL;
 +}
 +
-+static inline void ni_lock(ntfs_inode *ni)
++static inline void ni_lock(struct ntfs_inode *ni)
 +{
 +	mutex_lock(&ni->ni_lock);
 +}
 +
-+static inline void ni_unlock(ntfs_inode *ni)
++static inline void ni_unlock(struct ntfs_inode *ni)
 +{
 +	mutex_unlock(&ni->ni_lock);
 +}
 +
-+static inline int ni_trylock(ntfs_inode *ni)
++static inline int ni_trylock(struct ntfs_inode *ni)
 +{
 +	return mutex_trylock(&ni->ni_lock);
 +}
 +
-+static inline int ni_has_resident_data(ntfs_inode *ni)
++static inline int ni_has_resident_data(struct ntfs_inode *ni)
 +{
 +	return ni->ni_flags & NI_FLAG_RESIDENT;
 +}
 +
-+static inline int attr_load_runs_attr(ntfs_inode *ni, ATTRIB *attr,
++static inline int attr_load_runs_attr(struct ntfs_inode *ni,
++				      struct ATTRIB *attr,
 +				      struct runs_tree *run, CLST vcn)
 +{
 +	return attr_load_runs_vcn(ni, attr->type, attr_name(attr),
@@ -2420,3 +2477,5 @@ index 000000000000..0bb8d75b8abb
 +}
 -- 
 2.25.2
+
+

@@ -63,7 +63,7 @@ _localmodcfg=
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-ft
-pkgver=5.8.3
+pkgver=5.8.12
 pkgrel=1
 _ckpatchversion=1
 arch=(x86_64)

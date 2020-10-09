@@ -1,28 +1,85 @@
-From: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-To: "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Cc: "Pali Rohár" <pali@kernel.org>
-Subject: [PATCH v2 03/10] fs/ntfs3: Add bitmap
-Date: Fri, 21 Aug 2020 16:25:10 +0000
-Message-ID: <dcfab32866914bbab1c5af38817f8ebb@paragon-software.com> (raw)
+From mboxrd@z Thu Jan  1 00:00:00 1970
+Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
+	aws-us-west-2-korg-lkml-1.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C73BCC433E7
+	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:40:42 +0000 (UTC)
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by mail.kernel.org (Postfix) with ESMTP id 85869214D8
+	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:40:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="fV1Cy53x"
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1728020AbgH1Okj (ORCPT
+        <rfc822;linux-kernel@archiver.kernel.org>);
+        Fri, 28 Aug 2020 10:40:39 -0400
+Received: from relayfre-01.paragon-software.com ([176.12.100.13]:57852 "EHLO
+        relayfre-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727969AbgH1OkX (ORCPT
+        <rfc822;linux-kernel@vger.kernel.org>);
+        Fri, 28 Aug 2020 10:40:23 -0400
+Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
+        by relayfre-01.paragon-software.com (Postfix) with ESMTPS id E41AE27E;
+        Fri, 28 Aug 2020 17:40:16 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paragon-software.com; s=mail; t=1598625616;
+        bh=LsZqvcfqN4iaP1FLhZSeqe+wbystI5ElcXOOBfYj0Oc=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References;
+        b=fV1Cy53xMHdmL3rzZUXlxPB9zFXie2jc3HCIzqqoHUhO/xXgxBxctVn1gMC4Diu/G
+         LCpO7cDcZr48yRpHLxFPWmyxlmXnOgTWXXVjjlz+ilX0poMYL9W53VsO/Y55VRMcK3
+         sNeh+grHPjC3DtUP5ZFIazW4IbydgO+NJpTlC2n0=
+Received: from localhost.localdomain (172.30.8.44) by
+ vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1847.3; Fri, 28 Aug 2020 17:40:15 +0300
+From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+To:     <linux-fsdevel@vger.kernel.org>
+CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
+        <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
+        <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
+        <mark@harmstone.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v3 03/10] fs/ntfs3: Add bitmap
+Date:   Fri, 28 Aug 2020 07:39:31 -0700
+Message-ID: <20200828143938.102889-4-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [172.30.8.44]
+X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+ vdlg-exch-02.paragon-software.com (172.30.1.105)
+Sender: linux-kernel-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-kernel.vger.kernel.org>
+X-Mailing-List: linux-kernel@vger.kernel.org
+Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-4-almaz.alexandrovich@paragon-software.com/>
+List-Archive: <https://lore.kernel.org/lkml/>
+List-Post: <mailto:linux-kernel@vger.kernel.org>
 
-Bitmap implementation
+This adds bitmap
 
 Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 ---
- fs/ntfs3/bitfunc.c |  144 +++++
+ fs/ntfs3/bitfunc.c |  137 ++++
  fs/ntfs3/bitmap.c  | 1545 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 1689 insertions(+)
+ 2 files changed, 1682 insertions(+)
  create mode 100644 fs/ntfs3/bitfunc.c
  create mode 100644 fs/ntfs3/bitmap.c
 
 diff --git a/fs/ntfs3/bitfunc.c b/fs/ntfs3/bitfunc.c
 new file mode 100644
-index 000000000000..b10a13d0c3b2
+index 000000000000..b19972177535
 --- /dev/null
 +++ b/fs/ntfs3/bitfunc.c
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,137 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/bitfunc.c
@@ -66,30 +123,27 @@ index 000000000000..b10a13d0c3b2
 +	size_t pos = bit & 7;
 +	const u8 *map = (u8 *)lmap + (bit >> 3);
 +
-+	if (!pos)
-+		goto check_size_t;
-+	if (8 - pos >= nbits)
-+		return !nbits ||
-+		       !(*map & fill_mask[pos + nbits] & zero_mask[pos]);
++	if (pos) {
++		if (8 - pos >= nbits)
++			return !nbits || !(*map & fill_mask[pos + nbits] &
++					   zero_mask[pos]);
 +
-+	if (*map++ & zero_mask[pos])
-+		return false;
-+	nbits -= 8 - pos;
-+
-+check_size_t:
-+	pos = ((size_t)map) & (sizeof(size_t) - 1);
-+	if (!pos)
-+		goto step_size_t;
-+
-+	pos = sizeof(size_t) - pos;
-+	if (nbits < pos * 8)
-+		goto step_size_t;
-+	for (nbits -= pos * 8; pos; pos--, map++) {
-+		if (*map)
++		if (*map++ & zero_mask[pos])
 +			return false;
++		nbits -= 8 - pos;
 +	}
 +
-+step_size_t:
++	pos = ((size_t)map) & (sizeof(size_t) - 1);
++	if (pos) {
++		pos = sizeof(size_t) - pos;
++		if (nbits >= pos * 8) {
++			for (nbits -= pos * 8; pos; pos--, map++) {
++				if (*map)
++					return false;
++			}
++		}
++	}
++
 +	for (pos = nbits / BITS_IN_SIZE_T; pos; pos--, map += sizeof(size_t)) {
 +		if (*((size_t *)map))
 +			return false;
@@ -119,33 +173,29 @@ index 000000000000..b10a13d0c3b2
 +	size_t pos = bit & 7;
 +	const u8 *map = (u8 *)lmap + (bit >> 3);
 +
-+	if (!pos)
-+		goto check_size_t;
++	if (pos) {
++		if (8 - pos >= nbits) {
++			mask = fill_mask[pos + nbits] & zero_mask[pos];
++			return !nbits || (*map & mask) == mask;
++		}
 +
-+	if (8 - pos >= nbits) {
-+		mask = fill_mask[pos + nbits] & zero_mask[pos];
-+		return !nbits || (*map & mask) == mask;
-+	}
-+
-+	mask = zero_mask[pos];
-+	if ((*map++ & mask) != mask)
-+		return false;
-+	nbits -= 8 - pos;
-+
-+check_size_t:
-+	pos = ((size_t)map) & (sizeof(size_t) - 1); // 0,1,2,3
-+	if (!pos)
-+		goto step_size_t;
-+	pos = sizeof(size_t) - pos;
-+	if (nbits < pos * 8)
-+		goto step_size_t;
-+
-+	for (nbits -= pos * 8; pos; pos--, map++) {
-+		if (*map != 0xFF)
++		mask = zero_mask[pos];
++		if ((*map++ & mask) != mask)
 +			return false;
++		nbits -= 8 - pos;
 +	}
 +
-+step_size_t:
++	pos = ((size_t)map) & (sizeof(size_t) - 1);
++	if (pos) {
++		pos = sizeof(size_t) - pos;
++		if (nbits >= pos * 8) {
++			for (nbits -= pos * 8; pos; pos--, map++) {
++				if (*map != 0xFF)
++					return false;
++			}
++		}
++	}
++
 +	for (pos = nbits / BITS_IN_SIZE_T; pos; pos--, map += sizeof(size_t)) {
 +		if (*((size_t *)map) != MINUS_ONE_T)
 +			return false;
@@ -169,7 +219,7 @@ index 000000000000..b10a13d0c3b2
 +}
 diff --git a/fs/ntfs3/bitmap.c b/fs/ntfs3/bitmap.c
 new file mode 100644
-index 000000000000..f37a6976525b
+index 000000000000..fe41e010b2eb
 --- /dev/null
 +++ b/fs/ntfs3/bitmap.c
 @@ -0,0 +1,1545 @@
@@ -204,11 +254,11 @@ index 000000000000..f37a6976525b
 +	struct rb_node_key count; /* Tree sorted by len*/
 +};
 +
-+static int wnd_rescan(wnd_bitmap *wnd);
-+static struct buffer_head *wnd_map(wnd_bitmap *wnd, size_t iw);
-+static bool wnd_is_free_hlp(wnd_bitmap *wnd, size_t bit, size_t bits);
++static int wnd_rescan(struct wnd_bitmap *wnd);
++static struct buffer_head *wnd_map(struct wnd_bitmap *wnd, size_t iw);
++static bool wnd_is_free_hlp(struct wnd_bitmap *wnd, size_t bit, size_t bits);
 +
-+static inline u32 wnd_bits(const wnd_bitmap *wnd, size_t i)
++static inline u32 wnd_bits(const struct wnd_bitmap *wnd, size_t i)
 +{
 +	return i + 1 == wnd->nwnd ? wnd->bits_last : wnd->sb->s_blocksize * 8;
 +}
@@ -281,7 +331,7 @@ index 000000000000..f37a6976525b
 + *
 + *
 + */
-+void wnd_close(wnd_bitmap *wnd)
++void wnd_close(struct wnd_bitmap *wnd)
 +{
 +	struct rb_node *node, *next;
 +
@@ -395,7 +445,7 @@ index 000000000000..f37a6976525b
 + * adds a new extent of free space
 + * build = 1 when building tree
 + */
-+static void wnd_add_free_ext(wnd_bitmap *wnd, size_t bit, size_t len,
++static void wnd_add_free_ext(struct wnd_bitmap *wnd, size_t bit, size_t len,
 +			     bool build)
 +{
 +	struct e_node *e, *e0 = NULL;
@@ -538,7 +588,7 @@ index 000000000000..f37a6976525b
 + *
 + * removes a run from the cached free space
 + */
-+static void wnd_remove_free_ext(wnd_bitmap *wnd, size_t bit, size_t len)
++static void wnd_remove_free_ext(struct wnd_bitmap *wnd, size_t bit, size_t len)
 +{
 +	struct rb_node *n, *n3;
 +	struct e_node *e, *e3;
@@ -684,12 +734,12 @@ index 000000000000..f37a6976525b
 + *
 + * Scan all bitmap. used while initialization.
 + */
-+static int wnd_rescan(wnd_bitmap *wnd)
++static int wnd_rescan(struct wnd_bitmap *wnd)
 +{
 +	int err = 0;
 +	size_t prev_tail = 0;
 +	struct super_block *sb = wnd->sb;
-+	ntfs_sb_info *sbi = sb->s_fs_info;
++	struct ntfs_sb_info *sbi = sb->s_fs_info;
 +	u64 lbo, len = 0;
 +	u32 blocksize = sb->s_blocksize;
 +	u8 cluster_bits = sbi->cluster_bits;
@@ -848,7 +898,7 @@ index 000000000000..f37a6976525b
 +/*
 + * wnd_init
 + */
-+int wnd_init(wnd_bitmap *wnd, struct super_block *sb, size_t nbits)
++int wnd_init(struct wnd_bitmap *wnd, struct super_block *sb, size_t nbits)
 +{
 +	int err;
 +	u32 blocksize = sb->s_blocksize;
@@ -888,12 +938,12 @@ index 000000000000..f37a6976525b
 + *
 + * call sb_bread for requested window
 + */
-+static struct buffer_head *wnd_map(wnd_bitmap *wnd, size_t iw)
++static struct buffer_head *wnd_map(struct wnd_bitmap *wnd, size_t iw)
 +{
 +	size_t vbo;
 +	CLST lcn, clen;
 +	struct super_block *sb = wnd->sb;
-+	ntfs_sb_info *sbi;
++	struct ntfs_sb_info *sbi;
 +	struct buffer_head *bh;
 +	u64 lbo;
 +
@@ -920,7 +970,7 @@ index 000000000000..f37a6976525b
 + *
 + * Marks the bits range from bit to bit + bits as free
 + */
-+int wnd_set_free(wnd_bitmap *wnd, size_t bit, size_t bits)
++int wnd_set_free(struct wnd_bitmap *wnd, size_t bit, size_t bits)
 +{
 +	int err = 0;
 +	struct super_block *sb = wnd->sb;
@@ -975,7 +1025,7 @@ index 000000000000..f37a6976525b
 + *
 + * Marks the bits range from bit to bit + bits as used
 + */
-+int wnd_set_used(wnd_bitmap *wnd, size_t bit, size_t bits)
++int wnd_set_used(struct wnd_bitmap *wnd, size_t bit, size_t bits)
 +{
 +	int err = 0;
 +	struct super_block *sb = wnd->sb;
@@ -1029,7 +1079,7 @@ index 000000000000..f37a6976525b
 + *
 + * Returns true if all clusters [bit, bit+bits) are free (bitmap only)
 + */
-+static bool wnd_is_free_hlp(wnd_bitmap *wnd, size_t bit, size_t bits)
++static bool wnd_is_free_hlp(struct wnd_bitmap *wnd, size_t bit, size_t bits)
 +{
 +	struct super_block *sb = wnd->sb;
 +	size_t iw = bit >> (sb->s_blocksize_bits + 3);
@@ -1072,7 +1122,7 @@ index 000000000000..f37a6976525b
 + *
 + * Returns true if all clusters [bit, bit+bits) are free
 + */
-+bool wnd_is_free(wnd_bitmap *wnd, size_t bit, size_t bits)
++bool wnd_is_free(struct wnd_bitmap *wnd, size_t bit, size_t bits)
 +{
 +	bool ret;
 +	struct rb_node *n;
@@ -1104,7 +1154,7 @@ index 000000000000..f37a6976525b
 + *
 + * Returns true if all clusters [bit, bit+bits) are used
 + */
-+bool wnd_is_used(wnd_bitmap *wnd, size_t bit, size_t bits)
++bool wnd_is_used(struct wnd_bitmap *wnd, size_t bit, size_t bits)
 +{
 +	bool ret = false;
 +	struct super_block *sb = wnd->sb;
@@ -1167,8 +1217,8 @@ index 000000000000..f37a6976525b
 + * looks for free space
 + * Returns 0 if not found
 + */
-+size_t wnd_find(wnd_bitmap *wnd, size_t to_alloc, size_t hint, size_t flags,
-+		size_t *allocated)
++size_t wnd_find(struct wnd_bitmap *wnd, size_t to_alloc, size_t hint,
++		size_t flags, size_t *allocated)
 +{
 +	struct super_block *sb;
 +	u32 wbits, wpos, wzbit, wzend;
@@ -1527,11 +1577,11 @@ index 000000000000..f37a6976525b
 + *
 + * Extend bitmap ($MFT bitmap)
 + */
-+int wnd_extend(wnd_bitmap *wnd, size_t new_bits)
++int wnd_extend(struct wnd_bitmap *wnd, size_t new_bits)
 +{
 +	int err;
 +	struct super_block *sb = wnd->sb;
-+	ntfs_sb_info *sbi = sb->s_fs_info;
++	struct ntfs_sb_info *sbi = sb->s_fs_info;
 +	u32 blocksize = sb->s_blocksize;
 +	u32 wbits = blocksize * 8;
 +	u32 b0, new_last;
@@ -1585,7 +1635,7 @@ index 000000000000..f37a6976525b
 +		op = b0 + bits > wbits ? wbits - b0 : bits;
 +		vbo = (u64)iw * blocksize;
 +
-+		err = ntfs_vbo_to_pbo(sbi, &wnd->run, vbo, &lbo, &bytes);
++		err = ntfs_vbo_to_lbo(sbi, &wnd->run, vbo, &lbo, &bytes);
 +		if (err)
 +			break;
 +
@@ -1622,7 +1672,7 @@ index 000000000000..f37a6976525b
 +/*
 + * wnd_zone_set
 + */
-+void wnd_zone_set(wnd_bitmap *wnd, size_t lcn, size_t len)
++void wnd_zone_set(struct wnd_bitmap *wnd, size_t lcn, size_t len)
 +{
 +	size_t zlen;
 +
@@ -1637,11 +1687,11 @@ index 000000000000..f37a6976525b
 +	wnd->zone_end = lcn + len;
 +}
 +
-+int ntfs_trim_fs(ntfs_sb_info *sbi, struct fstrim_range *range)
++int ntfs_trim_fs(struct ntfs_sb_info *sbi, struct fstrim_range *range)
 +{
 +	int err = 0;
 +	struct super_block *sb = sbi->sb;
-+	wnd_bitmap *wnd = &sbi->used.bitmap;
++	struct wnd_bitmap *wnd = &sbi->used.bitmap;
 +	u32 wbits = 8 * sb->s_blocksize;
 +	CLST len = 0, lcn = 0, done = 0;
 +	CLST minlen = bytes_to_cluster(sbi, range->minlen);
@@ -1720,3 +1770,5 @@ index 000000000000..f37a6976525b
 +}
 -- 
 2.25.2
+
+

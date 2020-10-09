@@ -1,66 +1,67 @@
 From mboxrd@z Thu Jan  1 00:00:00 1970
-Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+Return-Path: <SRS0=IB9q=DQ=vger.kernel.org=linux-kernel-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBAFFC433E6
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1767EC43457
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A254C207DF
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7450222BA
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="hxHYAfPE"
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="iQTa3mD5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728109AbgH1Olw (ORCPT
+        id S2388757AbgJIOX3 (ORCPT
         <rfc822;linux-kernel@archiver.kernel.org>);
-        Fri, 28 Aug 2020 10:41:52 -0400
-Received: from relayfre-01.paragon-software.com ([176.12.100.13]:57910 "EHLO
+        Fri, 9 Oct 2020 10:23:29 -0400
+Received: from relayfre-01.paragon-software.com ([176.12.100.13]:52144 "EHLO
         relayfre-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728004AbgH1Ok1 (ORCPT
+        by vger.kernel.org with ESMTP id S1731698AbgJIOXN (ORCPT
         <rfc822;linux-kernel@vger.kernel.org>);
-        Fri, 28 Aug 2020 10:40:27 -0400
+        Fri, 9 Oct 2020 10:23:13 -0400
 Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
-        by relayfre-01.paragon-software.com (Postfix) with ESMTPS id C74AA1D12;
-        Fri, 28 Aug 2020 17:40:19 +0300 (MSK)
+        by relayfre-01.paragon-software.com (Postfix) with ESMTPS id 51237212E;
+        Fri,  9 Oct 2020 17:23:10 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paragon-software.com; s=mail; t=1598625619;
-        bh=FTEuB/eX5myTF07mcDnTm+JLlKIq36iohzLtqsD0w7I=;
+        d=paragon-software.com; s=mail; t=1602253390;
+        bh=hUyZWVbgxKlcw/mUi/FvnWB+WyvlIGoSQAgeC+DQMrg=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=hxHYAfPEyVMqdr5omNEzhzTR+PY6//L9YRMS+A7gCkO7T7Q6Y2wCuiL6AgjtjSZcT
-         X/UF6HW3Ws+F7hXttKo/1cxH/NA220zBYJjzFmi2eJxNVx/iHlMemKGVSwgAF+38MQ
-         EXPg74G30JlgBPqBMms4MZ2vbuBaTUaLZoObfblo=
-Received: from localhost.localdomain (172.30.8.44) by
+        b=iQTa3mD5OWxsspuGKRAS5UoQA5uO5VPKHvq+kIP7CFayIZ+aF7T7L8mf3PraPnKHR
+         jhQGxSmB3XVIdrWEMwFZbBLyaUugK5cJbgaEe/0yuqu+QqPlcxXIjtcZSxIZ7U92wL
+         MPJC4HTB900SvwPl1BQxehEKSwQe3bRJiyL0bPAw=
+Received: from fsd-lkpg.ufsd.paragon-software.com (172.30.114.105) by
  vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1847.3; Fri, 28 Aug 2020 17:40:19 +0300
+ 15.1.1847.3; Fri, 9 Oct 2020 17:23:09 +0300
 From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 To:     <linux-fsdevel@vger.kernel.org>
 CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
         <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
         <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
-        <mark@harmstone.com>,
+        <mark@harmstone.com>, <nborisov@suse.com>,
+        <linux-ntfs-dev@lists.sourceforge.net>, <anton@tuxera.com>,
         Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-Subject: [PATCH v3 08/10] fs/ntfs3: Add Kconfig, Makefile and doc
-Date:   Fri, 28 Aug 2020 07:39:36 -0700
-Message-ID: <20200828143938.102889-9-almaz.alexandrovich@paragon-software.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
-References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v8 08/10] fs/ntfs3: Add Kconfig, Makefile and doc
+Date:   Fri, 9 Oct 2020 17:22:59 +0300
+Message-ID: <20201009142301.412454-9-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
+References: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.30.8.44]
-X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+X-Originating-IP: [172.30.114.105]
+X-ClientProxiedBy: vdlg-exch-02.paragon-software.com (172.30.1.105) To
  vdlg-exch-02.paragon-software.com (172.30.1.105)
-Sender: linux-kernel-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kernel.vger.kernel.org>
 X-Mailing-List: linux-kernel@vger.kernel.org
-Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-9-almaz.alexandrovich@paragon-software.com/>
+Archived-At: <https://lore.kernel.org/lkml/20201009142301.412454-9-almaz.alexandrovich@paragon-software.com/>
 List-Archive: <https://lore.kernel.org/lkml/>
 List-Post: <mailto:linux-kernel@vger.kernel.org>
 
@@ -68,20 +69,20 @@ This adds Kconfig, Makefile and doc
 
 Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 ---
- Documentation/filesystems/ntfs3.rst | 103 ++++++++++++++++++++++++++++
- fs/ntfs3/Kconfig                    |  23 +++++++
+ Documentation/filesystems/ntfs3.rst | 107 ++++++++++++++++++++++++++++
+ fs/ntfs3/Kconfig                    |  23 ++++++
  fs/ntfs3/Makefile                   |  11 +++
- 3 files changed, 137 insertions(+)
+ 3 files changed, 141 insertions(+)
  create mode 100644 Documentation/filesystems/ntfs3.rst
  create mode 100644 fs/ntfs3/Kconfig
  create mode 100644 fs/ntfs3/Makefile
 
 diff --git a/Documentation/filesystems/ntfs3.rst b/Documentation/filesystems/ntfs3.rst
 new file mode 100644
-index 000000000000..02f59ff97d28
+index 000000000000..7b7d71b26c95
 --- /dev/null
 +++ b/Documentation/filesystems/ntfs3.rst
-@@ -0,0 +1,103 @@
+@@ -0,0 +1,107 @@
 +.. SPDX-License-Identifier: GPL-2.0
 +
 +=====
@@ -111,13 +112,17 @@ index 000000000000..02f59ff97d28
 +
 +===============================================================================
 +
-+nls=name		These options inform the driver how to interpret path
-+			strings and translate them to Unicode and back. In case
-+			none of these options are set, or if specified codepage
-+			doesn't exist on the system, the default codepage will be
++nls=name		This option informs the driver how to interpret path
++			strings and translate them to Unicode and back. If
++			this option is not set, the default codepage will be
 +			used (CONFIG_NLS_DEFAULT).
 +			Examples:
 +				'nls=utf8'
++
++nls_alt=name		This option extends "nls". It will be used to translate
++			path string to Unicode if primary nls failed.
++			Examples:
++				'nls_alt=cp1251'
 +
 +uid=
 +gid=
@@ -216,7 +221,7 @@ index 000000000000..92a9c68008c8
 +	  It is recommended to say N here.
 diff --git a/fs/ntfs3/Makefile b/fs/ntfs3/Makefile
 new file mode 100644
-index 000000000000..4d4fe198b8b8
+index 000000000000..d99dd1af43aa
 --- /dev/null
 +++ b/fs/ntfs3/Makefile
 @@ -0,0 +1,11 @@
@@ -227,11 +232,11 @@ index 000000000000..4d4fe198b8b8
 +
 +obj-$(CONFIG_NTFS3_FS) += ntfs3.o
 +
-+ntfs3-objs := bitfunc.o bitmap.o inode.o fsntfs.o frecord.o \
++ntfs3-y := bitfunc.o bitmap.o inode.o fsntfs.o frecord.o \
 +	    index.o attrlist.o record.o attrib.o run.o xattr.o\
 +	    upcase.o super.o file.o dir.o namei.o lznt.o\
 +	    fslog.o
 -- 
-2.25.2
+2.25.4
 
 

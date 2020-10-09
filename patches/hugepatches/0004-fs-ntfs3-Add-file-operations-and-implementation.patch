@@ -1,66 +1,67 @@
 From mboxrd@z Thu Jan  1 00:00:00 1970
-Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+Return-Path: <SRS0=IB9q=DQ=vger.kernel.org=linux-kernel-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BC1C433E6
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A65DC43467
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2CEF207DF
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:42:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C83F2222F
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="lh82Ol7w"
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="gcY+JKdT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727046AbgH1Om3 (ORCPT
+        id S2388786AbgJIOXs (ORCPT
         <rfc822;linux-kernel@archiver.kernel.org>);
-        Fri, 28 Aug 2020 10:42:29 -0400
-Received: from relaydlg-01.paragon-software.com ([81.5.88.159]:49847 "EHLO
+        Fri, 9 Oct 2020 10:23:48 -0400
+Received: from relaydlg-01.paragon-software.com ([81.5.88.159]:42921 "EHLO
         relaydlg-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727979AbgH1Okq (ORCPT
+        by vger.kernel.org with ESMTP id S2387978AbgJIOXi (ORCPT
         <rfc822;linux-kernel@vger.kernel.org>);
-        Fri, 28 Aug 2020 10:40:46 -0400
+        Fri, 9 Oct 2020 10:23:38 -0400
 Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
-        by relaydlg-01.paragon-software.com (Postfix) with ESMTPS id 67800821F8;
-        Fri, 28 Aug 2020 17:40:18 +0300 (MSK)
+        by relaydlg-01.paragon-software.com (Postfix) with ESMTPS id 251BA8237E;
+        Fri,  9 Oct 2020 17:23:09 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paragon-software.com; s=mail; t=1598625618;
-        bh=yk0X+trYm1VAn7KXldj2PKSIaayD2SL3RX3mrpsEeA0=;
+        d=paragon-software.com; s=mail; t=1602253389;
+        bh=yQv3ktnKKUPW0aJeQX6oo/z2VE66fD79Bo5Lf4v6RLg=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=lh82Ol7wRo/BS3fjEjJ3Ido4slXocZYhOyC/z9CwMq+DskYMzbo7pdQQXIt8BDG9y
-         KdlqZ9jlijV2RAMmpc0AWayQU3HmHU+tq2hOMb5nhmxVlTWtGpCoIWuiJV8B4hK4Il
-         fTo1egdvK4IO8aNDCbKakIXFalttiA/C1cpGNl3U=
-Received: from localhost.localdomain (172.30.8.44) by
+        b=gcY+JKdTy8UWksfa7eQqTRM+CqsDHTHHQpB6aWh4fOZYQa/F7huI1/QUprvYcqljg
+         fvfc+PRsinPZz6zzpe9Xw10NhDMn7C1XZR5pgLwnxta1C2c5xV4qwpUaHEhp+NmhBD
+         SNPo68JoggQILxHKUuPWVlzItxfYJnk2u4PV6YP8=
+Received: from fsd-lkpg.ufsd.paragon-software.com (172.30.114.105) by
  vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1847.3; Fri, 28 Aug 2020 17:40:16 +0300
+ 15.1.1847.3; Fri, 9 Oct 2020 17:23:08 +0300
 From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 To:     <linux-fsdevel@vger.kernel.org>
 CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
         <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
         <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
-        <mark@harmstone.com>,
+        <mark@harmstone.com>, <nborisov@suse.com>,
+        <linux-ntfs-dev@lists.sourceforge.net>, <anton@tuxera.com>,
         Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-Subject: [PATCH v3 04/10] fs/ntfs3: Add file operations and implementation
-Date:   Fri, 28 Aug 2020 07:39:32 -0700
-Message-ID: <20200828143938.102889-5-almaz.alexandrovich@paragon-software.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
-References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v8 04/10] fs/ntfs3: Add file operations and implementation
+Date:   Fri, 9 Oct 2020 17:22:55 +0300
+Message-ID: <20201009142301.412454-5-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
+References: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.30.8.44]
-X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+X-Originating-IP: [172.30.114.105]
+X-ClientProxiedBy: vdlg-exch-02.paragon-software.com (172.30.1.105) To
  vdlg-exch-02.paragon-software.com (172.30.1.105)
-Sender: linux-kernel-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kernel.vger.kernel.org>
 X-Mailing-List: linux-kernel@vger.kernel.org
-Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-5-almaz.alexandrovich@paragon-software.com/>
+Archived-At: <https://lore.kernel.org/lkml/20201009142301.412454-5-almaz.alexandrovich@paragon-software.com/>
 List-Archive: <https://lore.kernel.org/lkml/>
 List-Post: <mailto:linux-kernel@vger.kernel.org>
 
@@ -68,13 +69,13 @@ This adds file operations and implementation
 
 Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 ---
- fs/ntfs3/dir.c     |  642 ++++++++++++
- fs/ntfs3/file.c    | 1214 ++++++++++++++++++++++
- fs/ntfs3/frecord.c | 2378 ++++++++++++++++++++++++++++++++++++++++++++
- fs/ntfs3/namei.c   |  580 +++++++++++
+ fs/ntfs3/dir.c     |  608 ++++++++++++
+ fs/ntfs3/file.c    | 1154 ++++++++++++++++++++++
+ fs/ntfs3/frecord.c | 2335 ++++++++++++++++++++++++++++++++++++++++++++
+ fs/ntfs3/namei.c   |  576 +++++++++++
  fs/ntfs3/record.c  |  615 ++++++++++++
- fs/ntfs3/run.c     | 1188 ++++++++++++++++++++++
- 6 files changed, 6617 insertions(+)
+ fs/ntfs3/run.c     | 1161 ++++++++++++++++++++++
+ 6 files changed, 6449 insertions(+)
  create mode 100644 fs/ntfs3/dir.c
  create mode 100644 fs/ntfs3/file.c
  create mode 100644 fs/ntfs3/frecord.c
@@ -84,10 +85,10 @@ Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 
 diff --git a/fs/ntfs3/dir.c b/fs/ntfs3/dir.c
 new file mode 100644
-index 000000000000..5bf0297f6b2f
+index 000000000000..a142bb9ae6ff
 --- /dev/null
 +++ b/fs/ntfs3/dir.c
-@@ -0,0 +1,642 @@
+@@ -0,0 +1,608 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/dir.c
@@ -108,7 +109,7 @@ index 000000000000..5bf0297f6b2f
 +#include "ntfs_fs.h"
 +
 +/*
-+ * Convert little endian utf16 to UTF-8.
++ * Convert little endian utf16 to nls string
 + */
 +int ntfs_utf16_to_nls(struct ntfs_sb_info *sbi, const struct le_str *uni,
 +		      u8 *buf, int buf_len)
@@ -116,14 +117,14 @@ index 000000000000..5bf0297f6b2f
 +	int ret, uni_len;
 +	const __le16 *ip;
 +	u8 *op;
-+	struct nls_table *nls = sbi->nls;
++	struct nls_table *nls = sbi->options.nls[0];
 +
 +	static_assert(sizeof(wchar_t) == sizeof(__le16));
 +
 +	if (!nls) {
 +		/* utf16 -> utf8 */
 +		ret = utf16s_to_utf8s((wchar_t *)uni->name, uni->len,
-+				      UTF16_HOST_ENDIAN, buf, buf_len);
++				      UTF16_LITTLE_ENDIAN, buf, buf_len);
 +		buf[ret] = '\0';
 +		return ret;
 +	}
@@ -137,8 +138,8 @@ index 000000000000..5bf0297f6b2f
 +		int charlen;
 +
 +		if (buf_len < NLS_MAX_CHARSET_SIZE) {
-+			ntfs_printk(sbi->sb, KERN_WARNING
-+				    "filename was truncated while converting.");
++			ntfs_warn(sbi->sb,
++				  "filename was truncated while converting.");
 +			break;
 +		}
 +
@@ -160,25 +161,33 @@ index 000000000000..5bf0297f6b2f
 +	return op - buf;
 +}
 +
-+static inline u8 get_digit(u8 d)
-+{
-+	u8 x = d & 0xf;
-+
-+	return x <= 9 ? ('0' + x) : ('A' + x - 10);
-+}
-+
 +#define PLANE_SIZE 0x00010000
 +
 +#define SURROGATE_PAIR 0x0000d800
 +#define SURROGATE_LOW 0x00000400
 +#define SURROGATE_BITS 0x000003ff
 +
++static inline void put_utf16(wchar_t *s, unsigned c, enum utf16_endian endian)
++{
++	switch (endian) {
++	default:
++		*s = (wchar_t)c;
++		break;
++	case UTF16_LITTLE_ENDIAN:
++		*s = __cpu_to_le16(c);
++		break;
++	case UTF16_BIG_ENDIAN:
++		*s = __cpu_to_be16(c);
++		break;
++	}
++}
++
 +/*
 + * modified version of 'utf8s_to_utf16s' allows to
-+ * - detect -ENAMETOOLONG
-+ * - convert problem symbols into triplet %XX
++ * detect -ENAMETOOLONG without writing out of expected maximum
 + */
-+static int _utf8s_to_utf16s(const u8 *s, int inlen, wchar_t *pwcs, int maxout)
++static int _utf8s_to_utf16s(const u8 *s, int inlen, enum utf16_endian endian,
++			    wchar_t *pwcs, int maxout)
 +{
 +	u16 *op;
 +	int size;
@@ -188,52 +197,92 @@ index 000000000000..5bf0297f6b2f
 +	while (inlen > 0 && *s) {
 +		if (*s & 0x80) {
 +			size = utf8_to_utf32(s, inlen, &u);
-+			if (size < 0) {
-+				if (maxout < 3)
-+					return -ENAMETOOLONG;
-+
-+				op[0] = '%';
-+				op[1] = get_digit(*s >> 4);
-+				op[2] = get_digit(*s >> 0);
-+
-+				op += 3;
-+				maxout -= 3;
-+				inlen--;
-+				s++;
-+				continue;
-+			}
-+
++			if (size < 0)
++				return -EINVAL;
 +			s += size;
 +			inlen -= size;
 +
 +			if (u >= PLANE_SIZE) {
 +				if (maxout < 2)
 +					return -ENAMETOOLONG;
-+				u -= PLANE_SIZE;
 +
-+				op[0] = SURROGATE_PAIR |
-+					((u >> 10) & SURROGATE_BITS);
-+				op[1] = SURROGATE_PAIR | SURROGATE_LOW |
-+					(u & SURROGATE_BITS);
-+				op += 2;
++				u -= PLANE_SIZE;
++				put_utf16(op++,
++					  SURROGATE_PAIR |
++						  ((u >> 10) & SURROGATE_BITS),
++					  endian);
++				put_utf16(op++,
++					  SURROGATE_PAIR | SURROGATE_LOW |
++						  (u & SURROGATE_BITS),
++					  endian);
 +				maxout -= 2;
 +			} else {
 +				if (maxout < 1)
 +					return -ENAMETOOLONG;
 +
-+				*op++ = u;
++				put_utf16(op++, u, endian);
 +				maxout--;
 +			}
 +		} else {
 +			if (maxout < 1)
 +				return -ENAMETOOLONG;
 +
-+			*op++ = *s++;
++			put_utf16(op++, *s++, endian);
 +			inlen--;
 +			maxout--;
 +		}
 +	}
 +	return op - pwcs;
++}
++
++/* helper for ntfs_nls_to_utf16 */
++static int _ntfs_nls_to_utf16(struct nls_table *nls, const u8 *name,
++			      u32 name_len, wchar_t *uname, u32 max_ulen,
++			      enum utf16_endian endian)
++{
++	int ret, slen;
++	const u8 *end;
++
++	if (!nls) {
++		/* utf8 -> utf16 */
++		return _utf8s_to_utf16s(name, name_len, endian, uname,
++					max_ulen);
++	}
++
++	ret = 0;
++
++	for (end = name + name_len; name < end; ret++, name += slen) {
++		if (ret >= max_ulen)
++			return -ENAMETOOLONG;
++
++		slen = nls->char2uni(name, end - name, uname + ret);
++		if (!slen)
++			return -EINVAL;
++		if (slen < 0)
++			return slen;
++	}
++
++#ifdef __BIG_ENDIAN
++	if (endian == UTF16_LITTLE_ENDIAN) {
++		int i = ret;
++
++		while (i--) {
++			__cpu_to_le16s(uname);
++			uname++;
++		}
++	}
++#else
++	if (endian == UTF16_BIG_ENDIAN) {
++		int i = ret;
++
++		while (i--) {
++			__cpu_to_be16s(uname);
++			uname++;
++		}
++	}
++#endif
++
++	return ret;
 +}
 +
 +/*
@@ -244,7 +293,7 @@ index 000000000000..5bf0297f6b2f
 + * endian - endian of target utf16 string
 + *
 + * This function is called:
-+ * - to create ntfs names (max_ulen == NTFS_NAME_LEN == 255)
++ * - to create ntfs name
 + * - to create symlink
 + *
 + * returns utf16 string length or error (if negative)
@@ -253,89 +302,45 @@ index 000000000000..5bf0297f6b2f
 +		      struct cpu_str *uni, u32 max_ulen,
 +		      enum utf16_endian endian)
 +{
-+	int i, ret, slen, warn;
-+	u32 tail;
-+	const u8 *str, *end;
-+	wchar_t *uname = uni->name;
-+	struct nls_table *nls = sbi->nls;
++	int ret;
++	struct nls_table *nls = sbi->options.nls[0];
 +
 +	static_assert(sizeof(wchar_t) == sizeof(u16));
 +
-+	if (!nls) {
-+		/* utf8 -> utf16 */
-+		ret = _utf8s_to_utf16s(name, name_len, uname, max_ulen);
-+		if (ret < 0)
-+			return ret;
-+		goto out;
++	/* use primary nls (may be NULL) */
++	ret = _ntfs_nls_to_utf16(nls, name, name_len, uni->name, max_ulen,
++				 endian);
++
++	if (ret == -ENAMETOOLONG)
++		return -ENAMETOOLONG;
++
++	if (ret > 0)
++		return uni->len = ret;
++
++	if (!sbi->options.nls[1]) {
++		ntfs_warn(sbi->sb, "%s failed to convert \"%.*s\" into utf16",
++			  nls ? nls->charset : "utf8", name_len, name);
++		return ret;
 +	}
 +
-+	str = name;
-+	end = name + name_len;
-+	warn = 0;
++	/* use alternative nls */
++	ret = _ntfs_nls_to_utf16(sbi->options.nls[1], name, name_len, uni->name,
++				 max_ulen, endian);
 +
-+	while (str < end && *str) {
-+		if (!max_ulen)
-+			return -ENAMETOOLONG;
-+		tail = end - str;
++	if (ret == -ENAMETOOLONG)
++		return -ENAMETOOLONG;
 +
-+		/*str -> uname*/
-+		slen = nls->char2uni(str, tail, uname);
-+		if (slen > 0) {
-+			max_ulen -= 1;
-+			uname += 1;
-+			str += slen;
-+			continue;
-+		}
-+
-+		if (!warn) {
-+			warn = 1;
-+			ntfs_printk(
-+				sbi->sb,
-+				KERN_ERR
-+				"%s -> utf16 failed: '%.*s', pos %d, chars %x %x %x",
-+				nls->charset, name_len, name, (int)(str - name),
-+				str[0], tail > 1 ? str[1] : 0,
-+				tail > 2 ? str[2] : 0);
-+		}
-+
-+		if (max_ulen < 3)
-+			return -ENAMETOOLONG;
-+
-+		uname[0] = '%';
-+		uname[1] = get_digit(*str >> 4);
-+		uname[2] = get_digit(*str >> 0);
-+
-+		max_ulen -= 3;
-+		uname += 3;
-+		str += 1;
++	if (ret > 0) {
++		/*
++		 * primary nls failed but alternative nls ok
++		 * should we print something?
++		 */
++		return uni->len = ret;
 +	}
 +
-+	ret = uname - uni->name;
-+out:
-+	uni->len = ret;
-+
-+#ifdef __BIG_ENDIAN
-+	if (endian == UTF16_LITTLE_ENDIAN) {
-+		i = ret;
-+		uname = uni->name;
-+
-+		while (i--) {
-+			__cpu_to_le16s(uname);
-+			uname++;
-+		}
-+	}
-+#else
-+	if (endian == UTF16_BIG_ENDIAN) {
-+		i = ret;
-+		uname = uni->name;
-+
-+		while (i--) {
-+			__cpu_to_be16s(uname);
-+			uname++;
-+		}
-+	}
-+#endif
-+
++	ntfs_warn(sbi->sb, "%s and %s failed to convert \"%.*s\" into utf16",
++		  nls ? nls->charset : "utf8", sbi->options.nls[1]->charset,
++		  name_len, name);
 +	return ret;
 +}
 +
@@ -382,30 +387,6 @@ index 000000000000..5bf0297f6b2f
 +	return err == -ENOENT ? NULL : err ? ERR_PTR(err) : inode;
 +}
 +
-+/* helper function */
-+struct inode *dir_search(struct inode *dir, const struct qstr *name,
-+			 struct ntfs_fnd *fnd)
-+{
-+	struct super_block *sb = dir->i_sb;
-+	struct ntfs_sb_info *sbi = sb->s_fs_info;
-+	int err;
-+	struct inode *inode;
-+	struct cpu_str *uni = __getname();
-+	const u8 *n = name->name;
-+
-+	if (!uni)
-+		return ERR_PTR(-ENOMEM);
-+
-+	err = ntfs_nls_to_utf16(sbi, n, name->len, uni, NTFS_NAME_LEN,
-+				UTF16_HOST_ENDIAN);
-+
-+	inode = err < 0 ? ERR_PTR(err) : dir_search_u(dir, uni, fnd);
-+
-+	__putname(uni);
-+
-+	return inode;
-+}
-+
 +static inline int ntfs_filldir(struct ntfs_sb_info *sbi, struct ntfs_inode *ni,
 +			       const struct NTFS_DE *e, u8 *name,
 +			       struct dir_context *ctx)
@@ -438,10 +419,8 @@ index 000000000000..5bf0297f6b2f
 +	name_len = ntfs_utf16_to_nls(sbi, (struct le_str *)&fname->name_len,
 +				     name, PATH_MAX);
 +	if (name_len <= 0) {
-+		ntfs_printk(sbi->sb,
-+			    KERN_WARNING
-+			    "failed to convert name for inode %lx.",
-+			    ino);
++		ntfs_warn(sbi->sb, "failed to convert name for inode %lx.",
++			  ino);
 +		return 0;
 +	}
 +
@@ -465,36 +444,32 @@ index 000000000000..5bf0297f6b2f
 +	u32 end = le32_to_cpu(hdr->used);
 +	u32 off = le32_to_cpu(hdr->de_off);
 +
-+next:
-+	if (off + sizeof(struct NTFS_DE) > end)
-+		return -1;
++	for (;; off += e_size) {
++		if (off + sizeof(struct NTFS_DE) > end)
++			return -1;
 +
-+	e = Add2Ptr(hdr, off);
-+	e_size = le16_to_cpu(e->size);
-+	if (e_size < sizeof(struct NTFS_DE) || off + e_size > end)
-+		return -1;
++		e = Add2Ptr(hdr, off);
++		e_size = le16_to_cpu(e->size);
++		if (e_size < sizeof(struct NTFS_DE) || off + e_size > end)
++			return -1;
 +
-+	if (de_is_last(e))
-+		return 0;
++		if (de_is_last(e))
++			return 0;
 +
-+	/* Skip already enumerated*/
-+	if (vbo + off < pos) {
-+		off += e_size;
-+		goto next;
++		/* Skip already enumerated*/
++		if (vbo + off < pos)
++			continue;
++
++		if (le16_to_cpu(e->key_size) < SIZEOF_ATTRIBUTE_FILENAME)
++			return -1;
++
++		ctx->pos = vbo + off;
++
++		/* Submit the name to the filldir callback. */
++		err = ntfs_filldir(sbi, ni, e, name, ctx);
++		if (err)
++			return err;
 +	}
-+
-+	if (le16_to_cpu(e->key_size) < SIZEOF_ATTRIBUTE_FILENAME)
-+		return -1;
-+
-+	ctx->pos = vbo + off;
-+
-+	/* Submit the name to the filldir callback. */
-+	err = ntfs_filldir(sbi, ni, e, name, ctx);
-+	if (err)
-+		return err;
-+
-+	off += e_size;
-+	goto next;
 +}
 +
 +/*
@@ -507,7 +482,6 @@ index 000000000000..5bf0297f6b2f
 +static int ntfs_readdir(struct file *file, struct dir_context *ctx)
 +{
 +	const struct INDEX_ROOT *root;
-+	const struct INDEX_HDR *hdr;
 +	u64 vbo;
 +	size_t bit;
 +	loff_t eod;
@@ -552,18 +526,12 @@ index 000000000000..5bf0297f6b2f
 +
 +	if (pos >= sbi->record_size) {
 +		bit = (pos - sbi->record_size) >> index_bits;
-+		goto index_enum;
++	} else {
++		err = ntfs_read_hdr(sbi, ni, &root->ihdr, 0, pos, name, ctx);
++		if (err)
++			goto out;
++		bit = 0;
 +	}
-+
-+	hdr = &root->ihdr;
-+
-+	err = ntfs_read_hdr(sbi, ni, hdr, 0, pos, name, ctx);
-+	if (err)
-+		goto out;
-+
-+	bit = 0;
-+
-+index_enum:
 +
 +	if (!i_size) {
 +		ctx->pos = eod;
@@ -587,26 +555,25 @@ index 000000000000..5bf0297f6b2f
 +		}
 +
 +		vbo = (u64)bit << index_bits;
-+		if (vbo >= i_size)
-+			goto fs_error;
++		if (vbo >= i_size) {
++			ntfs_inode_err(dir, "Looks like your dir is corrupt");
++			err = -EINVAL;
++			goto out;
++		}
 +
 +		err = indx_read(&ni->dir, ni, bit << ni->dir.idx2vbn_bits,
 +				&node);
 +		if (err)
 +			goto out;
 +
-+		hdr = &node->index->ihdr;
-+		err = ntfs_read_hdr(sbi, ni, hdr, vbo + sbi->record_size, pos,
-+				    name, ctx);
++		err = ntfs_read_hdr(sbi, ni, &node->index->ihdr,
++				    vbo + sbi->record_size, pos, name, ctx);
 +		if (err)
 +			goto out;
 +
 +		bit += 1;
 +	}
 +
-+fs_error:
-+	ntfs_inode_printk(dir, KERN_ERR "Looks like your dir is corrupt");
-+	err = -EINVAL;
 +out:
 +
 +	__putname(name);
@@ -732,10 +699,10 @@ index 000000000000..5bf0297f6b2f
 +};
 diff --git a/fs/ntfs3/file.c b/fs/ntfs3/file.c
 new file mode 100644
-index 000000000000..72c6a263b5bc
+index 000000000000..388b948481e3
 --- /dev/null
 +++ b/fs/ntfs3/file.c
-@@ -0,0 +1,1214 @@
+@@ -0,0 +1,1154 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/file.c
@@ -819,8 +786,6 @@ index 000000000000..72c6a263b5bc
 +		 u32 flags)
 +{
 +	struct inode *inode = d_inode(path->dentry);
-+	struct super_block *sb = inode->i_sb;
-+	struct ntfs_sb_info *sbi = sb->s_fs_info;
 +	struct ntfs_inode *ni = ntfs_i(inode);
 +
 +	if (is_compressed(ni))
@@ -835,8 +800,6 @@ index 000000000000..72c6a263b5bc
 +
 +	stat->result_mask |= STATX_BTIME;
 +	stat->btime = ni->i_crtime;
-+	stat->blksize = sbi->cluster_size;
-+	stat->blocks <<= sbi->cluster_bits - 9;
 +
 +	return 0;
 +}
@@ -866,7 +829,8 @@ index 000000000000..72c6a263b5bc
 +			bits = sbi->cluster_bits;
 +			vcn = pos >> bits;
 +
-+			err = attr_data_get_block(ni, vcn, &lcn, &clen, NULL);
++			err = attr_data_get_block(ni, vcn, 0, &lcn, &clen,
++						  NULL);
 +			if (err)
 +				goto out;
 +
@@ -880,9 +844,9 @@ index 000000000000..72c6a263b5bc
 +					goto next;
 +				}
 +
-+				if (vbo < pos)
++				if (vbo < pos) {
 +					pos = vbo;
-+				else {
++				} else {
 +					to = (new_valid >> bits) << bits;
 +					if (pos < to) {
 +						ni->i_valid = to;
@@ -916,7 +880,9 @@ index 000000000000..72c6a263b5bc
 +next:
 +		if (pos >= new_valid)
 +			break;
++
 +		balance_dirty_pages_ratelimited(mapping);
++		cond_resched();
 +	}
 +
 +	mark_inode_dirty(inode);
@@ -925,120 +891,8 @@ index 000000000000..72c6a263b5bc
 +
 +out:
 +	ni->i_valid = valid;
-+	ntfs_inode_printk(inode,
-+			  KERN_WARNING
-+			  "failed to extend initialized size to %llx.",
-+			  new_valid);
-+	return err;
-+}
-+
-+static int ntfs_extend_initialized_size_cmpr(struct file *file,
-+					     struct ntfs_inode *ni,
-+					     const loff_t valid,
-+					     const loff_t new_valid)
-+{
-+	struct inode *inode = &ni->vfs_inode;
-+	struct address_space *mapping = inode->i_mapping;
-+	struct ntfs_sb_info *sbi = inode->i_sb->s_fs_info;
-+	loff_t pos = valid;
-+	u8 bits = NTFS_LZNT_CUNIT + sbi->cluster_bits;
-+	int err;
-+
-+	WARN_ON(!is_compressed(ni));
-+	WARN_ON(valid >= new_valid);
-+
-+	for (;;) {
-+		u32 zerofrom, len;
-+		struct page *page;
-+		CLST frame, vcn, lcn, clen;
-+
-+		frame = pos >> bits;
-+		vcn = frame << NTFS_LZNT_CUNIT;
-+
-+		err = attr_data_get_block(ni, vcn, &lcn, &clen, NULL);
-+		if (err)
-+			goto out;
-+
-+		if (lcn == SPARSE_LCN) {
-+			loff_t vbo = (loff_t)frame << bits;
-+			loff_t to = vbo + ((u64)clen << sbi->cluster_bits);
-+
-+			if (to <= new_valid) {
-+				ni->i_valid = to;
-+				pos = to;
-+				goto next;
-+			}
-+
-+			if (vbo >= pos) {
-+				to = (new_valid >> bits) << bits;
-+				if (pos < to) {
-+					ni->i_valid = to;
-+					pos = to;
-+					goto next;
-+				}
-+			}
-+		}
-+
-+		zerofrom = pos & (PAGE_SIZE - 1);
-+		len = PAGE_SIZE - zerofrom;
-+
-+		if (pos + len > new_valid)
-+			len = new_valid - pos;
-+again:
-+		page = find_or_create_page(mapping, pos >> PAGE_SHIFT,
-+					   mapping_gfp_constraint(mapping,
-+								  ~__GFP_FS));
-+
-+		if (!page) {
-+			err = -ENOMEM;
-+			goto out;
-+		}
-+
-+		if (zerofrom && !PageUptodate(page)) {
-+			err = ntfs_readpage(NULL, page);
-+			lock_page(page);
-+			if (page->mapping != mapping) {
-+				unlock_page(page);
-+				put_page(page);
-+				goto again;
-+			}
-+			if (!PageUptodate(page)) {
-+				err = -EIO;
-+				unlock_page(page);
-+				put_page(page);
-+				goto out;
-+			}
-+		}
-+
-+		wait_on_page_writeback(page);
-+
-+		zero_user_segment(page, zerofrom, PAGE_SIZE);
-+		if (!zerofrom)
-+			SetPageUptodate(page);
-+
-+		ClearPageChecked(page);
-+		set_page_dirty(page);
-+		unlock_page(page);
-+		put_page(page);
-+		pos += len;
-+		ni->i_valid = pos;
-+next:
-+		if (pos >= new_valid)
-+			break;
-+		balance_dirty_pages_ratelimited(mapping);
-+	}
-+
-+	mark_inode_dirty(inode);
-+
-+	return 0;
-+
-+out:
-+	ni->i_valid = valid;
-+	ntfs_inode_printk(
-+		inode,
-+		KERN_WARNING
-+		"failed to extend initialized compressed size to %llx.",
-+		new_valid);
++	ntfs_inode_warn(inode, "failed to extend initialized size to %llx.",
++			new_valid);
 +	return err;
 +}
 +
@@ -1079,8 +933,8 @@ index 000000000000..72c6a263b5bc
 +		    likely(!page_has_buffers(page))) {
 +			create_empty_buffers(page, blocksize, 0);
 +			if (!page_has_buffers(page)) {
-+				ntfs_inode_printk(
-+					inode, KERN_ERR
++				ntfs_inode_err(
++					inode,
 +					"failed to allocate page buffers.");
 +				/*err = -ENOMEM;*/
 +				goto unlock_page;
@@ -1098,8 +952,9 @@ index 000000000000..72c6a263b5bc
 +				if (from <= bh_off && bh_next <= to) {
 +					set_buffer_uptodate(bh);
 +					mark_buffer_dirty(bh);
-+				} else if (!buffer_uptodate(bh))
++				} else if (!buffer_uptodate(bh)) {
 +					partial = true;
++				}
 +				bh_off = bh_next;
 +			} while (head != (bh = bh->b_this_page));
 +		}
@@ -1122,63 +977,32 @@ index 000000000000..72c6a263b5bc
 +	mark_inode_dirty(inode);
 +}
 +
-+struct ntfs_file_vm_ops {
-+	atomic_t refcnt;
++struct vma_cookie {
 +	loff_t to;
-+
-+	const struct vm_operations_struct *base;
-+	struct vm_operations_struct vm_ops;
 +};
-+
-+/*
-+ * vm_operations_struct::open
-+ */
-+static void ntfs_filemap_open(struct vm_area_struct *vma)
-+{
-+	struct ntfs_file_vm_ops *vm_ops;
-+	const struct vm_operations_struct *base;
-+
-+	vm_ops = container_of(vma->vm_ops, struct ntfs_file_vm_ops, vm_ops);
-+	base = vm_ops->base;
-+
-+	atomic_inc(&vm_ops->refcnt);
-+
-+	if (base->open)
-+		base->open(vma);
-+}
 +
 +/*
 + * vm_operations_struct::close
 + */
 +static void ntfs_filemap_close(struct vm_area_struct *vma)
 +{
-+	struct ntfs_file_vm_ops *vm_ops;
-+	const struct vm_operations_struct *base;
-+	struct inode *inode;
-+	struct ntfs_inode *ni;
++	struct inode *inode = file_inode(vma->vm_file);
++	struct ntfs_inode *ni = ntfs_i(inode);
++	loff_t to;
 +
-+	vm_ops = container_of(vma->vm_ops, struct ntfs_file_vm_ops, vm_ops);
-+
-+	if (!atomic_dec_and_test(&vm_ops->refcnt))
-+		return;
-+
-+	base = vm_ops->base;
-+	if (!(vma->vm_flags & VM_WRITE))
-+		goto close_base;
-+
-+	inode = file_inode(vma->vm_file);
-+	ni = ntfs_i(inode);
++	if (sizeof(void *) >= sizeof(loff_t))
++		to = (loff_t)vma->vm_private_data;
++	else
++		to = ((struct vma_cookie *)vma->vm_private_data)->to;
 +
 +	// Update valid size
 +	ni->i_valid = max_t(loff_t, ni->i_valid,
-+			    min_t(loff_t, i_size_read(inode), vm_ops->to));
++			    min_t(loff_t, i_size_read(inode), to));
 +
-+close_base:
-+	if (base->close)
-+		base->close(vma);
-+
-+	vma->vm_ops = base;
-+	ntfs_free(vm_ops);
++	if (sizeof(void *) < sizeof(loff_t)) {
++		ntfs_free(vma->vm_private_data);
++		vma->vm_private_data = NULL; // is it necessary?
++	}
 +}
 +
 +/*
@@ -1186,36 +1010,46 @@ index 000000000000..72c6a263b5bc
 + */
 +static vm_fault_t ntfs_filemap_fault(struct vm_fault *vmf)
 +{
-+	vm_fault_t ret;
-+	struct ntfs_file_vm_ops *vm_ops;
 +	struct vm_area_struct *vma = vmf->vma;
++	vm_fault_t ret;
++	loff_t to, *vmc_to;
 +
-+	vm_ops = container_of(vma->vm_ops, struct ntfs_file_vm_ops, vm_ops);
++	ret = filemap_fault(vmf);
 +
-+	/* Call base function */
-+	ret = vm_ops->base->fault(vmf);
++	if (!(ret & VM_FAULT_LOCKED))
++		return ret;
 +
-+	if (VM_FAULT_LOCKED & ret) {
-+		/* Update maximum mapped range */
-+		loff_t to = (loff_t)(vmf->pgoff + 1) << PAGE_SHIFT;
++	/* Update maximum mapped range */
++	to = (loff_t)(vmf->pgoff + 1) << PAGE_SHIFT;
 +
-+		if (vm_ops->to < to)
-+			vm_ops->to = to;
-+	}
++	if (sizeof(void *) >= sizeof(loff_t))
++		vmc_to = (loff_t *)&vma->vm_private_data;
++	else
++		vmc_to = &((struct vma_cookie *)vma->vm_private_data)->to;
++
++	if (*vmc_to < to)
++		*vmc_to = to;
 +
 +	return ret;
 +}
++
++static const struct vm_operations_struct vma_cookie = {
++	.close = ntfs_filemap_close,
++	.fault = ntfs_filemap_fault,
++	.map_pages = filemap_map_pages,
++	.page_mkwrite = filemap_page_mkwrite,
++};
 +
 +/*
 + * file_operations::mmap
 + */
 +static int ntfs_file_mmap(struct file *file, struct vm_area_struct *vma)
 +{
-+	struct inode *inode = file->f_mapping->host;
++	struct address_space *mapping = file->f_mapping;
++	struct inode *inode = mapping->host;
 +	struct ntfs_inode *ni = ntfs_i(inode);
 +	u64 to, from = ((u64)vma->vm_pgoff << PAGE_SHIFT);
 +	bool rw = vma->vm_flags & VM_WRITE;
-+	struct ntfs_file_vm_ops *vm_ops = NULL;
 +	int err;
 +
 +	if (is_encrypted(ni)) {
@@ -1223,22 +1057,13 @@ index 000000000000..72c6a263b5bc
 +		goto out;
 +	}
 +
-+	if (!rw)
-+		goto generic;
-+
-+	if (is_compressed(ni)) {
-+		err = -EOPNOTSUPP;
++	if (!rw) {
++		err = generic_file_mmap(file, vma);
 +		goto out;
 +	}
 +
-+	/*
-+	 * Allocate and init small struct to keep track the mapping operations
-+	 * It is useful when mmap(size) + truncate(size/2) + unmap(). see
-+	 * xfstests/generic/039
-+	 */
-+	vm_ops = ntfs_alloc(sizeof(struct ntfs_file_vm_ops), 1);
-+	if (unlikely(!vm_ops)) {
-+		err = -ENOMEM;
++	if (is_compressed(ni)) {
++		err = -EOPNOTSUPP;
 +		goto out;
 +	}
 +
@@ -1258,7 +1083,7 @@ index 000000000000..72c6a263b5bc
 +		bool new;
 +
 +		for (vcn = from >> sbi->cluster_bits; vcn < end; vcn += len) {
-+			err = attr_data_get_block(ni, vcn, &lcn, &len, &new);
++			err = attr_data_get_block(ni, vcn, 1, &lcn, &len, &new);
 +			if (err) {
 +				inode_unlock(inode);
 +				goto out;
@@ -1279,27 +1104,45 @@ index 000000000000..72c6a263b5bc
 +	if (err)
 +		goto out;
 +
-+generic:
-+	err = generic_file_mmap(file, vma);
-+	if (err)
++	if (vma->vm_private_data) {
++		ntfs_inode_warn(
++			inode,
++			"mmap: failed to keep private vma_data, possible garbidge data");
++		err = generic_file_mmap(file, vma);
 +		goto out;
-+
-+	if (rw) {
-+		atomic_set(&vm_ops->refcnt, 1);
-+		vm_ops->to = to;
-+		vm_ops->base = vma->vm_ops;
-+		memcpy(&vm_ops->vm_ops, vma->vm_ops,
-+		       sizeof(struct vm_operations_struct));
-+		vm_ops->vm_ops.fault = &ntfs_filemap_fault;
-+		vm_ops->vm_ops.open = &ntfs_filemap_open;
-+		vm_ops->vm_ops.close = &ntfs_filemap_close;
-+		vma->vm_ops = &vm_ops->vm_ops;
 +	}
 +
-+out:
-+	if (err)
-+		ntfs_free(vm_ops);
++	if (!mapping->a_ops->readpage) {
++		err = -ENOEXEC;
++		goto out;
++	}
 +
++	/*
++	 * Allocate and init small struct to keep track the mapping operations
++	 * It is useful when mmap(size) + truncate(size/2) + unmap(). see
++	 * xfstests/generic/039
++	 *
++	 * TODO: if sizeof(void*) == 8 bytes we can store the only field 'to'
++	 * of vma_cookie in vma->vm_private_data
++	 */
++	if (sizeof(void *) >= sizeof(loff_t))
++		vma->vm_private_data = (void *)to;
++	else {
++		struct vma_cookie *vmc =
++			ntfs_alloc(sizeof(struct vma_cookie), 0);
++
++		if (unlikely(!vmc)) {
++			err = -ENOMEM;
++			goto out;
++		}
++		vmc->to = to;
++		vma->vm_private_data = vmc;
++	}
++
++	file_accessed(file);
++	vma->vm_ops = &vma_cookie;
++
++out:
 +	return err;
 +}
 +
@@ -1333,12 +1176,12 @@ index 000000000000..72c6a263b5bc
 +		inode->i_size = end;
 +	}
 +
-+	if (extend_init) {
-+		err = (is_compressed(ni) ? ntfs_extend_initialized_size_cmpr :
-+					   ntfs_extend_initialized_size)(
-+			file, ni, ni->i_valid, pos);
++	if (extend_init && !is_compressed(ni)) {
++		err = ntfs_extend_initialized_size(file, ni, ni->i_valid, pos);
 +		if (err)
 +			goto out;
++	} else {
++		err = 0;
 +	}
 +
 +	inode->i_ctime = inode->i_mtime = current_time(inode);
@@ -1365,16 +1208,17 @@ index 000000000000..72c6a263b5bc
 +/*
 + * Preallocate space for a file. This implements ntfs's fallocate file
 + * operation, which gets called from sys_fallocate system call. User
-+ * space requests len bytes at offset. If FALLOC_FL_KEEP_SIZE is set
++ * space requests 'len' bytes at 'vbo'. If FALLOC_FL_KEEP_SIZE is set
 + * we just allocate clusters without zeroing them out. Otherwise we
 + * allocate and zero out clusters via an expanding truncate.
 + */
-+static long ntfs_fallocate(struct file *file, int mode, loff_t offset,
-+			   loff_t len)
++static long ntfs_fallocate(struct file *file, int mode, loff_t vbo, loff_t len)
 +{
 +	struct inode *inode = file->f_mapping->host;
 +	struct super_block *sb = inode->i_sb;
 +	struct ntfs_sb_info *sbi = sb->s_fs_info;
++	struct ntfs_inode *ni = ntfs_i(inode);
++	loff_t i_size;
 +	loff_t end;
 +	int err;
 +
@@ -1384,18 +1228,18 @@ index 000000000000..72c6a263b5bc
 +
 +	/* Return error if mode is not supported */
 +	if (mode & ~(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE |
-+		     FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE |
-+		     FALLOC_FL_INSERT_RANGE))
++		     FALLOC_FL_COLLAPSE_RANGE))
 +		return -EOPNOTSUPP;
 +
 +	inode_lock(inode);
++	i_size = inode->i_size;
 +
 +	if (mode & FALLOC_FL_PUNCH_HOLE) {
 +		if (!(mode & FALLOC_FL_KEEP_SIZE)) {
 +			err = -EINVAL;
 +			goto out;
 +		}
-+		/*TODO*/
++		/*TODO: add support*/
 +		err = -EOPNOTSUPP;
 +		goto out;
 +	}
@@ -1406,36 +1250,54 @@ index 000000000000..72c6a263b5bc
 +			goto out;
 +		}
 +
-+		/*TODO*/
++		/*TODO: add support*/
 +		err = -EOPNOTSUPP;
 +		goto out;
 +	}
 +
-+	if (mode & FALLOC_FL_INSERT_RANGE) {
-+		err = -EOPNOTSUPP;
-+		goto out;
-+	}
++	end = vbo + len;
 +
-+	if (mode & FALLOC_FL_ZERO_RANGE) {
-+		err = -EOPNOTSUPP;
-+		goto out;
-+	}
++	ntfs_set_state(sbi, NTFS_DIRTY_DIRTY);
 +
-+	end = offset + len;
-+	if (mode & FALLOC_FL_KEEP_SIZE) {
-+		/* Start the allocation.We are not zeroing out the clusters */
-+		err = ntfs_set_size(inode, ntfs_up_cluster(sbi, end));
-+	} else {
-+		if (end <= i_size_read(inode)) {
-+			err = 0;
-+			goto out;
-+		}
++	/*
++	 * normal file: allocate clusters, do not change 'valid' size
++	 */
++	err = ntfs_set_size(inode, max(end, i_size));
++	if (err)
++		goto out;
++
++	if (is_sparsed(ni) || is_compressed(ni)) {
++		CLST vcn = vbo >> sbi->cluster_bits;
++		CLST cend = bytes_to_cluster(sbi, end);
++		CLST lcn, clen;
++		bool new;
 +
 +		/*
-+		 * Allocate clusters but does not change 'valid'
++		 * allocate but not zero new clusters
++		 * this breaks security (one can read unused on-disk areas)
++		 * zeroing these clusters may be too long
++		 * may be we should check here for root rights?
 +		 */
-+		err = ntfs_extend_ex(inode, offset, len, NULL);
++		for (; vcn < cend; vcn += clen) {
++			err = attr_data_get_block(ni, vcn, cend - vcn, &lcn,
++						  &clen, &new);
++			if (err)
++				goto out;
++		}
 +	}
++
++	if (mode & FALLOC_FL_KEEP_SIZE) {
++		ni_lock(ni);
++		/*true - keep preallocated*/
++		err = attr_set_size(ni, ATTR_DATA, NULL, 0, &ni->file.run,
++				    i_size, &ni->i_valid, true, NULL);
++		ni_unlock(ni);
++		if (err)
++			goto out;
++	}
++
++	inode->i_ctime = inode->i_mtime = current_time(inode);
++	mark_inode_dirty(inode);
 +
 +out:
 +	if (err == -EFBIG)
@@ -1461,17 +1323,12 @@ index 000000000000..72c6a263b5bc
 +	new_valid = ntfs_up_block(sb, min(ni->i_valid, new_size));
 +
 +	ni_lock(ni);
-+	down_write(&ni->file.run_lock);
 +
 +	truncate_setsize(inode, new_size);
-+
-+	err = attr_set_size(ni, ATTR_DATA, NULL, 0, &ni->file.run, new_size,
-+			    &new_valid, true, NULL);
 +
 +	if (new_valid < ni->i_valid)
 +		ni->i_valid = new_valid;
 +
-+	up_write(&ni->file.run_lock);
 +	ni_unlock(ni);
 +
 +	ni->std_fa |= FILE_ATTRIBUTE_ARCHIVE;
@@ -1523,11 +1380,13 @@ index 000000000000..72c6a263b5bc
 +		inode_dio_wait(inode);
 +
 +		if (attr->ia_size < oldsize) {
-+			err = block_truncate_page(inode->i_mapping,
-+						  attr->ia_size,
-+						  ntfs_get_block);
-+			if (err)
-+				goto out;
++			if (!is_compressed(ni)) {
++				err = block_truncate_page(inode->i_mapping,
++							  attr->ia_size,
++							  ntfs_get_block);
++				if (err)
++					goto out;
++			}
 +			ntfs_truncate_blocks(inode, attr->ia_size);
 +		} else if (attr->ia_size > oldsize) {
 +			err = ntfs_extend_ex(inode, attr->ia_size, 0, NULL);
@@ -1554,7 +1413,6 @@ index 000000000000..72c6a263b5bc
 +
 +	mark_inode_dirty(inode);
 +out:
-+
 +	return err;
 +}
 +
@@ -1567,27 +1425,24 @@ index 000000000000..72c6a263b5bc
 +	struct ntfs_inode *ni = ntfs_i(inode);
 +
 +	if (is_encrypted(ni)) {
-+		ntfs_inode_printk(inode,
-+				  KERN_WARNING "encrypted i/o not supported");
++		ntfs_inode_warn(inode, "encrypted i/o not supported");
 +		return -EOPNOTSUPP;
 +	}
 +
 +	if (is_compressed(ni) && (iocb->ki_flags & IOCB_DIRECT)) {
-+		ntfs_inode_printk(inode, KERN_WARNING
-+				  "direct i/o + compressed not supported");
++		ntfs_inode_warn(inode, "direct i/o + compressed not supported");
 +		return -EOPNOTSUPP;
 +	}
 +
 +	if (ni->ni_flags & NI_FLAG_COMPRESSED_MASK) {
-+		ntfs_inode_printk(
-+			inode, KERN_WARNING
++		ntfs_inode_warn(
++			inode,
 +			"read external compressed file not supported (temporary)");
 +		return -EOPNOTSUPP;
 +	}
 +
 +	if (is_dedup(ni)) {
-+		ntfs_inode_printk(inode, KERN_WARNING
-+				  "read deduplicated not supported");
++		ntfs_inode_warn(inode, "read deduplicated not supported");
 +		return -EOPNOTSUPP;
 +	}
 +
@@ -1596,31 +1451,60 @@ index 000000000000..72c6a263b5bc
 +	return err;
 +}
 +
-+/*
-+ * on error we return an unlocked page and the error value
-+ * on success we return a locked page and 0
-+ */
-+static int prepare_uptodate_page(struct inode *inode, struct page *page,
-+				 u64 pos, bool force_uptodate)
++/* returns array of locked pages */
++static int ntfs_get_frame(struct address_space *mapping, pgoff_t index,
++			  struct page **pages, u32 pages_per_frame,
++			  pgoff_t max_index, bool skip_read)
 +{
 +	int err = 0;
++	u32 npages = 0;
++	gfp_t gfp_mask =
++		mapping_gfp_constraint(mapping, ~__GFP_WRITE) | __GFP_FS;
 +
-+	if (((pos & (PAGE_SIZE - 1)) || force_uptodate) &&
-+	    !PageUptodate(page)) {
-+		err = ntfs_readpage(NULL, page);
-+		if (err)
++	while (npages < pages_per_frame && index < max_index) {
++		struct page *page;
++
++		page = find_or_create_page(mapping, index++, gfp_mask);
++		if (!page) {
++			err = -ENOMEM;
++fail:
++			while (npages--) {
++				page = pages[npages];
++				unlock_page(page);
++				put_page(page);
++			}
++
 +			return err;
-+		lock_page(page);
-+		if (!PageUptodate(page)) {
-+			unlock_page(page);
-+			return -EIO;
 +		}
-+		if (page->mapping != inode->i_mapping) {
-+			unlock_page(page);
-+			return -EAGAIN;
++
++		pages[npages++] = page;
++
++		if (npages == 1 && !skip_read) {
++			/* it reads full frame */
++			err = ntfs_readpage(NULL, page);
++			if (err) {
++				/* page is still locked */
++				goto fail;
++			}
++
++			/* page is unlocked */
++			lock_page(page);
++			if (!PageUptodate(page)) {
++				err = -EIO;
++				goto fail;
++			}
++
++			if (page->mapping != mapping) {
++				unlock_page(page);
++				put_page(page);
++				index -= 1;
++				npages -= 1;
++				continue;
++			}
 +		}
 +	}
-+	return 0;
++
++	return npages;
 +}
 +
 +/*helper for ntfs_file_write_iter (compressed files)*/
@@ -1631,25 +1515,31 @@ index 000000000000..72c6a263b5bc
 +	struct file *file = iocb->ki_filp;
 +	size_t count = iov_iter_count(from);
 +	loff_t pos = iocb->ki_pos;
-+	loff_t end = pos + count;
 +	struct inode *inode = file_inode(file);
 +	struct address_space *mapping = inode->i_mapping;
 +	struct ntfs_inode *ni = ntfs_i(inode);
++	u64 valid = ni->i_valid;
++	struct ntfs_sb_info *sbi = ni->mi.sbi;
 +	struct page *page, **pages = NULL;
-+	size_t ip, max_pages, written = 0;
-+	bool force_uptodate = false;
-+	pgoff_t from_idx, end_idx;
-+	u32 off;
-+	gfp_t mask = mapping_gfp_constraint(mapping, ~__GFP_FS) | __GFP_WRITE;
++	size_t written = 0;
++	u8 frame_bits = NTFS_LZNT_CUNIT + sbi->cluster_bits;
++	u32 frame_size = 1u << frame_bits;
++	u32 pages_per_frame = frame_size >> PAGE_SHIFT;
++	u32 npages, ip, off;
++	CLST frame;
++	u64 frame_vbo;
++	pgoff_t index, max_index;
 +
-+	from_idx = pos >> PAGE_SHIFT;
-+	end_idx = (end + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+	max_pages = end_idx - from_idx;
-+	if (max_pages > 16)
-+		max_pages = 16;
-+	WARN_ON(end_idx <= from_idx);
++	if (frame_size < PAGE_SIZE) {
++		/*
++		 * frame_size == 8K if cluster 512
++		 * frame_size == 64K if cluster 4096
++		 */
++		ntfs_inode_warn(inode, "page size is bigger than frame size");
++		return -EOPNOTSUPP;
++	}
 +
-+	pages = ntfs_alloc(max_pages * sizeof(struct page *), 1);
++	pages = ntfs_alloc(pages_per_frame * sizeof(struct page *), 0);
 +	if (!pages)
 +		return -ENOMEM;
 +
@@ -1662,79 +1552,107 @@ index 000000000000..72c6a263b5bc
 +	if (err)
 +		goto out;
 +
-+	while (count) {
-+		pgoff_t index = pos >> PAGE_SHIFT;
-+		size_t offset = offset_in_page(pos);
-+		size_t bytes = max_pages * PAGE_SIZE - offset;
-+		size_t wpages, copied;
++	/* zero range [valid : pos) */
++	max_index = (pos + PAGE_SIZE - 1) >> PAGE_SHIFT;
++	while (valid < pos) {
++		CLST lcn, clen;
 +
++		frame = valid >> frame_bits;
++		frame_vbo = valid & ~(frame_size - 1);
++		off = valid & (frame_size - 1);
++
++		err = attr_data_get_block(ni, frame << NTFS_LZNT_CUNIT, 0, &lcn,
++					  &clen, NULL);
++		if (err)
++			goto out;
++
++		if (lcn == SPARSE_LCN) {
++			ni->i_valid = valid =
++				frame_vbo + ((u64)clen << sbi->cluster_bits);
++			continue;
++		}
++
++		/* Load full frame */
++		err = ntfs_get_frame(mapping, frame_vbo >> PAGE_SHIFT, pages,
++				     pages_per_frame, max_index, !off);
++		if (err < 0)
++			goto out;
++
++		npages = err;
++
++		ip = off >> PAGE_SHIFT;
++		off = offset_in_page(valid);
++		for (; ip < npages; ip++, off = 0) {
++			page = pages[ip];
++			zero_user_segment(page, off, PAGE_SIZE);
++			flush_dcache_page(page);
++			SetPageUptodate(page);
++		}
++
++		ni_lock(ni);
++		err = ni_write_frame(ni, pages, npages);
++		ni_unlock(ni);
++
++		for (ip = 0; ip < npages; ip++) {
++			page = pages[ip];
++			ClearPageDirty(page);
++			SetPageUptodate(page);
++			unlock_page(page);
++			put_page(page);
++		}
++
++		if (err)
++			goto out;
++
++		ni->i_valid = valid = frame_vbo + frame_size;
++	}
++
++	max_index = (inode->i_size + PAGE_SIZE - 1) >> PAGE_SHIFT;
++
++	/* copy user data [pos : pos + count) */
++	while (count) {
++		size_t copied, bytes;
++		bool skip_read;
++
++		off = pos & (frame_size - 1);
++		bytes = frame_size - off;
 +		if (bytes > count)
 +			bytes = count;
 +
-+		wpages = (offset + bytes + PAGE_SIZE - 1) >> PAGE_SHIFT;
++		frame = pos >> frame_bits;
++		frame_vbo = pos & ~(frame_size - 1);
++		index = frame_vbo >> PAGE_SHIFT;
 +
-+		WARN_ON(wpages > max_pages);
++		skip_read = !off && (bytes >= frame_size ||
++				     pos + bytes >= inode->i_size);
 +
 +		if (unlikely(iov_iter_fault_in_readable(from, bytes))) {
 +			err = -EFAULT;
 +			goto out;
 +		}
 +
-+		for (ip = 0; ip < wpages; ip++) {
-+again:
-+			page = find_or_create_page(mapping, index + ip, mask);
-+			if (!page) {
-+				err = -ENOMEM;
-+fail:
-+				while (ip--) {
-+					page = pages[ip];
-+					unlock_page(page);
-+					put_page(page);
-+				}
++		/* Load full frame */
++		err = ntfs_get_frame(mapping, index, pages, pages_per_frame,
++				     max_index, skip_read);
++		if (err < 0)
++			goto out;
 +
-+				goto out;
-+			}
-+
-+			pages[ip] = page;
-+
-+			if (!ip)
-+				err = prepare_uptodate_page(inode, page, pos,
-+							    force_uptodate);
-+
-+			if (!err && ip == wpages - 1)
-+				err = prepare_uptodate_page(inode, page,
-+							    pos + bytes, false);
-+
-+			if (err) {
-+				put_page(page);
-+				if (err == -EAGAIN) {
-+					err = 0;
-+					goto again;
-+				}
-+				goto fail;
-+			}
-+			wait_on_page_writeback(page);
-+		}
++		npages = err;
 +
 +		WARN_ON(!bytes);
 +		copied = 0;
-+		ip = 0;
++		ip = off >> PAGE_SHIFT;
 +		off = offset_in_page(pos);
 +
++		/* copy user data to pages */
 +		for (;;) {
-+			size_t tail = PAGE_SIZE - off;
-+			size_t count = min(tail, bytes);
-+			size_t cp;
++			size_t cp, tail = PAGE_SIZE - off;
 +
 +			page = pages[ip];
 +
 +			cp = iov_iter_copy_from_user_atomic(page, from, off,
-+							    count);
-+
++							    min(tail, bytes));
 +			flush_dcache_page(page);
-+
-+			if (!PageUptodate(page) && cp < count)
-+				cp = 0;
 +
 +			iov_iter_advance(from, cp);
 +			copied += cp;
@@ -1742,41 +1660,35 @@ index 000000000000..72c6a263b5bc
 +			if (!bytes || !cp)
 +				break;
 +
-+			if (cp < tail)
++			if (cp < tail) {
 +				off += cp;
-+			else {
++			} else {
 +				ip++;
 +				off = 0;
 +			}
 +		}
 +
-+		if (!copied)
-+			force_uptodate = true;
-+		else {
-+			size_t dpages;
++		ni_lock(ni);
++		err = ni_write_frame(ni, pages, npages);
++		ni_unlock(ni);
 +
-+			force_uptodate = false;
-+			dpages =
-+				(offset + copied + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+
-+			for (ip = 0; ip < dpages; ip++) {
-+				page = pages[ip];
-+				SetPageUptodate(page);
-+				ClearPageChecked(page);
-+				set_page_dirty(page);
-+			}
-+		}
-+
-+		for (ip = 0; ip < wpages; ip++) {
++		for (ip = 0; ip < npages; ip++) {
 +			page = pages[ip];
-+			ClearPageChecked(page);
++			ClearPageDirty(page);
++			SetPageUptodate(page);
 +			unlock_page(page);
 +			put_page(page);
 +		}
 +
-+		cond_resched();
++		if (err)
++			goto out;
 +
-+		balance_dirty_pages_ratelimited(mapping);
++		/*
++		 * We can loop for a long time in here. Be nice and allow
++		 * us to schedule out to avoid softlocking if preempt
++		 * is disabled.
++		 */
++		cond_resched();
 +
 +		pos += copied;
 +		written += copied;
@@ -1811,27 +1723,24 @@ index 000000000000..72c6a263b5bc
 +	struct ntfs_inode *ni = ntfs_i(inode);
 +
 +	if (is_encrypted(ni)) {
-+		ntfs_inode_printk(inode,
-+				  KERN_WARNING "encrypted i/o not supported");
++		ntfs_inode_warn(inode, "encrypted i/o not supported");
 +		return -EOPNOTSUPP;
 +	}
 +
 +	if (is_compressed(ni) && (iocb->ki_flags & IOCB_DIRECT)) {
-+		ntfs_inode_printk(inode, KERN_WARNING
-+				  "direct i/o + compressed not supported");
++		ntfs_inode_warn(inode, "direct i/o + compressed not supported");
 +		return -EOPNOTSUPP;
 +	}
 +
 +	if (ni->ni_flags & NI_FLAG_COMPRESSED_MASK) {
-+		ntfs_inode_printk(
-+			inode, KERN_WARNING
++		ntfs_inode_warn(
++			inode,
 +			"write into external compressed file not supported (temporary)");
 +		return -EOPNOTSUPP;
 +	}
 +
 +	if (is_dedup(ni)) {
-+		ntfs_inode_printk(inode, KERN_WARNING
-+				  "write into deduplicated not supported");
++		ntfs_inode_warn(inode, "write into deduplicated not supported");
 +		return -EOPNOTSUPP;
 +	}
 +
@@ -1870,7 +1779,7 @@ index 000000000000..72c6a263b5bc
 +
 +	if (unlikely((is_compressed(ni) || is_encrypted(ni)) &&
 +		     (file->f_flags & O_DIRECT))) {
-+		return -ENOTBLK;
++		return -EOPNOTSUPP;
 +	}
 +
 +	return generic_file_open(inode, file);
@@ -1892,14 +1801,12 @@ index 000000000000..72c6a263b5bc
 +
 +	sbi = ni->mi.sbi;
 +
-+	if (!sbi->options.prealloc)
-+		return 0;
-+
 +	ni_lock(ni);
++	down_write(&ni->file.run_lock);
 +
 +	err = attr_set_size(ni, ATTR_DATA, NULL, 0, &ni->file.run,
 +			    inode->i_size, &ni->i_valid, false, NULL);
-+
++	up_write(&ni->file.run_lock);
 +	ni_unlock(ni);
 +
 +	return err;
@@ -1952,10 +1859,10 @@ index 000000000000..72c6a263b5bc
 +};
 diff --git a/fs/ntfs3/frecord.c b/fs/ntfs3/frecord.c
 new file mode 100644
-index 000000000000..ad09fca5d7db
+index 000000000000..6894f0855a62
 --- /dev/null
 +++ b/fs/ntfs3/frecord.c
-@@ -0,0 +1,2378 @@
+@@ -0,0 +1,2335 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/frecord.c
@@ -2055,6 +1962,21 @@ index 000000000000..ad09fca5d7db
 +
 +	attr = mi_find_attr(&ni->mi, NULL, ATTR_STD, NULL, 0, NULL);
 +	return attr ? resident_data_ex(attr, sizeof(struct ATTR_STD_INFO)) :
++		      NULL;
++}
++
++/*
++ * ni_std5
++ *
++ * returns pointer into std_info from primary record
++ */
++struct ATTR_STD_INFO5 *ni_std5(struct ntfs_inode *ni)
++{
++	const struct ATTRIB *attr;
++
++	attr = mi_find_attr(&ni->mi, NULL, ATTR_STD, NULL, 0, NULL);
++
++	return attr ? resident_data_ex(attr, sizeof(struct ATTR_STD_INFO5)) :
 +		      NULL;
 +}
 +
@@ -2259,21 +2181,17 @@ index 000000000000..ad09fca5d7db
 +
 +	/*
 +	 * Unfortunately ATTR_LIST_ENTRY contains only start vcn
-+	 * So to find the ATTRIB segment that contains Vcn we should
++	 * So to find the ATTRIB segment that contains 'vcn' we should
 +	 * enumerate some entries
 +	 */
-+	if (!vcn)
-+		goto load_rec;
++	if (vcn) {
++		for (;; le = next) {
++			next = al_find_ex(ni, le, type, name, name_len, NULL);
++			if (!next || le64_to_cpu(next->vcn) > vcn)
++				break;
++		}
++	}
 +
-+next_le:
-+	next = al_find_ex(ni, le, type, name, name_len, NULL);
-+	if (!next || le64_to_cpu(next->vcn) > vcn)
-+		goto load_rec;
-+
-+	le = next;
-+	goto next_le;
-+
-+load_rec:
 +	if (ni_load_mi(ni, le, &mi))
 +		return NULL;
 +
@@ -2490,8 +2408,8 @@ index 000000000000..ad09fca5d7db
 +	int err;
 +	u32 lsize;
 +	struct ATTRIB *attr;
-+	struct ATTRIB *arr_move[3];
-+	struct ATTR_LIST_ENTRY *le, *le_b[3];
++	struct ATTRIB *arr_move[7];
++	struct ATTR_LIST_ENTRY *le, *le_b[7];
 +	struct MFT_REC *rec;
 +	bool is_mft;
 +	CLST rno = 0;
@@ -2531,8 +2449,7 @@ index 000000000000..ad09fca5d7db
 +		le->name_off = offsetof(struct ATTR_LIST_ENTRY, name);
 +		le->vcn = 0;
 +		if (le != ni->attr_list.le)
-+			le->ref = ((struct ATTR_LIST_ENTRY *)ni->attr_list.le)
-+					  ->ref;
++			le->ref = ni->attr_list.le->ref;
 +		le->id = attr->id;
 +
 +		if (attr->name_len)
@@ -2556,9 +2473,9 @@ index 000000000000..ad09fca5d7db
 +	ni->attr_list.size = lsize;
 +
 +	to_free = le32_to_cpu(rec->used) + lsize + SIZEOF_RESIDENT;
-+	if (to_free <= rs)
++	if (to_free <= rs) {
 +		to_free = 0;
-+	else {
++	} else {
 +		to_free -= rs;
 +
 +		if (to_free > free_b) {
@@ -2668,7 +2585,7 @@ index 000000000000..ad09fca5d7db
 +			goto out;
 +	}
 +
-+	vbo = is_mft_data ? (svcn << sbi->cluster_bits) : 0;
++	vbo = is_mft_data ? ((u64)svcn << sbi->cluster_bits) : 0;
 +
 +	if (force_ext)
 +		goto insert_ext;
@@ -2794,21 +2711,19 @@ index 000000000000..ad09fca5d7db
 +			free -= list_reserve;
 +	}
 +
-+	if (asize > free)
-+		goto insert_ext;
-+
-+	attr = ni_ins_new_attr(ni, &ni->mi, NULL, type, name, name_len, asize,
-+			       name_off, svcn);
-+	if (attr) {
-+		if (ins_attr)
-+			*ins_attr = attr;
-+		if (ins_mi)
-+			*ins_mi = &ni->mi;
-+		err = 0;
-+		goto out;
++	if (asize <= free) {
++		attr = ni_ins_new_attr(ni, &ni->mi, NULL, type, name, name_len,
++				       asize, name_off, svcn);
++		if (attr) {
++			if (ins_attr)
++				*ins_attr = attr;
++			if (ins_mi)
++				*ins_mi = &ni->mi;
++			err = 0;
++			goto out;
++		}
 +	}
 +
-+insert_ext:
 +	if (!is_mft || type != ATTR_DATA || svcn) {
 +		/* This ATTRIB will be external. */
 +		err = ni_ins_attr_ext(ni, NULL, type, name, name_len, asize,
@@ -2843,53 +2758,50 @@ index 000000000000..ad09fca5d7db
 +
 +	/* Start real attribute moving */
 +	attr = NULL;
-+next_move:
 +
-+	attr = mi_enum_attr(&ni->mi, attr);
-+	if (!attr) {
-+		/* We should never be here 'cause we have already check this case */
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	/* Skip attributes that MUST be primary record */
-+	if (attr->type == ATTR_STD)
-+		goto next_move;
-+	if (attr->type == ATTR_LIST)
-+		goto next_move;
-+
-+	le = NULL;
-+	if (ni->attr_list.size) {
-+		le = al_find_le(ni, NULL, attr);
-+		if (!le) {
-+			/* Really this is a serious bug */
++	for (;;) {
++		attr = mi_enum_attr(&ni->mi, attr);
++		if (!attr) {
++			/* We should never be here 'cause we have already check this case */
 +			err = -EINVAL;
 +			goto out;
 +		}
++
++		/* Skip attributes that MUST be primary record */
++		if (attr->type == ATTR_STD || attr->type == ATTR_LIST)
++			continue;
++
++		le = NULL;
++		if (ni->attr_list.size) {
++			le = al_find_le(ni, NULL, attr);
++			if (!le) {
++				/* Really this is a serious bug */
++				err = -EINVAL;
++				goto out;
++			}
++		}
++
++		t32 = le32_to_cpu(attr->size);
++		t16 = le16_to_cpu(attr->name_off);
++		err = ni_ins_attr_ext(ni, le, attr->type, Add2Ptr(attr, t16),
++				      attr->name_len, t32, attr_svcn(attr), t16,
++				      false, &eattr, NULL);
++		if (err)
++			return err;
++
++		id = eattr->id;
++		memcpy(eattr, attr, t32);
++		eattr->id = id;
++
++		/* remove attrib from primary record */
++		mi_remove_attr(&ni->mi, attr);
++
++		/* attr now points to next attribute */
++		if (attr->type == ATTR_END)
++			goto out;
 +	}
-+
-+	t32 = le32_to_cpu(attr->size);
-+	t16 = le16_to_cpu(attr->name_off);
-+	err = ni_ins_attr_ext(ni, le, attr->type, Add2Ptr(attr, t16),
-+			      attr->name_len, t32, attr_svcn(attr), t16, false,
-+			      &eattr, NULL);
-+	if (err)
-+		return err;
-+
-+	id = eattr->id;
-+	memcpy(eattr, attr, t32);
-+	eattr->id = id;
-+
-+	/* remove attrib from primary record */
-+	mi_remove_attr(&ni->mi, attr);
-+
-+	/* attr now points to next attribute */
-+	if (attr->type == ATTR_END)
-+		goto out;
-+
-+	/* Try to insert when the free space is enough */
-+	if (asize + list_reserve > sbi->record_size - le32_to_cpu(rec->used))
-+		goto next_move;
++	while (asize + list_reserve > sbi->record_size - le32_to_cpu(rec->used))
++		;
 +
 +	attr = ni_ins_new_attr(ni, &ni->mi, NULL, type, name, name_len, asize,
 +			       name_off, svcn);
@@ -3211,6 +3123,7 @@ index 000000000000..ad09fca5d7db
 +
 +	if (new_attr)
 +		*new_attr = attr;
++
 +	return 0;
 +}
 +
@@ -3253,53 +3166,43 @@ index 000000000000..ad09fca5d7db
 +	u32 asize;
 +	CLST svcn, evcn;
 +	struct ntfs_sb_info *sbi = ni->mi.sbi;
-+	bool nt5 = is_nt5(sbi);
++	bool nt3 = is_ntfs3(sbi);
 +	struct MFT_REF ref;
 +
-+next_attr:
-+	attr = ni_enum_attr_ex(ni, attr, &le);
-+	if (!attr)
-+		goto attr_list;
++	while ((attr = ni_enum_attr_ex(ni, attr, &le))) {
++		if (!nt3 || attr->name_len) {
++			;
++		} else if (attr->type == ATTR_REPARSE) {
++			get_mi_ref(&ni->mi, &ref);
++			ntfs_remove_reparse(sbi, 0, &ref);
++		} else if (attr->type == ATTR_ID && !attr->non_res &&
++			   le32_to_cpu(attr->res.data_size) >=
++				   sizeof(struct GUID)) {
++			ntfs_objid_remove(sbi, resident_data(attr));
++		}
 +
-+	if (!nt5 || attr->name_len)
-+		;
-+	else if (attr->type == ATTR_REPARSE) {
-+		get_mi_ref(&ni->mi, &ref);
-+		err = ntfs_remove_reparse(sbi, 0, &ref);
-+	} else if (attr->type == ATTR_ID) {
-+		if (!attr->non_res &&
-+		    le32_to_cpu(attr->res.data_size) >= sizeof(struct GUID))
-+			err = ntfs_objid_remove(sbi, resident_data(attr));
++		if (!attr->non_res)
++			continue;
++
++		svcn = le64_to_cpu(attr->nres.svcn);
++		evcn = le64_to_cpu(attr->nres.evcn);
++
++		if (evcn + 1 <= svcn)
++			continue;
++
++		asize = le32_to_cpu(attr->size);
++		roff = le16_to_cpu(attr->nres.run_off);
++
++		/*run==1 means unpack and deallocate*/
++		run_unpack_ex((struct runs_tree *)(size_t)1, sbi, ni->mi.rno,
++			      svcn, evcn, Add2Ptr(attr, roff), asize - roff);
 +	}
 +
-+	if (!attr->non_res)
-+		goto next_attr;
++	if (ni->attr_list.size) {
++		run_deallocate(ni->mi.sbi, &ni->attr_list.run, true);
++		al_destroy(ni);
++	}
 +
-+	svcn = le64_to_cpu(attr->nres.svcn);
-+	evcn = le64_to_cpu(attr->nres.evcn);
-+
-+	if (evcn + 1 <= svcn)
-+		goto next_attr;
-+
-+	asize = le32_to_cpu(attr->size);
-+	roff = le16_to_cpu(attr->nres.run_off);
-+
-+	err = run_unpack_ex((struct runs_tree *)(size_t)1, sbi, ni->mi.rno,
-+			    svcn, evcn, Add2Ptr(attr, roff), asize - roff);
-+	if (err < 0)
-+		goto next_attr;
-+	err = 0;
-+
-+	goto next_attr;
-+
-+attr_list:
-+	if (!ni->attr_list.size)
-+		goto free_subrecord;
-+
-+	run_deallocate(ni->mi.sbi, &ni->attr_list.run, true);
-+	al_destroy(ni);
-+
-+free_subrecord:
 +	/* Free all subrecords */
 +	for (node = rb_first(&ni->mi_tree); node;) {
 +		struct rb_node *next = rb_next(node);
@@ -3379,58 +3282,16 @@ index 000000000000..ad09fca5d7db
 +	*le = NULL;
 +
 +	/* Enumerate all names */
-+next_name:
-+	attr = ni_find_attr(ni, attr, le, ATTR_NAME, NULL, 0, NULL, NULL);
-+	if (!attr)
-+		return NULL;
++	for (;;) {
++		attr = ni_find_attr(ni, attr, le, ATTR_NAME, NULL, 0, NULL,
++				    NULL);
++		if (!attr)
++			return NULL;
 +
-+	fname = resident_data_ex(attr, SIZEOF_ATTRIBUTE_FILENAME);
-+	if (fname && name_type == fname->type)
-+		return fname;
-+	goto next_name;
-+}
-+
-+/*
-+ * ni_init_compress
-+ *
-+ * allocates and fill 'compress_ctx'
-+ * used to decompress lzx and xpress
-+ */
-+int ni_init_compress(struct ntfs_inode *ni, struct COMPRESS_CTX *ctx)
-+{
-+	u32 c_format = ((ni->ni_flags & NI_FLAG_COMPRESSED_MASK) >> 8) - 1;
-+	u32 chunk_bits;
-+
-+	switch (c_format) {
-+	case WOF_COMPRESSION_XPRESS4K:
-+		chunk_bits = 12; // 4k
-+		break;
-+	case WOF_COMPRESSION_LZX:
-+		chunk_bits = 15; // 32k
-+		break;
-+	case WOF_COMPRESSION_XPRESS8K:
-+		chunk_bits = 13; // 8k
-+		break;
-+	case WOF_COMPRESSION_XPRESS16K:
-+		chunk_bits = 14; // 16k
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
++		fname = resident_data_ex(attr, SIZEOF_ATTRIBUTE_FILENAME);
++		if (fname && name_type == fname->type)
++			return fname;
 +	}
-+
-+	ctx->chunk_bits = chunk_bits;
-+	ctx->offset_bits = ni->vfs_inode.i_size < 0x100000000ull ?
-+				   2 :
-+				   3; // 32 or 64 bits per offsets
-+
-+	ctx->compress_format = c_format;
-+	ctx->chunk_size = 1u << chunk_bits;
-+	ctx->chunk_num = -1;
-+	ctx->first_chunk = -1;
-+	ctx->total_chunks = (ni->vfs_inode.i_size - 1) >> chunk_bits;
-+	ctx->chunk0_off = ctx->total_chunks << ctx->offset_bits;
-+
-+	return 0;
 +}
 +
 +/*
@@ -3542,6 +3403,14 @@ index 000000000000..ad09fca5d7db
 +			err = -EINVAL;
 +			goto out;
 +		}
++		if (is_attr_compressed(attr)) {
++			/*unfortunately cp -r incorrectly treats compressed clusters*/
++			err = -EOPNOTSUPP;
++			ntfs_inode_warn(
++				&ni->vfs_inode,
++				"fiemap is not supported for compressed file (cp -r)");
++			goto out;
++		}
 +		run_lock = &ni->file.run_lock;
 +	}
 +
@@ -3569,8 +3438,10 @@ index 000000000000..ad09fca5d7db
 +			CLST next_vcn = vcn;
 +
 +			ok = run_get_entry(run, ++idx, &vcn, &lcn, &clen);
-+			if (ok && vcn != next_vcn)
++			if (ok && vcn != next_vcn) {
 +				ok = false;
++				vcn = next_vcn;
++			}
 +		}
 +
 +		if (!ok) {
@@ -3611,9 +3482,9 @@ index 000000000000..ad09fca5d7db
 +		}
 +
 +		flags = FIEMAP_EXTENT_MERGED;
-+		if (S_ISDIR(ni->vfs_inode.i_mode))
++		if (S_ISDIR(ni->vfs_inode.i_mode)) {
 +			;
-+		else if (is_attr_compressed(attr)) {
++		} else if (is_attr_compressed(attr)) {
 +			bool is_compr;
 +			CLST clst_data;
 +
@@ -3624,8 +3495,9 @@ index 000000000000..ad09fca5d7db
 +				break;
 +			if (is_compr)
 +				flags |= FIEMAP_EXTENT_ENCODED;
-+		} else if (is_attr_encrypted(attr))
++		} else if (is_attr_encrypted(attr)) {
 +			flags |= FIEMAP_EXTENT_DATA_ENCRYPTED;
++		}
 +
 +		vbo = (u64)vcn << cluster_bits;
 +		bytes = (u64)clen << cluster_bits;
@@ -3638,11 +3510,11 @@ index 000000000000..ad09fca5d7db
 +			flags |= FIEMAP_EXTENT_LAST;
 +		}
 +
-+		if (vbo + bytes <= valid)
++		if (vbo + bytes <= valid) {
 +			;
-+		else if (vbo >= valid)
++		} else if (vbo >= valid) {
 +			flags |= FIEMAP_EXTENT_UNWRITTEN;
-+		else {
++		} else {
 +			/* vbo < valid && valid < vbo + bytes */
 +			u64 dlen = valid - vbo;
 +
@@ -3700,14 +3572,15 @@ index 000000000000..ad09fca5d7db
 +	pgoff_t index = page->index, end_index;
 +	u64 vbo = (u64)index << PAGE_SHIFT;
 +	u32 pages_per_frame = 0;
-+	struct page **pages = NULL;
++	struct page **pages = NULL; /*array of at most 16 pages. stack?*/
 +	char *frame_buf = NULL;
-+	char *frame_unc;
++	char *frame_unc = NULL;
++	bool is_mapped = false;
 +	u32 cmpr_size, unc_size;
 +	u64 frame_vbo, valid_size;
 +	size_t unc_size_fin;
-+	struct COMPRESS_CTX *ctx = NULL;
-+	bool is_compr = false;
++	u32 npages, missed = 0;
++	bool is_cmpr;
 +
 +	end_index = (ni->vfs_inode.i_size + PAGE_SIZE - 1) >> PAGE_SHIFT;
 +
@@ -3727,48 +3600,38 @@ index 000000000000..ad09fca5d7db
 +	WARN_ON(!attr->non_res);
 +
 +	if (ni->ni_flags & NI_FLAG_COMPRESSED_MASK) {
-+		ctx = ntfs_alloc(sizeof(*ctx), 1);
-+		if (!ctx) {
-+			err = -ENOMEM;
-+			goto out;
-+		}
-+		err = ni_init_compress(ni, ctx);
-+		if (err)
-+			goto out;
-+
-+		frame_bits = ctx->chunk_bits;
-+		frame_size = ctx->chunk_size;
-+		frame = vbo >> frame_bits;
-+		frame_vbo = (u64)frame << frame_bits;
-+
 +		/* TODO: port lzx/xpress */
 +		err = -EOPNOTSUPP;
 +		goto out;
-+	} else if (is_attr_compressed(attr)) {
-+		if (sbi->cluster_size > NTFS_LZNT_MAX_CLUSTER) {
-+			err = -EOPNOTSUPP;
-+			goto out;
-+		}
++	}
 +
-+		if (attr->nres.c_unit != NTFS_LZNT_CUNIT) {
-+			err = -EOPNOTSUPP;
-+			goto out;
-+		}
-+
-+		frame_bits = 4 + sbi->cluster_bits;
-+		frame_size = 16 << sbi->cluster_bits;
-+		frame = vbo >> frame_bits;
-+		frame_vbo = (u64)frame << frame_bits;
-+
-+		err = attr_is_frame_compressed(ni, attr, frame, &clst_data,
-+					       &is_compr);
-+		if (err)
-+			goto out;
-+	} else {
-+		WARN_ON(1);
++	if (!is_attr_compressed(attr)) {
 +		err = -EINVAL;
 +		goto out;
 +	}
++
++	if (sbi->cluster_size > NTFS_LZNT_MAX_CLUSTER) {
++		err = -EOPNOTSUPP;
++		goto out;
++	}
++
++	if (attr->nres.c_unit != NTFS_LZNT_CUNIT) {
++		err = -EOPNOTSUPP;
++		goto out;
++	}
++
++	frame_bits = NTFS_LZNT_CUNIT + sbi->cluster_bits;
++	frame_size = sbi->cluster_size << NTFS_LZNT_CUNIT;
++	frame = vbo >> frame_bits;
++	frame_vbo = (u64)frame << frame_bits;
++
++	down_write(&ni->file.run_lock);
++	run_truncate_head(&ni->file.run, le64_to_cpu(attr->nres.svcn));
++	err = attr_is_frame_compressed(ni, attr, frame, &clst_data, &is_cmpr);
++	up_write(&ni->file.run_lock);
++
++	if (err)
++		goto out;
 +
 +	pages_per_frame = frame_size >> PAGE_SHIFT;
 +	pages = ntfs_alloc(pages_per_frame * sizeof(*pages), 1);
@@ -3779,76 +3642,106 @@ index 000000000000..ad09fca5d7db
 +
 +	idx = (vbo - frame_vbo) >> PAGE_SHIFT;
 +	pages[idx] = page;
-+	index = frame_vbo >> PAGE_SHIFT;
 +	kmap(page);
 +
++	npages = 1;
++	index = frame_vbo >> PAGE_SHIFT;
 +	for (i = 0; i < pages_per_frame && index < end_index; i++, index++) {
 +		if (i == idx)
 +			continue;
 +
-+		pg = grab_cache_page_nowait(mapping, index);
-+		if (!pg)
-+			continue;
++		//pg = grab_cache_page_nowait(mapping, index);
++		pg = find_get_page(mapping, index);
++		if (!pg) {
++			missed += 1;
++			continue; /* not critical - just not effective */
++		}
 +
 +		pages[i] = pg;
 +		if (!PageDirty(pg) && (!PageUptodate(pg) || PageError(pg)))
 +			ClearPageError(pg);
 +		kmap(pg);
++		npages += 1;
 +	}
 +
 +	valid_size = ni->i_valid;
++	unc_size = (missed + npages) << PAGE_SHIFT;
++
++	if (!missed) {
++		frame_unc = vmap(pages, npages, VM_MAP, PAGE_KERNEL);
++		if (frame_unc)
++			is_mapped = true;
++	}
 +
 +	if (frame_vbo >= valid_size || !clst_data) {
++		/* all zeroes */
++		err = 0;
++		if (is_mapped) {
++			memset(frame_unc, 0, npages << PAGE_SHIFT);
++			goto out1;
++		}
++
 +		for (i = 0; i < pages_per_frame; i++) {
 +			pg = pages[i];
-+			if (!pg || PageDirty(pg) ||
-+			    (PageUptodate(pg) && !PageError(pg)))
++			if (!pg)
 +				continue;
-+
 +			memset(page_address(pg), 0, PAGE_SIZE);
 +			flush_dcache_page(pg);
-+			SetPageUptodate(pg);
 +		}
-+		err = 0;
++
 +		goto out1;
 +	}
 +
-+	unc_size = frame_vbo + frame_size > valid_size ?
-+			   (valid_size - frame_vbo) :
-+			   frame_size;
++	cmpr_size = clst_data << sbi->cluster_bits;
 +
 +	/* read 'clst_data' clusters from disk */
-+	cmpr_size = clst_data << sbi->cluster_bits;
++	if (!is_cmpr && is_mapped) {
++		down_read(&ni->file.run_lock);
++		err = ntfs_read_run_nb(sbi, &ni->file.run, frame_vbo, frame_unc,
++				       cmpr_size, NULL);
++		up_read(&ni->file.run_lock);
++		goto out1;
++	}
++
 +	frame_buf = ntfs_alloc(cmpr_size, 0);
 +	if (!frame_buf) {
 +		err = -ENOMEM;
 +		goto out1;
 +	}
 +
++	down_read(&ni->file.run_lock);
 +	err = ntfs_read_run_nb(sbi, &ni->file.run, frame_vbo, frame_buf,
 +			       cmpr_size, NULL);
++	up_read(&ni->file.run_lock);
++
 +	if (err)
 +		goto out2;
 +
++	/* compress.lock protects sbi->compress.frame_unc (a-la frame_unc ) and sbi->compress.ctx */
 +	spin_lock(&sbi->compress.lock);
-+	frame_unc = sbi->compress.frame_unc;
++	if (!is_mapped)
++		frame_unc = sbi->compress.frame_unc;
 +
-+	if (!is_compr) {
-+		unc_size_fin = unc_size;
-+		frame_unc = frame_buf;
-+	} else {
-+		/* decompress: frame_buf -> frame_unc */
-+		unc_size_fin = decompress_lznt(frame_buf, cmpr_size, frame_unc,
-+					       frame_size);
-+		if ((ssize_t)unc_size_fin < 0) {
-+			err = unc_size_fin;
-+			goto out3;
-+		}
++	/* decompress: frame_buf -> frame_unc */
++	unc_size_fin =
++		decompress_lznt(frame_buf, cmpr_size, frame_unc, unc_size);
++	if ((ssize_t)unc_size_fin < 0) {
++		err = unc_size_fin;
++		goto out3;
++	}
 +
-+		if (!unc_size_fin || unc_size_fin > frame_size) {
-+			err = -EINVAL;
-+			goto out3;
++	if (!unc_size_fin || unc_size_fin > frame_size) {
++		err = -EINVAL;
++		goto out3;
++	}
++
++	if (is_mapped) {
++		if (valid_size < frame_vbo + unc_size) {
++			size_t ok = valid_size - frame_vbo;
++
++			memset(frame_unc + ok, 0, unc_size - ok);
 +		}
++		goto out3;
 +	}
 +
 +	for (i = 0; i < pages_per_frame; i++) {
@@ -3882,7 +3775,6 @@ index 000000000000..ad09fca5d7db
 +			memset(pa + use, 0, PAGE_SIZE - use);
 +
 +		flush_dcache_page(pg);
-+		SetPageUptodate(pg);
 +	}
 +
 +out3:
@@ -3891,6 +3783,19 @@ index 000000000000..ad09fca5d7db
 +out2:
 +	ntfs_free(frame_buf);
 +out1:
++	if (is_mapped)
++		vunmap(frame_unc);
++
++	if (err) {
++		SetPageError(page);
++	} else {
++		for (i = 0; i < pages_per_frame; i++) {
++			pg = pages[i];
++			if (pg)
++				SetPageUptodate(pg);
++		}
++	}
++
 +	for (i = 0; i < pages_per_frame; i++) {
 +		pg = pages[i];
 +		if (i == idx || !pg)
@@ -3900,8 +3805,6 @@ index 000000000000..ad09fca5d7db
 +		put_page(pg);
 +	}
 +
-+	if (err)
-+		SetPageError(page);
 +	kunmap(page);
 +
 +out:
@@ -3909,47 +3812,31 @@ index 000000000000..ad09fca5d7db
 +	ntfs_free(pages);
 +	unlock_page(page);
 +
-+	ntfs_free(ctx);
-+
 +	return err;
 +}
 +
 +/*
-+ * ni_writepage_cmpr
++ * ni_write_frame
 + *
-+ * helper for ntfs_writepage_cmpr
++ * pages - array of locked pages
 + */
-+int ni_writepage_cmpr(struct page *page, int sync)
++int ni_write_frame(struct ntfs_inode *ni, struct page **pages, u32 npages)
 +{
 +	int err;
-+	struct address_space *mapping = page->mapping;
-+	struct inode *inode = mapping->host;
-+	loff_t i_size = i_size_read(inode);
-+	struct ntfs_inode *ni = ntfs_i(inode);
 +	struct ntfs_sb_info *sbi = ni->mi.sbi;
-+	pgoff_t index = page->index, end_index;
-+	u64 vbo = (u64)index << PAGE_SHIFT;
-+	u32 pages_per_frame = 0;
-+	struct page **pages = NULL;
++	u8 frame_bits = NTFS_LZNT_CUNIT + sbi->cluster_bits;
++	u32 frame_size = sbi->cluster_size << NTFS_LZNT_CUNIT;
++	u64 frame_vbo = (u64)pages[0]->index << PAGE_SHIFT;
++	CLST frame = frame_vbo >> frame_bits;
++	u32 pages_per_frame;
 +	char *frame_buf = NULL;
++	char *frame_unc, *frame_wr;
 +	struct ATTR_LIST_ENTRY *le;
 +	struct ATTRIB *attr;
-+	u8 frame_bits;
-+	u32 frame_size, i, idx, unc_size;
-+	CLST frame;
++	u32 i;
 +	struct page *pg;
-+	char *frame_unc;
-+	u64 frame_vbo;
-+	size_t cmpr_size_fin, cmpr_size_clst;
-+	gfp_t mask;
-+
-+	end_index = (i_size + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+
-+	if (index >= end_index) {
-+		SetPageUptodate(page);
-+		err = 0;
-+		goto out;
-+	}
++	bool is_mapped = false;
++	size_t cmpr_size_fin, cmpr_size;
 +
 +	le = NULL;
 +	attr = ni_find_attr(ni, NULL, &le, ATTR_DATA, NULL, 0, NULL, NULL);
@@ -3980,13 +3867,6 @@ index 000000000000..ad09fca5d7db
 +		goto out;
 +	}
 +
-+	frame_bits = NTFS_LZNT_CUNIT + sbi->cluster_bits;
-+	frame_size = sbi->cluster_size << NTFS_LZNT_CUNIT;
-+	frame = vbo >> frame_bits;
-+	frame_vbo = (u64)frame << frame_bits;
-+	unc_size = frame_vbo + frame_size > i_size ? (i_size - frame_vbo) :
-+						     frame_size;
-+
 +	frame_buf = ntfs_alloc(frame_size, 0);
 +	if (!frame_buf) {
 +		err = -ENOMEM;
@@ -3994,241 +3874,153 @@ index 000000000000..ad09fca5d7db
 +	}
 +
 +	pages_per_frame = frame_size >> PAGE_SHIFT;
-+	pages = ntfs_alloc(pages_per_frame * sizeof(*pages), 1);
-+	if (!pages) {
-+		err = -ENOMEM;
-+		goto out;
++
++	for (i = 0; i < npages; i++)
++		kmap(pages[i]);
++
++	/*
++	 * To compress we should get a continues memory
++	 * Is vmap faster then memcpy?
++	 */
++	if (npages == pages_per_frame) {
++		frame_unc = vmap(pages, npages, VM_MAP, PAGE_KERNEL_RO);
++		if (frame_unc)
++			is_mapped = true;
 +	}
 +
-+	idx = (vbo - frame_vbo) >> PAGE_SHIFT;
-+	pages[idx] = page;
-+	index = frame_vbo >> PAGE_SHIFT;
-+	mask = mapping_gfp_mask(mapping);
-+	kmap(page);
-+
-+	for (i = 0; i < pages_per_frame && index < end_index; i++, index++) {
-+		if (i == idx)
-+			continue;
-+
-+		// added FGP_CREAT
-+		pg = pagecache_get_page(
-+			mapping, index,
-+			FGP_LOCK | FGP_NOFS | FGP_CREAT | FGP_NOWAIT, mask);
-+		if (!pg)
-+			continue;
-+
-+		pages[i] = pg;
-+
-+		if (PageError(pg)) {
-+			err = -EIO;
-+			goto out2;
-+		}
-+
-+		if (!PageDirty(pg) && !PageUptodate(pg)) {
-+			memset(page_address(pg), 0, PAGE_SIZE);
-+			flush_dcache_page(pg);
-+			SetPageUptodate(pg);
-+		}
-+
-+		kmap(pg);
-+	}
-+
++	/* compress.lock protects sbi->compress.frame_unc (a-la frame_unc ) and sbi->compress.ctx */
 +	spin_lock(&sbi->compress.lock);
-+	frame_unc = sbi->compress.frame_unc;
++	if (!is_mapped) {
++		frame_unc = sbi->compress.frame_unc;
 +
-+	for (i = 0; i < pages_per_frame; i++) {
-+		pg = pages[i];
-+		if (pg)
++		for (i = 0; i < npages; i++) {
++			pg = pages[i];
 +			memcpy(frame_unc + i * PAGE_SIZE, page_address(pg),
 +			       PAGE_SIZE);
-+		else
++		}
++
++		for (; i < pages_per_frame; i++)
 +			memset(frame_unc + i * PAGE_SIZE, 0, PAGE_SIZE);
 +	}
 +
 +	/* compress: frame_unc -> frame_buf */
-+	cmpr_size_fin = compress_lznt(frame_unc, unc_size, frame_buf,
++	cmpr_size_fin = compress_lznt(frame_unc, frame_size, frame_buf,
 +				      frame_size, sbi->compress.ctx);
 +
-+	cmpr_size_clst = ntfs_up_cluster(sbi, cmpr_size_fin);
-+	if (cmpr_size_clst + sbi->cluster_size > frame_size) {
-+		/* write frame as is */
-+		memcpy(frame_buf, frame_unc, frame_size);
++	frame_wr = frame_buf;
++	if (cmpr_size_fin + sbi->cluster_size > frame_size) {
++		/* frame is not compressed */
 +		cmpr_size_fin = frame_size;
++		cmpr_size = frame_size;
++		if (is_mapped)
++			frame_wr = frame_unc;
++		else
++			memcpy(frame_buf, frame_unc, frame_size);
 +	} else if (cmpr_size_fin) {
-+		memset(frame_buf + cmpr_size_fin, 0,
-+		       cmpr_size_clst - cmpr_size_fin);
++		/* frame is compressed */
++		cmpr_size = ntfs_up_cluster(sbi, cmpr_size_fin);
++		memset(frame_buf + cmpr_size_fin, 0, cmpr_size - cmpr_size_fin);
++	} else {
++		/* frame is sparsed */
++		cmpr_size = 0;
 +	}
++
 +	spin_unlock(&sbi->compress.lock);
 +
++	down_write(&ni->file.run_lock);
++	run_truncate_head(&ni->file.run, le64_to_cpu(attr->nres.svcn));
 +	err = attr_allocate_frame(ni, frame, cmpr_size_fin, ni->i_valid);
++	up_write(&ni->file.run_lock);
 +	if (err)
 +		goto out2;
 +
-+	if (!cmpr_size_clst)
++	if (!cmpr_size)
 +		goto out2;
 +
-+	err = ntfs_sb_write_run(sbi, &ni->file.run, frame_vbo, frame_buf,
-+				cmpr_size_clst);
-+	if (err)
-+		goto out2;
++	down_read(&ni->file.run_lock);
++	err = ntfs_sb_write_run(sbi, &ni->file.run, frame_vbo, frame_wr,
++				cmpr_size);
++	up_read(&ni->file.run_lock);
++
++	if (is_mapped)
++		vunmap(frame_unc);
++
++	for (i = 0; i < npages; i++)
++		kunmap(pages[i]);
 +
 +out2:
 +	ntfs_free(frame_buf);
-+	for (i = 0; i < pages_per_frame; i++) {
-+		pg = pages[i];
-+		if (!pg || i == idx)
-+			continue;
-+		kunmap(pg);
-+		SetPageUptodate(pg);
-+		/* clear page dirty so that writepages wouldn't work for us. */
-+		ClearPageDirty(pg);
-+		unlock_page(pg);
-+		put_page(pg);
-+	}
-+
-+	if (err)
-+		SetPageError(page);
-+	kunmap(page);
 +
 +out:
-+	/* At this point, err contains 0 or -EIO depending on the "critical" page */
-+	ntfs_free(pages);
-+	set_page_writeback(page);
-+	unlock_page(page);
-+	end_page_writeback(page);
-+
 +	return err;
 +}
 +
 +/*
-+ * ni_write_inode
-+ *
-+ * write mft base record and all subrecords to disk
++ * update duplicate info of ATTR_FILE_NAME in MFT and in parent directories
 + */
-+int ni_write_inode(struct inode *inode, int sync, const char *hint)
++static bool ni_update_parent(struct ntfs_inode *ni, struct NTFS_DUP_INFO *dup,
++			     int sync)
 +{
-+	int err = 0, err2;
-+	struct ntfs_inode *ni = ntfs_i(inode);
-+	struct super_block *sb = inode->i_sb;
-+	struct ntfs_sb_info *sbi = sb->s_fs_info;
-+	bool modified, re_dirty = false;
-+	struct mft_inode *mi;
-+	struct MFT_REC *rec;
-+	struct ATTR_STD_INFO *std;
-+	struct rb_node *node, *next;
-+	struct ATTR_LIST_ENTRY *le;
 +	struct ATTRIB *attr;
-+	struct NTFS_DUP_INFO dup;
-+	bool is_meta, active, upd_parent;
-+
-+	if (is_bad_inode(inode))
-+		return 0;
-+
-+	if (!ni_trylock(ni)) {
-+		/* 'ni' is under modification, skip for now */
-+		return 0;
-+	}
-+
-+	is_meta = ntfs_is_meta_file(sbi, inode->i_ino);
-+	active = sb->s_flags & SB_ACTIVE;
-+	upd_parent = ni->ni_flags & NI_FLAG_UPDATE_PARENT;
-+	rec = ni->mi.mrec;
-+
-+	if (!is_rec_inuse(rec) || (sbi->flags & NTFS_FLAGS_LOG_REPLAING))
-+		goto write_subrecords;
-+
-+	if (!inode->i_nlink)
-+		goto write_subrecords;
-+
-+	/* update times in standard attribute */
-+	std = ni_std(ni);
-+	if (!std) {
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	modified = false;
-+	/* Update the access times if they have changed. */
-+	dup.m_time = kernel2nt(&inode->i_mtime);
-+	if (std->m_time != dup.m_time) {
-+		std->m_time = dup.m_time;
-+		modified = true;
-+	}
-+
-+	dup.c_time = kernel2nt(&inode->i_ctime);
-+	if (std->c_time != dup.c_time) {
-+		std->c_time = dup.c_time;
-+		modified = true;
-+	}
-+
-+	dup.a_time = kernel2nt(&inode->i_atime);
-+	if (std->a_time != dup.a_time) {
-+		std->a_time = dup.a_time;
-+		modified = true;
-+	}
-+
-+	dup.fa = ni->std_fa;
-+	if (std->fa != dup.fa) {
-+		std->fa = dup.fa;
-+		modified = true;
-+	}
-+
-+	if (modified)
-+		ni->mi.dirty = true;
-+
-+	if (is_meta || !(modified || upd_parent))
-+		goto skip_dir_update;
-+
-+	dup.cr_time = std->cr_time;
-+	le = NULL;
++	struct mft_inode *mi;
++	struct ATTR_LIST_ENTRY *le = NULL;
++	struct ntfs_sb_info *sbi = ni->mi.sbi;
++	struct super_block *sb = sbi->sb;
++	bool re_dirty = false;
++	bool active = sb->s_flags & SB_ACTIVE;
++	bool upd_parent = ni->ni_flags & NI_FLAG_UPDATE_PARENT;
 +
 +	if (ni->mi.mrec->flags & RECORD_FLAG_DIR) {
-+		dup.fa |= FILE_ATTRIBUTE_DIRECTORY;
++		dup->fa |= FILE_ATTRIBUTE_DIRECTORY;
 +		attr = NULL;
-+		dup.alloc_size = 0;
-+		dup.data_size = 0;
++		dup->alloc_size = 0;
++		dup->data_size = 0;
 +	} else {
-+		dup.fa &= ~FILE_ATTRIBUTE_DIRECTORY;
++		dup->fa &= ~FILE_ATTRIBUTE_DIRECTORY;
 +
 +		attr = ni_find_attr(ni, NULL, &le, ATTR_DATA, NULL, 0, NULL,
 +				    &mi);
-+		if (!attr)
-+			dup.alloc_size = dup.data_size = 0;
-+		else if (!attr->non_res) {
++		if (!attr) {
++			dup->alloc_size = dup->data_size = 0;
++		} else if (!attr->non_res) {
 +			u32 data_size = le32_to_cpu(attr->res.data_size);
 +
-+			dup.alloc_size = cpu_to_le64(QuadAlign(data_size));
-+			dup.data_size = cpu_to_le64(data_size);
++			dup->alloc_size = cpu_to_le64(QuadAlign(data_size));
++			dup->data_size = cpu_to_le64(data_size);
 +		} else {
 +			u64 new_valid = ni->i_valid;
 +			u64 data_size = le64_to_cpu(attr->nres.data_size);
++			__le64 valid_le;
 +
-+			dup.alloc_size = is_attr_ext(attr) ?
-+						 attr->nres.total_size :
-+						 attr->nres.alloc_size;
-+			dup.data_size = attr->nres.data_size;
++			dup->alloc_size = is_attr_ext(attr) ?
++						  attr->nres.total_size :
++						  attr->nres.alloc_size;
++			dup->data_size = attr->nres.data_size;
 +
 +			if (new_valid > data_size)
 +				new_valid = data_size;
-+			if (new_valid != le64_to_cpu(attr->nres.valid_size)) {
-+				attr->nres.valid_size = cpu_to_le64(new_valid);
++
++			valid_le = cpu_to_le64(new_valid);
++			if (valid_le != attr->nres.valid_size) {
++				attr->nres.valid_size = valid_le;
 +				mi->dirty = true;
 +			}
 +		}
 +	}
 +
 +	/* TODO: fill reparse info */
-+	dup.reparse = 0;
-+	dup.ea_size = 0;
++	dup->reparse = 0;
++	dup->ea_size = 0;
 +
 +	if (ni->ni_flags & NI_FLAG_EA) {
 +		attr = ni_find_attr(ni, attr, &le, ATTR_EA_INFO, NULL, 0, NULL,
 +				    NULL);
 +		if (attr) {
-+			const struct EA_INFO *info =
-+				resident_data_ex(attr, sizeof(struct EA_INFO));
++			const struct EA_INFO *info;
 +
-+			dup.ea_size = info->size_pack;
++			info = resident_data_ex(attr, sizeof(struct EA_INFO));
++
++			dup->ea_size = info->size_pack;
 +		}
 +	}
 +
@@ -4244,11 +4036,12 @@ index 000000000000..ad09fca5d7db
 +		if (!fname)
 +			continue;
 +
-+		if (memcmp(&fname->dup, &dup, sizeof(fname->dup))) {
-+			memcpy(&fname->dup, &dup, sizeof(fname->dup));
++		if (memcmp(&fname->dup, dup, sizeof(fname->dup))) {
++			memcpy(&fname->dup, dup, sizeof(fname->dup));
 +			mi->dirty = true;
-+		} else if (!upd_parent)
++		} else if (!upd_parent) {
 +			continue;
++		}
 +
 +		if (!active)
 +			continue; /*avoid __wait_on_freeing_inode(inode); */
@@ -4256,9 +4049,8 @@ index 000000000000..ad09fca5d7db
 +		/*ntfs_iget5 may sleep*/
 +		dir = ntfs_iget5(sb, &fname->home, NULL);
 +		if (IS_ERR(dir)) {
-+			ntfs_inode_printk(
-+				inode,
-+				KERN_WARNING
++			ntfs_inode_warn(
++				&ni->vfs_inode,
 +				"failed to open parent directory r=%lx to update",
 +				(long)ino_get(&fname->home));
 +			continue;
@@ -4267,27 +4059,101 @@ index 000000000000..ad09fca5d7db
 +		if (!is_bad_inode(dir)) {
 +			struct ntfs_inode *dir_ni = ntfs_i(dir);
 +
-+			if (!ni_trylock(dir_ni))
++			if (!ni_trylock(dir_ni)) {
 +				re_dirty = true;
-+			else {
-+				indx_update_dup(dir_ni, sbi, fname, &dup, sync);
++			} else {
++				indx_update_dup(dir_ni, sbi, fname, dup, sync);
 +				ni_unlock(dir_ni);
 +			}
 +		}
 +		iput(dir);
 +	}
 +
-+	if (re_dirty)
-+		ni->ni_flags |= NI_FLAG_UPDATE_PARENT;
-+	else
-+		ni->ni_flags &= ~NI_FLAG_UPDATE_PARENT;
++	return re_dirty;
++}
 +
-+skip_dir_update:
-+	err = al_update(ni);
-+	if (err)
-+		goto out;
++/*
++ * ni_write_inode
++ *
++ * write mft base record and all subrecords to disk
++ */
++int ni_write_inode(struct inode *inode, int sync, const char *hint)
++{
++	int err = 0, err2;
++	struct ntfs_inode *ni = ntfs_i(inode);
++	struct super_block *sb = inode->i_sb;
++	struct ntfs_sb_info *sbi = sb->s_fs_info;
++	bool re_dirty = false;
++	struct ATTR_STD_INFO *std;
++	struct rb_node *node, *next;
++	struct NTFS_DUP_INFO dup;
 +
-+write_subrecords:
++	if (is_bad_inode(inode))
++		return 0;
++
++	if (!ni_trylock(ni)) {
++		/* 'ni' is under modification, skip for now */
++		mark_inode_dirty_sync(inode);
++		return 0;
++	}
++
++	if (is_rec_inuse(ni->mi.mrec) &&
++	    !(sbi->flags & NTFS_FLAGS_LOG_REPLAYING) && inode->i_nlink) {
++		bool modified = false;
++
++		/* update times in standard attribute */
++		std = ni_std(ni);
++		if (!std) {
++			err = -EINVAL;
++			goto out;
++		}
++
++		/* Update the access times if they have changed. */
++		dup.m_time = kernel2nt(&inode->i_mtime);
++		if (std->m_time != dup.m_time) {
++			std->m_time = dup.m_time;
++			modified = true;
++		}
++
++		dup.c_time = kernel2nt(&inode->i_ctime);
++		if (std->c_time != dup.c_time) {
++			std->c_time = dup.c_time;
++			modified = true;
++		}
++
++		dup.a_time = kernel2nt(&inode->i_atime);
++		if (std->a_time != dup.a_time) {
++			std->a_time = dup.a_time;
++			modified = true;
++		}
++
++		dup.fa = ni->std_fa;
++		if (std->fa != dup.fa) {
++			std->fa = dup.fa;
++			modified = true;
++		}
++
++		if (modified)
++			ni->mi.dirty = true;
++
++		if (!ntfs_is_meta_file(sbi, inode->i_ino) &&
++		    (modified || (ni->ni_flags & NI_FLAG_UPDATE_PARENT))) {
++			dup.cr_time = std->cr_time;
++			/* Not critical if this function fail */
++			re_dirty = ni_update_parent(ni, &dup, sync);
++
++			if (re_dirty)
++				ni->ni_flags |= NI_FLAG_UPDATE_PARENT;
++			else
++				ni->ni_flags &= ~NI_FLAG_UPDATE_PARENT;
++		}
++
++		/* update attribute list */
++		err = al_update(ni);
++		if (err)
++			goto out;
++	}
++
 +	for (node = rb_first(&ni->mi_tree); node; node = next) {
 +		struct mft_inode *mi = rb_entry(node, struct mft_inode, node);
 +		bool is_empty;
@@ -4313,33 +4179,31 @@ index 000000000000..ad09fca5d7db
 +		}
 +	}
 +
-+	err2 = mi_write(&ni->mi, sync);
-+	if (!err && err2)
-+		err = err2;
++	if (ni->mi.dirty) {
++		err2 = mi_write(&ni->mi, sync);
++		if (!err && err2)
++			err = err2;
++	}
 +out:
 +	ni_unlock(ni);
 +
 +	if (err) {
-+		ntfs_printk(sb, KERN_ERR "%s r=%lx failed, %d.", hint,
-+			    inode->i_ino, err);
++		ntfs_err(sb, "%s r=%lx failed, %d.", hint, inode->i_ino, err);
 +		ntfs_set_state(sbi, NTFS_DIRTY_ERROR);
 +		return err;
 +	}
 +
-+	if (re_dirty && active)
++	if (re_dirty && (sb->s_flags & SB_ACTIVE))
 +		mark_inode_dirty_sync(inode);
-+
-+	if (inode->i_ino < sbi->mft.recs_mirr)
-+		sbi->flags |= NTFS_FLAGS_MFTMIRR;
 +
 +	return 0;
 +}
 diff --git a/fs/ntfs3/namei.c b/fs/ntfs3/namei.c
 new file mode 100644
-index 000000000000..55116311ade9
+index 000000000000..b178163a6adc
 --- /dev/null
 +++ b/fs/ntfs3/namei.c
-@@ -0,0 +1,580 @@
+@@ -0,0 +1,576 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/namei.c
@@ -4364,7 +4228,8 @@ index 000000000000..55116311ade9
 + *
 + * formats NTFS_DE in 'buf'
 + */
-+int fill_name_de(struct ntfs_sb_info *sbi, void *buf, const struct qstr *name)
++int fill_name_de(struct ntfs_sb_info *sbi, void *buf, const struct qstr *name,
++		 const struct cpu_str *uni)
 +{
 +	int err;
 +	struct NTFS_DE *e = buf;
@@ -4374,12 +4239,27 @@ index 000000000000..55116311ade9
 +#ifndef NTFS3_64BIT_CLUSTER
 +	e->ref.high = fname->home.high = 0;
 +#endif
-+	/* Convert input string to unicode */
-+	err = ntfs_nls_to_utf16(sbi, name->name, name->len,
-+				(struct cpu_str *)&fname->name_len,
-+				NTFS_NAME_LEN, UTF16_LITTLE_ENDIAN);
-+	if (err < 0)
-+		return err;
++	if (uni) {
++#ifdef __BIG_ENDIAN
++		int ulen = uni->len;
++		__le16 *uname = fname->name;
++		const u16 *name_cpu = uni->name;
++
++		while (ulen--)
++			*uname++ = cpu_to_le16(*name_cpu++);
++#else
++		memcpy(fname->name, uni->name, uni->len * sizeof(u16));
++#endif
++		fname->name_len = uni->len;
++
++	} else {
++		/* Convert input string to unicode */
++		err = ntfs_nls_to_utf16(sbi, name->name, name->len,
++					(struct cpu_str *)&fname->name_len,
++					NTFS_NAME_LEN, UTF16_LITTLE_ENDIAN);
++		if (err < 0)
++			return err;
++	}
 +
 +	fname->type = FILE_NAME_POSIX;
 +	data_size = fname_full_size(fname);
@@ -4387,38 +4267,9 @@ index 000000000000..55116311ade9
 +	e->size = cpu_to_le16(QuadAlign(data_size) + sizeof(struct NTFS_DE));
 +	e->key_size = cpu_to_le16(data_size);
 +	e->flags = 0;
-+	e->Reserved = 0;
++	e->res = 0;
 +
 +	return 0;
-+}
-+
-+static struct dentry *__ntfs_lookup(struct inode *dir, struct dentry *dentry,
-+				    struct ntfs_fnd *fnd)
-+{
-+	struct dentry *d;
-+	struct inode *inode;
-+
-+	inode = dir_search(dir, &dentry->d_name, fnd);
-+
-+	if (!inode) {
-+		d_add(dentry, NULL);
-+		d = NULL;
-+		goto out;
-+	}
-+
-+	if (IS_ERR(inode)) {
-+		d = ERR_CAST(inode);
-+		goto out;
-+	}
-+
-+	d = d_splice_alias(inode, dentry);
-+	if (IS_ERR(d)) {
-+		iput(inode);
-+		goto out;
-+	}
-+
-+out:
-+	return d;
 +}
 +
 +/*
@@ -4429,15 +4280,28 @@ index 000000000000..55116311ade9
 +static struct dentry *ntfs_lookup(struct inode *dir, struct dentry *dentry,
 +				  u32 flags)
 +{
-+	struct dentry *de;
 +	struct ntfs_inode *ni = ntfs_i(dir);
++	struct cpu_str *uni = __getname();
++	struct inode *inode;
++	int err;
 +
-+	ni_lock(ni);
++	if (!uni)
++		inode = ERR_PTR(-ENOMEM);
++	else {
++		err = ntfs_nls_to_utf16(ni->mi.sbi, dentry->d_name.name,
++					dentry->d_name.len, uni, NTFS_NAME_LEN,
++					UTF16_HOST_ENDIAN);
++		if (err < 0)
++			inode = ERR_PTR(err);
++		else {
++			ni_lock(ni);
++			inode = dir_search_u(dir, uni, NULL);
++			ni_unlock(ni);
++		}
++		__putname(uni);
++	}
 +
-+	de = __ntfs_lookup(dir, dentry, NULL);
-+
-+	ni_unlock(ni);
-+	return de;
++	return d_splice_alias(inode, dentry);
 +}
 +
 +/*
@@ -4661,7 +4525,7 @@ index 000000000000..55116311ade9
 +		goto out1;
 +	}
 +
-+	err = fill_name_de(sbi, old_de, &old_dentry->d_name);
++	err = fill_name_de(sbi, old_de, &old_dentry->d_name, NULL);
 +	if (err < 0)
 +		goto out2;
 +
@@ -4671,7 +4535,7 @@ index 000000000000..55116311ade9
 +		new_de = old_de;
 +	} else {
 +		new_de = Add2Ptr(old_de, 1024);
-+		err = fill_name_de(sbi, new_de, &new_dentry->d_name);
++		err = fill_name_de(sbi, new_de, &new_dentry->d_name, NULL);
 +		if (err < 0)
 +			goto out2;
 +	}
@@ -4710,29 +4574,25 @@ index 000000000000..55116311ade9
 +	le16_add_cpu(&ni->mi.mrec->hard_links, -1);
 +	ni->mi.dirty = true;
 +
-+	if (name_type == FILE_NAME_POSIX)
-+		goto skip_short;
++	if (name_type != FILE_NAME_POSIX) {
++		/* get paired name */
++		fname = ni_fname_type(ni, name_type, &le);
++		if (fname) {
++			/* remove second name from directory */
++			err = indx_delete_entry(&old_diri->dir, old_diri, fname,
++						fname_full_size(fname), sbi);
++			if (err)
++				goto out5;
 +
-+	/* get paired name */
-+	fname = ni_fname_type(ni, name_type, &le);
-+	if (!fname)
-+		goto skip_short;
++			/* remove second name from mft */
++			err = ni_remove_attr_le(ni, attr_from_name(fname), le);
++			if (err)
++				goto out6;
 +
-+	/* remove second name from directory */
-+	err = indx_delete_entry(&old_diri->dir, old_diri, fname,
-+				fname_full_size(fname), sbi);
-+	if (err)
-+		goto out5;
-+
-+	/* remove second name from mft */
-+	err = ni_remove_attr_le(ni, attr_from_name(fname), le);
-+	if (err)
-+		goto out6;
-+
-+	le16_add_cpu(&ni->mi.mrec->hard_links, -1);
-+	ni->mi.dirty = true;
-+
-+skip_short:
++			le16_add_cpu(&ni->mi.mrec->hard_links, -1);
++			ni->mi.dirty = true;
++		}
++	}
 +
 +	/* Add new name */
 +	new_de->ref.low = cpu_to_le32(old_inode->i_ino);
@@ -4779,13 +4639,6 @@ index 000000000000..55116311ade9
 +	if (old_dir != new_dir) {
 +		new_dir->i_mtime = new_dir->i_ctime = old_dir->i_ctime;
 +		mark_inode_dirty(new_dir);
-+#ifdef NTFS_COUNT_CONTAINED
-+		if (S_ISDIR(old_inode->i_mode)) {
-+			drop_nlink(old_dir);
-+			if (!new_inode)
-+				inc_nlink(new_dir);
-+		}
-+#endif
 +	}
 +
 +	if (old_inode) {
@@ -4831,51 +4684,58 @@ index 000000000000..55116311ade9
 +	struct inode *inode;
 +	struct ntfs_fnd *fnd = NULL;
 +	struct ntfs_inode *ni = ntfs_i(dir);
++	struct dentry *d = NULL;
++	struct cpu_str *uni = __getname();
++
++	if (!uni)
++		return -ENOMEM;
++
++	err = ntfs_nls_to_utf16(ni->mi.sbi, dentry->d_name.name,
++				dentry->d_name.len, uni, NTFS_NAME_LEN,
++				UTF16_HOST_ENDIAN);
++	if (err < 0)
++		goto out;
 +
 +	ni_lock(ni);
 +
 +	if (d_in_lookup(dentry)) {
-+		struct dentry *d;
-+
 +		fnd = fnd_get(&ntfs_i(dir)->dir);
 +		if (!fnd) {
 +			err = -ENOMEM;
-+			goto out;
++			goto out1;
 +		}
 +
-+		d = __ntfs_lookup(dir, dentry, fnd);
++		d = d_splice_alias(dir_search_u(dir, uni, fnd), dentry);
 +		if (IS_ERR(d)) {
 +			err = PTR_ERR(d);
 +			d = NULL;
-+			goto out1;
++			goto out2;
 +		}
 +
 +		if (d)
 +			dentry = d;
-+
-+		if (d_really_is_positive(dentry)) {
-+			if (file->f_mode & FMODE_OPENED) {
-+				dput(d);
-+				err = 0;
-+			} else
-+				err = finish_no_open(file, d);
-+			goto out1;
-+		}
-+		WARN_ON(d);
 +	}
 +
-+	if (!(flags & O_CREAT)) {
-+		err = -ENOENT;
-+		goto out1;
++	if (!(flags & O_CREAT) || d_really_is_positive(dentry)) {
++		err = finish_no_open(file, d);
++		goto out2;
 +	}
 +
-+	err = ntfs_create_inode(dir, dentry, file, mode, 0, NULL, 0, excl, fnd,
++	file->f_mode |= FMODE_CREATED;
++
++	/*fnd contains tree's path to insert to*/
++	err = ntfs_create_inode(dir, dentry, uni, mode, 0, NULL, 0, excl, fnd,
 +				&inode);
++	if (!err)
++		err = finish_open(file, dentry, ntfs_file_open);
++	dput(d);
 +
-+out1:
++out2:
 +	fnd_put(fnd);
-+out:
++out1:
 +	ni_unlock(ni);
++out:
++	__putname(uni);
 +
 +	return err;
 +}
@@ -4922,7 +4782,7 @@ index 000000000000..55116311ade9
 +};
 diff --git a/fs/ntfs3/record.c b/fs/ntfs3/record.c
 new file mode 100644
-index 000000000000..8a3f7af581b7
+index 000000000000..dc883fd074aa
 --- /dev/null
 +++ b/fs/ntfs3/record.c
 @@ -0,0 +1,615 @@
@@ -4993,24 +4853,21 @@ index 000000000000..8a3f7af581b7
 +
 +	attr = NULL;
 +
-+next_attr:
-+	attr = mi_enum_attr(mi, attr);
-+	if (!attr) {
-+		rec->next_attr_id = cpu_to_le16(max_id + 1);
-+		mi->dirty = true;
-+		return cpu_to_le16(free_id);
-+	}
++	for (;;) {
++		attr = mi_enum_attr(mi, attr);
++		if (!attr) {
++			rec->next_attr_id = cpu_to_le16(max_id + 1);
++			mi->dirty = true;
++			return cpu_to_le16(free_id);
++		}
 +
-+	t16 = le16_to_cpu(attr->id);
-+	if (t16 == free_id) {
-+		free_id += 1;
-+		attr = NULL;
-+		goto next_attr;
++		t16 = le16_to_cpu(attr->id);
++		if (t16 == free_id) {
++			free_id += 1;
++			attr = NULL;
++		} else if (max_id < t16)
++			max_id = t16;
 +	}
-+
-+	if (max_id < t16)
-+		max_id = t16;
-+	goto next_attr;
 +}
 +
 +int mi_get(struct ntfs_sb_info *sbi, CLST rno, struct mft_inode **mi)
@@ -5074,7 +4931,7 @@ index 000000000000..8a3f7af581b7
 +		}
 +	}
 +
-+	err = ntfs_read_bh_ex(sbi, run, vbo, &rec->rhdr, bpr, &mi->nb);
++	err = ntfs_read_bh(sbi, run, vbo, &rec->rhdr, bpr, &mi->nb);
 +	if (rw_lock)
 +		up_read(rw_lock);
 +	if (!err)
@@ -5103,7 +4960,7 @@ index 000000000000..8a3f7af581b7
 +
 +	if (rw_lock)
 +		down_read(rw_lock);
-+	err = ntfs_read_bh_ex(sbi, run, vbo, &rec->rhdr, bpr, &mi->nb);
++	err = ntfs_read_bh(sbi, run, vbo, &rec->rhdr, bpr, &mi->nb);
 +	if (rw_lock)
 +		up_read(rw_lock);
 +
@@ -5275,9 +5132,12 @@ index 000000000000..8a3f7af581b7
 +	sbi = mi->sbi;
 +	rec = mi->mrec;
 +
-+	err = ntfs_write_bh_ex(sbi, &rec->rhdr, &mi->nb, wait);
++	err = ntfs_write_bh(sbi, &rec->rhdr, &mi->nb, wait);
 +	if (err)
 +		return err;
++
++	if (mi->rno < sbi->mft.recs_mirr)
++		sbi->flags |= NTFS_FLAGS_MFTMIRR;
 +
 +	mi->dirty = false;
 +
@@ -5298,15 +5158,15 @@ index 000000000000..8a3f7af581b7
 +
 +	rec = mi->mrec;
 +
-+	if (rno == MFT_REC_MFT)
++	if (rno == MFT_REC_MFT) {
 +		;
-+	else if (rno < MFT_REC_FREE)
++	} else if (rno < MFT_REC_FREE) {
 +		seq = rno;
-+	else if (rno >= sbi->mft.used)
++	} else if (rno >= sbi->mft.used) {
 +		;
-+	else if (mi_read(mi, is_mft))
++	} else if (mi_read(mi, is_mft)) {
 +		;
-+	else if (rec->rhdr.sign == NTFS_FILE_SIGNATURE) {
++	} else if (rec->rhdr.sign == NTFS_FILE_SIGNATURE) {
 +		/* Record is reused. Update its sequence number */
 +		seq = le16_to_cpu(rec->seq) + 1;
 +		if (!seq)
@@ -5543,10 +5403,10 @@ index 000000000000..8a3f7af581b7
 +}
 diff --git a/fs/ntfs3/run.c b/fs/ntfs3/run.c
 new file mode 100644
-index 000000000000..4c6757b8bb82
+index 000000000000..14f1830d2a3a
 --- /dev/null
 +++ b/fs/ntfs3/run.c
-@@ -0,0 +1,1188 @@
+@@ -0,0 +1,1161 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/run.c
@@ -5882,114 +5742,109 @@ index 000000000000..4c6757b8bb82
 +	 * for a new range.
 +	 * So first let's check if range I'm probing is here already.
 +	 */
-+	if (!inrange)
-+		goto requires_new_range;
-+
-+	r = run->runs_ + index;
-+
-+	/*
-+	 * If one of ranges was not allocated
-+	 * then I have to split location I just matched.
-+	 * and insert current one
-+	 * a common case this requires tail to be reinserted
-+	 * a recursive call.
-+	 */
-+	if (((lcn == SPARSE_LCN) != (r->lcn == SPARSE_LCN)) ||
-+	    (lcn != SPARSE_LCN && lcn != r->lcn + (vcn - r->vcn))) {
-+		CLST to_eat = vcn - r->vcn;
-+		CLST Tovcn = to_eat + len;
-+
-+		should_add_tail = Tovcn < r->len;
-+
-+		if (should_add_tail) {
-+			if (r->lcn == SPARSE_LCN)
-+				tail_lcn = (CLST)SPARSE_LCN;
-+			else
-+				tail_lcn = r->lcn + Tovcn;
-+			tail_vcn = r->vcn + Tovcn;
-+			tail_len = r->len - Tovcn;
-+		}
-+
-+		if (to_eat > 0) {
-+			r->len = to_eat;
-+			inrange = false;
-+			index += 1;
-+			goto requires_new_range;
-+		}
-+
-+		/* lcn should match one I'm going to add. */
-+		r->lcn = lcn;
-+	}
-+
-+	/*
-+	 * If existing range fits then I'm done.
-+	 * Otherwise extend found one and fall back to range jocode.
-+	 */
-+	if (r->vcn + r->len < vcn + len)
-+		r->len += len - ((r->vcn + r->len) - vcn);
-+	goto consolidate;
-+
++	if (!inrange) {
 +requires_new_range:
-+	/*
-+	 * Range was not found.
-+	 * Insert at position.
-+	 * 'index' points to the insertion point.
-+	 * Here is also the place to check
-+	 * if allocated size exceeded specified limit.
-+	 * If it does, third part of allocation will be thrown away.
-+	 */
-+	used = run->count * sizeof(struct ntfs_run);
++		/*
++		 * Range was not found.
++		 * Insert at position 'index'
++		 */
++		used = run->count * sizeof(struct ntfs_run);
 +
-+	/*
-+	 * Check allocated space.
-+	 * If one is not enough to get one more entry
-+	 * then it will be reallocated
-+	 */
-+	if (run->allocated < used + sizeof(struct ntfs_run)) {
-+		size_t bytes;
-+		struct ntfs_run *new_ptr;
++		/*
++		 * Check allocated space.
++		 * If one is not enough to get one more entry
++		 * then it will be reallocated
++		 */
++		if (run->allocated < used + sizeof(struct ntfs_run)) {
++			size_t bytes;
++			struct ntfs_run *new_ptr;
 +
-+		/* Use power of 2 for 'bytes'*/
-+		if (!used)
-+			bytes = 64;
-+		else if (used <= 16 * PAGE_SIZE) {
-+			if (is_power_of2(run->allocated))
-+				bytes = run->allocated << 1;
-+			else
-+				bytes = (size_t)1 << (2 + blksize_bits(used));
++			/* Use power of 2 for 'bytes'*/
++			if (!used) {
++				bytes = 64;
++			} else if (used <= 16 * PAGE_SIZE) {
++				if (is_power_of2(run->allocated))
++					bytes = run->allocated << 1;
++				else
++					bytes = (size_t)1
++						<< (2 + blksize_bits(used));
++			} else {
++				bytes = run->allocated + (16 * PAGE_SIZE);
++			}
++
++			WARN_ON_ONCE(bytes > 0x10000);
++
++			new_ptr = ntfs_alloc(bytes, 0);
++			if (!new_ptr)
++				return false;
++
++			r = new_ptr + index;
++			memcpy(new_ptr, run->runs_,
++			       index * sizeof(struct ntfs_run));
++			memcpy(r + 1, run->runs_ + index,
++			       sizeof(struct ntfs_run) * (run->count - index));
++
++			ntfs_free(run->runs_);
++			run->runs_ = new_ptr;
++			run->allocated = bytes;
++
 +		} else {
-+			bytes = run->allocated + (16 * PAGE_SIZE);
++			size_t i = run->count - index;
++
++			r = run->runs_ + index;
++
++			/* memmove appears to be a bottle neck here... */
++			if (i > 0)
++				memmove(r + 1, r, sizeof(struct ntfs_run) * i);
 +		}
 +
-+		new_ptr = ntfs_alloc(bytes, 0);
-+		if (!new_ptr)
-+			return false;
-+
-+		r = new_ptr + index;
-+		memcpy(new_ptr, run->runs_, index * sizeof(struct ntfs_run));
-+		memcpy(r + 1, run->runs_ + index,
-+		       sizeof(struct ntfs_run) * (run->count - index));
-+
-+		ntfs_free(run->runs_);
-+		run->runs_ = new_ptr;
-+		run->allocated = bytes;
-+
++		r->vcn = vcn;
++		r->lcn = lcn;
++		r->len = len;
++		run->count += 1;
 +	} else {
-+		size_t i = run->count - index;
-+
 +		r = run->runs_ + index;
 +
-+		/* memmove appears to be a bottle neck here... */
-+		if (i > 0)
-+			memmove(r + 1, r, sizeof(struct ntfs_run) * i);
++		/*
++		 * If one of ranges was not allocated
++		 * then I have to split location I just matched.
++		 * and insert current one
++		 * a common case this requires tail to be reinserted
++		 * a recursive call.
++		 */
++		if (((lcn == SPARSE_LCN) != (r->lcn == SPARSE_LCN)) ||
++		    (lcn != SPARSE_LCN && lcn != r->lcn + (vcn - r->vcn))) {
++			CLST to_eat = vcn - r->vcn;
++			CLST Tovcn = to_eat + len;
++
++			should_add_tail = Tovcn < r->len;
++
++			if (should_add_tail) {
++				tail_lcn = r->lcn == SPARSE_LCN ?
++						   SPARSE_LCN :
++						   (r->lcn + Tovcn);
++				tail_vcn = r->vcn + Tovcn;
++				tail_len = r->len - Tovcn;
++			}
++
++			if (to_eat > 0) {
++				r->len = to_eat;
++				inrange = false;
++				index += 1;
++				goto requires_new_range;
++			}
++
++			/* lcn should match one I'm going to add. */
++			r->lcn = lcn;
++		}
++
++		/*
++		 * If existing range fits then I'm done.
++		 * Otherwise extend found one and fall back to range jocode.
++		 */
++		if (r->vcn + r->len < vcn + len)
++			r->len += len - ((r->vcn + r->len) - vcn);
 +	}
-+
-+	r->vcn = vcn;
-+	r->lcn = lcn;
-+	r->len = len;
-+	run->count += 1;
-+
-+consolidate:
 +
 +	/*
 +	 * And normalize it starting from insertion point.
@@ -6134,177 +5989,173 @@ index 000000000000..4c6757b8bb82
 +	if (next_vcn != vcn)
 +		goto error;
 +
-+next_entry:
-+	/* offset of current fragment relatively to previous fragment */
-+	dlcn = 0;
-+	next_vcn = vcn + len;
++	for (;;) {
++		/* offset of current fragment relatively to previous fragment */
++		dlcn = 0;
++		next_vcn = vcn + len;
 +
-+	if (next_vcn > evcn1)
-+		len = evcn1 - vcn;
++		if (next_vcn > evcn1)
++			len = evcn1 - vcn;
 +
-+	/*
-+	 * mirror of len, but signed, because run_packed_size()
-+	 * works with signed int only
-+	 */
-+	len64 = len;
++		/*
++		 * mirror of len, but signed, because run_packed_size()
++		 * works with signed int only
++		 */
++		len64 = len;
 +
-+	/* how much bytes is packed len64 */
-+	size_size = run_packed_size(&len64);
++		/* how much bytes is packed len64 */
++		size_size = run_packed_size(&len64);
 +
-+	/* offset_size - how much bytes is packed dlcn */
-+	if (lcn == SPARSE_LCN)
-+		offset_size = 0;
-+	else {
-+		/* NOTE: lcn can be less than prev_lcn! */
-+		dlcn = (s64)lcn - prev_lcn;
-+		offset_size = run_packed_size(&dlcn);
-+		prev_lcn = lcn;
-+	}
++		/* offset_size - how much bytes is packed dlcn */
++		if (lcn == SPARSE_LCN) {
++			offset_size = 0;
++		} else {
++			/* NOTE: lcn can be less than prev_lcn! */
++			dlcn = (s64)lcn - prev_lcn;
++			offset_size = run_packed_size(&dlcn);
++			prev_lcn = lcn;
++		}
 +
-+	t = run_buf_size - packed_size - 2 - offset_size;
-+	if (t <= 0)
-+		goto out;
++		t = run_buf_size - packed_size - 2 - offset_size;
++		if (t <= 0)
++			goto out;
 +
-+	/* can we store this entire run */
-+	if (t < size_size)
-+		goto out;
++		/* can we store this entire run */
++		if (t < size_size)
++			goto out;
 +
-+	if (!run_buf)
-+		goto skip_pack;
++		if (run_buf) {
++			p = (u8 *)&len64;
 +
-+	p = (u8 *)&len64;
++			/* pack run header */
++			run_buf[0] = ((u8)(size_size | (offset_size << 4)));
++			run_buf += 1;
 +
-+	/* pack run header */
-+	run_buf[0] = ((u8)(size_size | (offset_size << 4)));
-+	run_buf += 1;
-+
-+	/* Pack the length of run */
-+	switch (size_size) {
++			/* Pack the length of run */
++			switch (size_size) {
 +#ifdef __BIG_ENDIAN
-+	case 8:
-+		run_buf[7] = p[0];
-+		fallthrough;
-+	case 7:
-+		run_buf[6] = p[1];
-+		fallthrough;
-+	case 6:
-+		run_buf[5] = p[2];
-+		fallthrough;
-+	case 5:
-+		run_buf[4] = p[3];
-+		fallthrough;
-+	case 4:
-+		run_buf[3] = p[4];
-+		fallthrough;
-+	case 3:
-+		run_buf[2] = p[5];
-+		fallthrough;
-+	case 2:
-+		run_buf[1] = p[6];
-+		fallthrough;
-+	case 1:
-+		run_buf[0] = p[7];
++			case 8:
++				run_buf[7] = p[0];
++				fallthrough;
++			case 7:
++				run_buf[6] = p[1];
++				fallthrough;
++			case 6:
++				run_buf[5] = p[2];
++				fallthrough;
++			case 5:
++				run_buf[4] = p[3];
++				fallthrough;
++			case 4:
++				run_buf[3] = p[4];
++				fallthrough;
++			case 3:
++				run_buf[2] = p[5];
++				fallthrough;
++			case 2:
++				run_buf[1] = p[6];
++				fallthrough;
++			case 1:
++				run_buf[0] = p[7];
 +#else
-+	case 8:
-+		run_buf[7] = p[7];
-+		fallthrough;
-+	case 7:
-+		run_buf[6] = p[6];
-+		fallthrough;
-+	case 6:
-+		run_buf[5] = p[5];
-+		fallthrough;
-+	case 5:
-+		run_buf[4] = p[4];
-+		fallthrough;
-+	case 4:
-+		run_buf[3] = p[3];
-+		fallthrough;
-+	case 3:
-+		run_buf[2] = p[2];
-+		fallthrough;
-+	case 2:
-+		run_buf[1] = p[1];
-+		fallthrough;
-+	case 1:
-+		run_buf[0] = p[0];
++			case 8:
++				run_buf[7] = p[7];
++				fallthrough;
++			case 7:
++				run_buf[6] = p[6];
++				fallthrough;
++			case 6:
++				run_buf[5] = p[5];
++				fallthrough;
++			case 5:
++				run_buf[4] = p[4];
++				fallthrough;
++			case 4:
++				run_buf[3] = p[3];
++				fallthrough;
++			case 3:
++				run_buf[2] = p[2];
++				fallthrough;
++			case 2:
++				run_buf[1] = p[1];
++				fallthrough;
++			case 1:
++				run_buf[0] = p[0];
 +#endif
-+	}
++			}
 +
-+	run_buf += size_size;
-+	p = (u8 *)&dlcn;
++			run_buf += size_size;
++			p = (u8 *)&dlcn;
 +
-+	/* Pack the offset from previous lcn */
-+	switch (offset_size) {
++			/* Pack the offset from previous lcn */
++			switch (offset_size) {
 +#ifdef __BIG_ENDIAN
-+	case 8:
-+		run_buf[7] = p[0];
-+		fallthrough;
-+	case 7:
-+		run_buf[6] = p[1];
-+		fallthrough;
-+	case 6:
-+		run_buf[5] = p[2];
-+		fallthrough;
-+	case 5:
-+		run_buf[4] = p[3];
-+		fallthrough;
-+	case 4:
-+		run_buf[3] = p[4];
-+		fallthrough;
-+	case 3:
-+		run_buf[2] = p[5];
-+		fallthrough;
-+	case 2:
-+		run_buf[1] = p[6];
-+		fallthrough;
-+	case 1:
-+		run_buf[0] = p[7];
++			case 8:
++				run_buf[7] = p[0];
++				fallthrough;
++			case 7:
++				run_buf[6] = p[1];
++				fallthrough;
++			case 6:
++				run_buf[5] = p[2];
++				fallthrough;
++			case 5:
++				run_buf[4] = p[3];
++				fallthrough;
++			case 4:
++				run_buf[3] = p[4];
++				fallthrough;
++			case 3:
++				run_buf[2] = p[5];
++				fallthrough;
++			case 2:
++				run_buf[1] = p[6];
++				fallthrough;
++			case 1:
++				run_buf[0] = p[7];
 +#else
-+	case 8:
-+		run_buf[7] = p[7];
-+		fallthrough;
-+	case 7:
-+		run_buf[6] = p[6];
-+		fallthrough;
-+	case 6:
-+		run_buf[5] = p[5];
-+		fallthrough;
-+	case 5:
-+		run_buf[4] = p[4];
-+		fallthrough;
-+	case 4:
-+		run_buf[3] = p[3];
-+		fallthrough;
-+	case 3:
-+		run_buf[2] = p[2];
-+		fallthrough;
-+	case 2:
-+		run_buf[1] = p[1];
-+		fallthrough;
-+	case 1:
-+		run_buf[0] = p[0];
++			case 8:
++				run_buf[7] = p[7];
++				fallthrough;
++			case 7:
++				run_buf[6] = p[6];
++				fallthrough;
++			case 6:
++				run_buf[5] = p[5];
++				fallthrough;
++			case 5:
++				run_buf[4] = p[4];
++				fallthrough;
++			case 4:
++				run_buf[3] = p[3];
++				fallthrough;
++			case 3:
++				run_buf[2] = p[2];
++				fallthrough;
++			case 2:
++				run_buf[1] = p[1];
++				fallthrough;
++			case 1:
++				run_buf[0] = p[0];
 +#endif
++			}
++
++			run_buf += offset_size;
++		}
++
++		packed_size += 1 + offset_size + size_size;
++		*packed_vcns += len;
++
++		if (packed_size + 1 >= run_buf_size || next_vcn >= evcn1)
++			goto out;
++
++		ok = run_get_entry(run, ++i, &vcn, &lcn, &len);
++		if (!ok)
++			goto error;
++
++		if (next_vcn != vcn)
++			goto error;
 +	}
-+
-+	run_buf += offset_size;
-+
-+skip_pack:
-+
-+	packed_size += 1 + offset_size + size_size;
-+	*packed_vcns += len;
-+
-+	if (packed_size + 1 >= run_buf_size || next_vcn >= evcn1)
-+		goto out;
-+
-+	ok = run_get_entry(run, ++i, &vcn, &lcn, &len);
-+	if (!ok)
-+		goto error;
-+
-+	if (next_vcn != vcn)
-+		goto error;
-+
-+	goto next_entry;
 +
 +out:
 +	/* Store last zero */
@@ -6328,14 +6179,8 @@ index 000000000000..4c6757b8bb82
 +{
 +	u64 prev_lcn, vcn;
 +	const u8 *run_last, *run_0;
-+	u64 lcn, len;
-+	/* size_size - how much bytes is packed len */
-+	u8 size_size;
-+	/* offset_size - how much bytes is packed dlcn */
-+	u8 offset_size;
-+	u8 *p;
++	u64 lcn;
 +	u64 next_vcn;
-+	s64 dlcn;
 +
 +	/* Check for empty */
 +	if (evcn + 1 == svcn)
@@ -6350,189 +6195,186 @@ index 000000000000..4c6757b8bb82
 +	vcn = svcn;
 +
 +	/* Read all runs the chain */
-+next_run:
 +	/* size_size - how much bytes is packed len */
-+	size_size = *run_buf & 0xF;
-+	/* offset_size - how much bytes is packed dlcn */
-+	offset_size = *run_buf++ >> 4;
++	while (run_buf < run_last) {
++		/* size_size - how much bytes is packed len */
++		u8 size_size = *run_buf & 0xF;
++		/* offset_size - how much bytes is packed dlcn */
++		u8 offset_size = *run_buf++ >> 4;
++		u64 len = 0;
++		u8 *p = (u8 *)&len;
 +
-+	/*
-+	 * Unpack runs.
-+	 * NOTE: runs are stored little endian order
-+	 * "len" is unsigned value, "dlcn" is signed
-+	 */
-+	if (!size_size)
-+		goto out;
++		if (!size_size)
++			break;
 +
-+	/*
-+	 * Large positive number requires to store 5 bytes
-+	 * e.g.: 05 FF 7E FF FF 00 00 00
-+	 */
-+	len = 0;
-+	p = (u8 *)&len;
++		/*
++		 * Unpack runs.
++		 * NOTE: runs are stored little endian order
++		 * "len" is unsigned value, "dlcn" is signed
++		 * Large positive number requires to store 5 bytes
++		 * e.g.: 05 FF 7E FF FF 00 00 00
++		 */
 +
-+	switch (size_size) {
-+	default:
++		switch (size_size) {
++		default:
 +error:
-+		return -EINVAL;
++			return -EINVAL;
 +
 +#ifdef __BIG_ENDIAN
-+	case 8:
-+		p[0] = run_buf[7];
-+		fallthrough;
-+	case 7:
-+		p[1] = run_buf[6];
-+		fallthrough;
-+	case 6:
-+		p[2] = run_buf[5];
-+		fallthrough;
-+	case 5:
-+		p[3] = run_buf[4];
-+		fallthrough;
-+	case 4:
-+		p[4] = run_buf[3];
-+		fallthrough;
-+	case 3:
-+		p[5] = run_buf[2];
-+		fallthrough;
-+	case 2:
-+		p[6] = run_buf[1];
-+		fallthrough;
-+	case 1:
-+		p[7] = run_buf[0];
++		case 8:
++			p[0] = run_buf[7];
++			fallthrough;
++		case 7:
++			p[1] = run_buf[6];
++			fallthrough;
++		case 6:
++			p[2] = run_buf[5];
++			fallthrough;
++		case 5:
++			p[3] = run_buf[4];
++			fallthrough;
++		case 4:
++			p[4] = run_buf[3];
++			fallthrough;
++		case 3:
++			p[5] = run_buf[2];
++			fallthrough;
++		case 2:
++			p[6] = run_buf[1];
++			fallthrough;
++		case 1:
++			p[7] = run_buf[0];
 +#else
-+	case 8:
-+		p[7] = run_buf[7];
-+		fallthrough;
-+	case 7:
-+		p[6] = run_buf[6];
-+		fallthrough;
-+	case 6:
-+		p[5] = run_buf[5];
-+		fallthrough;
-+	case 5:
-+		p[4] = run_buf[4];
-+		fallthrough;
-+	case 4:
-+		p[3] = run_buf[3];
-+		fallthrough;
-+	case 3:
-+		p[2] = run_buf[2];
-+		fallthrough;
-+	case 2:
-+		p[1] = run_buf[1];
-+		fallthrough;
-+	case 1:
-+		p[0] = run_buf[0];
++		case 8:
++			p[7] = run_buf[7];
++			fallthrough;
++		case 7:
++			p[6] = run_buf[6];
++			fallthrough;
++		case 6:
++			p[5] = run_buf[5];
++			fallthrough;
++		case 5:
++			p[4] = run_buf[4];
++			fallthrough;
++		case 4:
++			p[3] = run_buf[3];
++			fallthrough;
++		case 3:
++			p[2] = run_buf[2];
++			fallthrough;
++		case 2:
++			p[1] = run_buf[1];
++			fallthrough;
++		case 1:
++			p[0] = run_buf[0];
 +#endif
-+	}
++		}
 +
-+	/* skip size_size */
-+	run_buf += size_size;
++		/* skip size_size */
++		run_buf += size_size;
 +
-+	if (!len)
-+		goto error;
++		if (!len)
++			goto error;
 +
-+	if (!offset_size) {
-+		lcn = SPARSE_LCN;
-+		goto next_vcn;
-+	}
-+	/* Check sign */
-+	dlcn = (run_buf[offset_size - 1] & 0x80) ? (s64)-1 : 0;
-+	p = (u8 *)&dlcn;
++		if (!offset_size) {
++			lcn = SPARSE_LCN;
++		} else {
++			/* Check sign */
++			s64 dlcn =
++				(run_buf[offset_size - 1] & 0x80) ? (s64)-1 : 0;
 +
-+	switch (offset_size) {
-+	default:
-+		goto error;
++			p = (u8 *)&dlcn;
++
++			switch (offset_size) {
++			default:
++				goto error;
 +
 +#ifdef __BIG_ENDIAN
-+	case 8:
-+		p[0] = run_buf[7];
-+		fallthrough;
-+	case 7:
-+		p[1] = run_buf[6];
-+		fallthrough;
-+	case 6:
-+		p[2] = run_buf[5];
-+		fallthrough;
-+	case 5:
-+		p[3] = run_buf[4];
-+		fallthrough;
-+	case 4:
-+		p[4] = run_buf[3];
-+		fallthrough;
-+	case 3:
-+		p[5] = run_buf[2];
-+		fallthrough;
-+	case 2:
-+		p[6] = run_buf[1];
-+		fallthrough;
-+	case 1:
-+		p[7] = run_buf[0];
++			case 8:
++				p[0] = run_buf[7];
++				fallthrough;
++			case 7:
++				p[1] = run_buf[6];
++				fallthrough;
++			case 6:
++				p[2] = run_buf[5];
++				fallthrough;
++			case 5:
++				p[3] = run_buf[4];
++				fallthrough;
++			case 4:
++				p[4] = run_buf[3];
++				fallthrough;
++			case 3:
++				p[5] = run_buf[2];
++				fallthrough;
++			case 2:
++				p[6] = run_buf[1];
++				fallthrough;
++			case 1:
++				p[7] = run_buf[0];
 +#else
-+	case 8:
-+		p[7] = run_buf[7];
-+		fallthrough;
-+	case 7:
-+		p[6] = run_buf[6];
-+		fallthrough;
-+	case 6:
-+		p[5] = run_buf[5];
-+		fallthrough;
-+	case 5:
-+		p[4] = run_buf[4];
-+		fallthrough;
-+	case 4:
-+		p[3] = run_buf[3];
-+		fallthrough;
-+	case 3:
-+		p[2] = run_buf[2];
-+		fallthrough;
-+	case 2:
-+		p[1] = run_buf[1];
-+		fallthrough;
-+	case 1:
-+		p[0] = run_buf[0];
++			case 8:
++				p[7] = run_buf[7];
++				fallthrough;
++			case 7:
++				p[6] = run_buf[6];
++				fallthrough;
++			case 6:
++				p[5] = run_buf[5];
++				fallthrough;
++			case 5:
++				p[4] = run_buf[4];
++				fallthrough;
++			case 4:
++				p[3] = run_buf[3];
++				fallthrough;
++			case 3:
++				p[2] = run_buf[2];
++				fallthrough;
++			case 2:
++				p[1] = run_buf[1];
++				fallthrough;
++			case 1:
++				p[0] = run_buf[0];
 +#endif
-+	}
++			}
 +
-+	/* skip offset_size */
-+	run_buf += offset_size;
-+	lcn = prev_lcn + dlcn;
-+	prev_lcn = lcn;
++			/* skip offset_size */
++			run_buf += offset_size;
++			lcn = prev_lcn + dlcn;
++			prev_lcn = lcn;
++		}
 +
-+next_vcn:
-+	next_vcn = vcn + len;
-+	/* check boundary */
-+	if (next_vcn > evcn + 1)
-+		goto error;
++		next_vcn = vcn + len;
++		/* check boundary */
++		if (next_vcn > evcn + 1)
++			goto error;
 +
 +#ifndef NTFS3_64BIT_CLUSTER
-+	if ((vcn >> 32)
-+	    /* 0xffffffffffffffff is a valid 'lcn' */
-+	    || (lcn + 1) > 0x100000000ull || (len >> 32)) {
-+		goto error;
-+	}
++		if ((vcn >> 32)
++		    /* 0xffffffffffffffff is a valid 'lcn' */
++		    || (lcn + 1) > 0x100000000ull || (len >> 32)) {
++			goto error;
++		}
 +#endif
 +
-+	if (!run)
-+		; /* called from check_attr(fslog.c) to check run */
-+	else if ((size_t)run == 1) {
-+		/* called from ni_delete_all to free clusters without storing in run */
-+		if (lcn != SPARSE_LCN)
-+			mark_as_free_ex(sbi, lcn, len, true);
-+	} else if (!run_add_entry(run, vcn, lcn, len))
-+		return -ENOMEM;
++		if (!run)
++			; /* called from check_attr(fslog.c) to check run */
++		else if ((size_t)run == 1) {
++			/* called from ni_delete_all to free clusters without storing in run */
++			if (lcn != SPARSE_LCN)
++				mark_as_free_ex(sbi, lcn, len, true);
++		} else if (!run_add_entry(run, vcn, lcn, len))
++			return -ENOMEM;
 +
-+	if (lcn != SPARSE_LCN && lcn + len > sbi->used.bitmap.nbits)
-+		return -EINVAL;
++		if (lcn != SPARSE_LCN && lcn + len > sbi->used.bitmap.nbits)
++			return -EINVAL;
 +
-+	vcn = next_vcn;
++		vcn = next_vcn;
++	}
 +
-+	if (run_buf < run_last)
-+		goto next_run;
-+
-+out:
 +	/* Check vcn consistency */
 +	if (vcn == evcn + 1)
 +		return run_buf - run_0;
@@ -6646,96 +6488,87 @@ index 000000000000..4c6757b8bb82
 +	const u8 *run = run_buf;
 +	u64 vcn64 = vcn;
 +	u8 size_size;
-+	u8 offset_size;
-+	u64 len;
-+	u8 *p;
 +
-+next_run:
-+	size_size = *run & 0xF;
-+	if (!size_size)
-+		goto out;
++	while ((size_size = *run & 0xF)) {
++		u8 offset_size = *run++ >> 4;
++		u64 len = 0;
++		u8 *p = (u8 *)&len;
 +
-+	offset_size = *run++ >> 4;
-+
-+	len = 0;
-+	p = (u8 *)&len;
-+
-+	switch (size_size) {
-+	default:
++		switch (size_size) {
++		default:
 +error:
-+		return -EINVAL;
++			return -EINVAL;
 +
 +#ifdef __BIG_ENDIAN
-+	case 8:
-+		p[0] = run[7];
-+		fallthrough;
-+	case 7:
-+		p[1] = run[6];
-+		fallthrough;
-+	case 6:
-+		p[2] = run[5];
-+		fallthrough;
-+	case 5:
-+		p[3] = run[4];
-+		fallthrough;
-+	case 4:
-+		p[4] = run[3];
-+		fallthrough;
-+	case 3:
-+		p[5] = run[2];
-+		fallthrough;
-+	case 2:
-+		p[6] = run[1];
-+		fallthrough;
-+	case 1:
-+		p[7] = run[0];
++		case 8:
++			p[0] = run[7];
++			fallthrough;
++		case 7:
++			p[1] = run[6];
++			fallthrough;
++		case 6:
++			p[2] = run[5];
++			fallthrough;
++		case 5:
++			p[3] = run[4];
++			fallthrough;
++		case 4:
++			p[4] = run[3];
++			fallthrough;
++		case 3:
++			p[5] = run[2];
++			fallthrough;
++		case 2:
++			p[6] = run[1];
++			fallthrough;
++		case 1:
++			p[7] = run[0];
 +#else
-+	case 8:
-+		p[7] = run[7];
-+		fallthrough;
-+	case 7:
-+		p[6] = run[6];
-+		fallthrough;
-+	case 6:
-+		p[5] = run[5];
-+		fallthrough;
-+	case 5:
-+		p[4] = run[4];
-+		fallthrough;
-+	case 4:
-+		p[3] = run[3];
-+		fallthrough;
-+	case 3:
-+		p[2] = run[2];
-+		fallthrough;
-+	case 2:
-+		p[1] = run[1];
-+		fallthrough;
-+	case 1:
-+		p[0] = run[0];
++		case 8:
++			p[7] = run[7];
++			fallthrough;
++		case 7:
++			p[6] = run[6];
++			fallthrough;
++		case 6:
++			p[5] = run[5];
++			fallthrough;
++		case 5:
++			p[4] = run[4];
++			fallthrough;
++		case 4:
++			p[3] = run[3];
++			fallthrough;
++		case 3:
++			p[2] = run[2];
++			fallthrough;
++		case 2:
++			p[1] = run[1];
++			fallthrough;
++		case 1:
++			p[0] = run[0];
 +#endif
-+	}
++		}
 +
-+	/* skip size_size */
-+	run += size_size;
++		/* skip size_size */
++		run += size_size;
 +
-+	if (!len)
-+		goto error;
++		if (!len)
++			goto error;
 +
-+	run += offset_size;
++		run += offset_size;
 +
 +#ifdef NTFS3_64BIT_CLUSTER
-+	if ((vcn >> 32) || (len >> 32))
-+		goto error;
++		if ((vcn >> 32) || (len >> 32))
++			goto error;
 +#endif
-+	vcn64 += len;
-+	goto next_run;
++		vcn64 += len;
++	}
 +
-+out:
 +	*highest_vcn = vcn64 - 1;
 +	return 0;
 +}
 -- 
-2.25.2
+2.25.4
 
 

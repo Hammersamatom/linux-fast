@@ -1,66 +1,67 @@
 From mboxrd@z Thu Jan  1 00:00:00 1970
-Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+Return-Path: <SRS0=IB9q=DQ=vger.kernel.org=linux-kernel-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C73BCC433E7
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC60C433E7
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85869214D8
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:40:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7EF86222B9
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="fV1Cy53x"
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="bLrHjtcx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728020AbgH1Okj (ORCPT
+        id S2388766AbgJIOXc (ORCPT
         <rfc822;linux-kernel@archiver.kernel.org>);
-        Fri, 28 Aug 2020 10:40:39 -0400
-Received: from relayfre-01.paragon-software.com ([176.12.100.13]:57852 "EHLO
-        relayfre-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727969AbgH1OkX (ORCPT
+        Fri, 9 Oct 2020 10:23:32 -0400
+Received: from relaydlg-01.paragon-software.com ([81.5.88.159]:42910 "EHLO
+        relaydlg-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732056AbgJIOXR (ORCPT
         <rfc822;linux-kernel@vger.kernel.org>);
-        Fri, 28 Aug 2020 10:40:23 -0400
+        Fri, 9 Oct 2020 10:23:17 -0400
 Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
-        by relayfre-01.paragon-software.com (Postfix) with ESMTPS id E41AE27E;
-        Fri, 28 Aug 2020 17:40:16 +0300 (MSK)
+        by relaydlg-01.paragon-software.com (Postfix) with ESMTPS id 9667D8237D;
+        Fri,  9 Oct 2020 17:23:08 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paragon-software.com; s=mail; t=1598625616;
-        bh=LsZqvcfqN4iaP1FLhZSeqe+wbystI5ElcXOOBfYj0Oc=;
+        d=paragon-software.com; s=mail; t=1602253388;
+        bh=kSWB7McBh6rAvVlaUe3Z4KodjULwZfdtwK+g4zsN2IA=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=fV1Cy53xMHdmL3rzZUXlxPB9zFXie2jc3HCIzqqoHUhO/xXgxBxctVn1gMC4Diu/G
-         LCpO7cDcZr48yRpHLxFPWmyxlmXnOgTWXXVjjlz+ilX0poMYL9W53VsO/Y55VRMcK3
-         sNeh+grHPjC3DtUP5ZFIazW4IbydgO+NJpTlC2n0=
-Received: from localhost.localdomain (172.30.8.44) by
+        b=bLrHjtcxFZ8qmm+yp9Fb+Eo9+DZOxJ36IhAF3vkoyXnjDVE43+73RCGGUWiKLAbcT
+         0S2JOB3E/uSmRDMZ4DSPvE5ggszFVqUQGF4cjhWpJTybOKHPTqNpWlXAB2QmErq/PX
+         X/bZm4YlCtA9Crf5/FJd9WyQufDKEdH44wHifwp8=
+Received: from fsd-lkpg.ufsd.paragon-software.com (172.30.114.105) by
  vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1847.3; Fri, 28 Aug 2020 17:40:15 +0300
+ 15.1.1847.3; Fri, 9 Oct 2020 17:23:08 +0300
 From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 To:     <linux-fsdevel@vger.kernel.org>
 CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
         <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
         <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
-        <mark@harmstone.com>,
+        <mark@harmstone.com>, <nborisov@suse.com>,
+        <linux-ntfs-dev@lists.sourceforge.net>, <anton@tuxera.com>,
         Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-Subject: [PATCH v3 03/10] fs/ntfs3: Add bitmap
-Date:   Fri, 28 Aug 2020 07:39:31 -0700
-Message-ID: <20200828143938.102889-4-almaz.alexandrovich@paragon-software.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
-References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v8 03/10] fs/ntfs3: Add bitmap
+Date:   Fri, 9 Oct 2020 17:22:54 +0300
+Message-ID: <20201009142301.412454-4-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
+References: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.30.8.44]
-X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+X-Originating-IP: [172.30.114.105]
+X-ClientProxiedBy: vdlg-exch-02.paragon-software.com (172.30.1.105) To
  vdlg-exch-02.paragon-software.com (172.30.1.105)
-Sender: linux-kernel-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kernel.vger.kernel.org>
 X-Mailing-List: linux-kernel@vger.kernel.org
-Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-4-almaz.alexandrovich@paragon-software.com/>
+Archived-At: <https://lore.kernel.org/lkml/20201009142301.412454-4-almaz.alexandrovich@paragon-software.com/>
 List-Archive: <https://lore.kernel.org/lkml/>
 List-Post: <mailto:linux-kernel@vger.kernel.org>
 
@@ -69,8 +70,8 @@ This adds bitmap
 Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 ---
  fs/ntfs3/bitfunc.c |  137 ++++
- fs/ntfs3/bitmap.c  | 1545 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 1682 insertions(+)
+ fs/ntfs3/bitmap.c  | 1508 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 1645 insertions(+)
  create mode 100644 fs/ntfs3/bitfunc.c
  create mode 100644 fs/ntfs3/bitmap.c
 
@@ -219,10 +220,10 @@ index 000000000000..b19972177535
 +}
 diff --git a/fs/ntfs3/bitmap.c b/fs/ntfs3/bitmap.c
 new file mode 100644
-index 000000000000..fe41e010b2eb
+index 000000000000..c5fbdd0a3b1f
 --- /dev/null
 +++ b/fs/ntfs3/bitmap.c
-@@ -0,0 +1,1545 @@
+@@ -0,0 +1,1508 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/bitmap.c
@@ -358,13 +359,14 @@ index 000000000000..fe41e010b2eb
 +		struct rb_node_key *k;
 +
 +		k = rb_entry(*p, struct rb_node_key, node);
-+		if (v < k->key)
++		if (v < k->key) {
 +			p = &(*p)->rb_left;
-+		else if (v > k->key) {
++		} else if (v > k->key) {
 +			r = &k->node;
 +			p = &(*p)->rb_right;
-+		} else
++		} else {
 +			return &k->node;
++		}
 +	}
 +
 +	return r;
@@ -386,15 +388,15 @@ index 000000000000..fe41e010b2eb
 +		struct e_node *k =
 +			rb_entry(parent = *p, struct e_node, count.node);
 +
-+		if (e_ckey > k->count.key)
++		if (e_ckey > k->count.key) {
 +			p = &(*p)->rb_left;
-+		else if (e_ckey < k->count.key)
++		} else if (e_ckey < k->count.key) {
 +			p = &(*p)->rb_right;
-+		else if (e_skey < k->start.key)
++		} else if (e_skey < k->start.key) {
 +			p = &(*p)->rb_left;
-+		else if (e_skey > k->start.key)
++		} else if (e_skey > k->start.key) {
 +			p = &(*p)->rb_right;
-+		else {
++		} else {
 +			WARN_ON(1);
 +			return false;
 +		}
@@ -422,11 +424,11 @@ index 000000000000..fe41e010b2eb
 +		parent = *p;
 +
 +		k = rb_entry(parent, struct e_node, start.node);
-+		if (e_skey < k->start.key)
++		if (e_skey < k->start.key) {
 +			p = &(*p)->rb_left;
-+		else if (e_skey > k->start.key)
++		} else if (e_skey > k->start.key) {
 +			p = &(*p)->rb_right;
-+		else {
++		} else {
 +			WARN_ON(1);
 +			return false;
 +		}
@@ -452,125 +454,115 @@ index 000000000000..fe41e010b2eb
 +	size_t ib, end_in = bit + len;
 +	struct rb_node *n;
 +
-+	if (!build)
-+		goto lookup;
++	if (build) {
++		/* Use extent_min to filter too short extents */
++		if (wnd->count >= NTFS_MAX_WND_EXTENTS &&
++		    len <= wnd->extent_min) {
++			wnd->uptodated = -1;
++			return;
++		}
++	} else {
++		/* Try to find extent before 'bit' */
++		n = rb_lookup(&wnd->start_tree, bit);
 +
-+	if (wnd->count >= NTFS_MAX_WND_EXTENTS && len <= wnd->extent_min) {
-+		wnd->uptodated = -1;
-+		return;
-+	}
++		if (!n) {
++			n = rb_first(&wnd->start_tree);
++		} else {
++			e = rb_entry(n, struct e_node, start.node);
++			n = rb_next(n);
++			if (e->start.key + e->count.key == bit) {
++				/* Remove left */
++				bit = e->start.key;
++				len += e->count.key;
++				rb_erase(&e->start.node, &wnd->start_tree);
++				rb_erase(&e->count.node, &wnd->count_tree);
++				wnd->count -= 1;
++				e0 = e;
++			}
++		}
 +
-+	goto insert_new;
++		while (n) {
++			size_t next_end;
 +
-+lookup:
-+	/* Try to find extent before 'bit' */
-+	n = rb_lookup(&wnd->start_tree, bit);
++			e = rb_entry(n, struct e_node, start.node);
++			next_end = e->start.key + e->count.key;
++			if (e->start.key > end_in)
++				break;
 +
-+	if (!n)
-+		n = rb_first(&wnd->start_tree);
-+	else {
-+		e = rb_entry(n, struct e_node, start.node);
-+
-+		n = rb_next(n);
-+		if (e->start.key + e->count.key == bit) {
-+			/* Remove left */
-+			bit = e->start.key;
-+			len += e->count.key;
-+
++			/* Remove right */
++			n = rb_next(n);
++			len += next_end - end_in;
++			end_in = next_end;
 +			rb_erase(&e->start.node, &wnd->start_tree);
 +			rb_erase(&e->count.node, &wnd->count_tree);
 +			wnd->count -= 1;
-+			e0 = e;
++
++			if (!e0)
++				e0 = e;
++			else
++				ntfs_free(e);
++		}
++
++		if (wnd->uptodated != 1) {
++			/* Check bits before 'bit' */
++			ib = wnd->zone_bit == wnd->zone_end ||
++					     bit < wnd->zone_end ?
++				     0 :
++				     wnd->zone_end;
++
++			while (bit > ib && wnd_is_free_hlp(wnd, bit - 1, 1)) {
++				bit -= 1;
++				len += 1;
++			}
++
++			/* Check bits after 'end_in' */
++			ib = wnd->zone_bit == wnd->zone_end ||
++					     end_in > wnd->zone_bit ?
++				     wnd->nbits :
++				     wnd->zone_bit;
++
++			while (end_in < ib && wnd_is_free_hlp(wnd, end_in, 1)) {
++				end_in += 1;
++				len += 1;
++			}
 +		}
 +	}
++	/* Insert new fragment */
++	if (wnd->count >= NTFS_MAX_WND_EXTENTS) {
++		if (e0)
++			ntfs_free(e0);
 +
-+	while (n) {
-+		size_t next_end;
++		wnd->uptodated = -1;
 +
-+		e = rb_entry(n, struct e_node, start.node);
++		/* Compare with smallest fragment */
++		n = rb_last(&wnd->count_tree);
++		e = rb_entry(n, struct e_node, count.node);
++		if (len <= e->count.key)
++			goto out; /* Do not insert small fragments */
 +
-+		next_end = e->start.key + e->count.key;
-+		if (e->start.key > end_in)
-+			break;
++		if (build) {
++			struct e_node *e2;
 +
-+		/* Remove right */
-+		n = rb_next(n);
-+		len += next_end - end_in;
-+		end_in = next_end;
++			n = rb_prev(n);
++			e2 = rb_entry(n, struct e_node, count.node);
++			/* smallest fragment will be 'e2->count.key' */
++			wnd->extent_min = e2->count.key;
++		}
++
++		/* Replace smallest fragment by new one */
 +		rb_erase(&e->start.node, &wnd->start_tree);
 +		rb_erase(&e->count.node, &wnd->count_tree);
 +		wnd->count -= 1;
++	} else {
++		e = e0 ? e0 : ntfs_alloc(sizeof(struct e_node), 0);
++		if (!e) {
++			wnd->uptodated = -1;
++			goto out;
++		}
 +
-+		if (!e0)
-+			e0 = e;
-+		else
-+			ntfs_free(e);
++		if (build && len <= wnd->extent_min)
++			wnd->extent_min = len;
 +	}
-+
-+	if (wnd->uptodated == 1)
-+		goto insert_new;
-+
-+	/* Check bits before 'bit' */
-+	ib = wnd->zone_bit == wnd->zone_end || bit < wnd->zone_end ?
-+		     0 :
-+		     wnd->zone_end;
-+
-+	while (bit > ib && wnd_is_free_hlp(wnd, bit - 1, 1)) {
-+		bit -= 1;
-+		len += 1;
-+	}
-+
-+	/* Check bits after 'end_in' */
-+	ib = wnd->zone_bit == wnd->zone_end || end_in > wnd->zone_bit ?
-+		     wnd->nbits :
-+		     wnd->zone_bit;
-+
-+	while (end_in < ib && wnd_is_free_hlp(wnd, end_in, 1)) {
-+		end_in += 1;
-+		len += 1;
-+	}
-+
-+insert_new:
-+	/* Insert new fragment */
-+	if (wnd->count < NTFS_MAX_WND_EXTENTS)
-+		goto allocate_new;
-+
-+	if (e0)
-+		ntfs_free(e0);
-+
-+	wnd->uptodated = -1;
-+
-+	/* Compare with smallest fragment */
-+	n = rb_last(&wnd->count_tree);
-+	e = rb_entry(n, struct e_node, count.node);
-+	if (len <= e->count.key)
-+		goto out; /* Do not insert small fragments */
-+
-+	if (build) {
-+		struct e_node *e2;
-+
-+		n = rb_prev(n);
-+		e2 = rb_entry(n, struct e_node, count.node);
-+		/* smallest fragment will be 'e2->count.key' */
-+		wnd->extent_min = e2->count.key;
-+	}
-+
-+	/* Replace smallest fragment by new one */
-+	rb_erase(&e->start.node, &wnd->start_tree);
-+	rb_erase(&e->count.node, &wnd->count_tree);
-+	wnd->count -= 1;
-+	goto insert;
-+
-+allocate_new:
-+	e = e0 ? e0 : ntfs_alloc(sizeof(struct e_node), 0);
-+	if (!e) {
-+		wnd->uptodated = -1;
-+		goto out;
-+	}
-+
-+	if (build && len <= wnd->extent_min)
-+		wnd->extent_min = len;
-+insert:
 +	e->start.key = bit;
 +	e->count.key = len;
 +	if (len > wnd->extent_max)
@@ -594,7 +586,6 @@ index 000000000000..fe41e010b2eb
 +	struct e_node *e, *e3;
 +	size_t end_in = bit + len;
 +	size_t end3, end, new_key, new_len, max_new_len;
-+	bool bmax;
 +
 +	/* Try to find extent before 'bit' */
 +	n = rb_lookup(&wnd->start_tree, bit);
@@ -610,72 +601,64 @@ index 000000000000..fe41e010b2eb
 +
 +	/* Range [bit,end_in) must be inside 'e' or outside 'e' and 'n' */
 +	if (e->start.key > bit)
-+		goto check_biggest;
-+
-+	if (end_in <= end) {
++		;
++	else if (end_in <= end) {
 +		/* Range [bit,end_in) inside 'e' */
 +		new_key = end_in;
 +		new_len = end - end_in;
 +		len = bit - e->start.key;
-+		goto check_biggest;
-+	}
++	} else if (bit > end) {
++		bool bmax = false;
 +
-+	if (bit <= end)
-+		goto check_biggest;
++		n3 = rb_next(n);
 +
-+	bmax = false;
++		while (n3) {
++			e3 = rb_entry(n3, struct e_node, start.node);
++			if (e3->start.key >= end_in)
++				break;
 +
-+	n3 = rb_next(n);
++			if (e3->count.key == wnd->extent_max)
++				bmax = true;
 +
-+	while (n3) {
-+		e3 = rb_entry(n3, struct e_node, start.node);
-+		if (e3->start.key >= end_in)
-+			break;
++			end3 = e3->start.key + e3->count.key;
++			if (end3 > end_in) {
++				e3->start.key = end_in;
++				rb_erase(&e3->count.node, &wnd->count_tree);
++				e3->count.key = end3 - end_in;
++				rb_insert_count(&wnd->count_tree, e3);
++				break;
++			}
 +
-+		if (e3->count.key == wnd->extent_max)
-+			bmax = true;
-+
-+		end3 = e3->start.key + e3->count.key;
-+		if (end3 > end_in) {
-+			e3->start.key = end_in;
++			n3 = rb_next(n3);
++			rb_erase(&e3->start.node, &wnd->start_tree);
 +			rb_erase(&e3->count.node, &wnd->count_tree);
-+			e3->count.key = end3 - end_in;
-+			rb_insert_count(&wnd->count_tree, e3);
-+			break;
++			wnd->count -= 1;
++			ntfs_free(e3);
 +		}
-+
-+		n3 = rb_next(n3);
-+		rb_erase(&e3->start.node, &wnd->start_tree);
-+		rb_erase(&e3->count.node, &wnd->count_tree);
-+		wnd->count -= 1;
-+		ntfs_free(e3);
-+	}
-+	if (!bmax)
++		if (!bmax)
++			return;
++		n3 = rb_first(&wnd->count_tree);
++		wnd->extent_max =
++			n3 ? rb_entry(n3, struct e_node, count.node)->count.key :
++			     0;
 +		return;
-+	n3 = rb_first(&wnd->count_tree);
-+	wnd->extent_max =
-+		n3 ? rb_entry(n3, struct e_node, count.node)->count.key : 0;
-+	return;
-+
-+check_biggest:
-+	if (e->count.key != wnd->extent_max)
-+		goto check_len;
-+
-+	/* We have to change the biggest extent */
-+	n3 = rb_prev(&e->count.node);
-+	if (n3)
-+		goto check_len;
-+
-+	n3 = rb_next(&e->count.node);
-+	max_new_len = len > new_len ? len : new_len;
-+	if (!n3) {
-+		wnd->extent_max = max_new_len;
-+		goto check_len;
 +	}
-+	e3 = rb_entry(n3, struct e_node, count.node);
-+	wnd->extent_max = max(e3->count.key, max_new_len);
 +
-+check_len:
++	if (e->count.key != wnd->extent_max) {
++		;
++	} else if (rb_prev(&e->count.node)) {
++		;
++	} else {
++		n3 = rb_next(&e->count.node);
++		max_new_len = len > new_len ? len : new_len;
++		if (!n3) {
++			wnd->extent_max = max_new_len;
++		} else {
++			e3 = rb_entry(n3, struct e_node, count.node);
++			wnd->extent_max = max(e3->count.key, max_new_len);
++		}
++	}
++
 +	if (!len) {
 +		if (new_len) {
 +			e->start.key = new_key;
@@ -743,11 +726,7 @@ index 000000000000..fe41e010b2eb
 +	u64 lbo, len = 0;
 +	u32 blocksize = sb->s_blocksize;
 +	u8 cluster_bits = sbi->cluster_bits;
-+	const u32 ra_bytes = 512 * 1024;
-+	const u32 ra_pages = ra_bytes >> PAGE_SHIFT;
 +	u32 wbits = 8 * sb->s_blocksize;
-+	u32 ra_mask = (ra_bytes >> sb->s_blocksize_bits) - 1;
-+	struct address_space *mapping = sb->s_bdev->bd_inode->i_mapping;
 +	u32 used, frb;
 +	const ulong *buf;
 +	size_t wpos, wbit, iw, vbo;
@@ -760,116 +739,107 @@ index 000000000000..fe41e010b2eb
 +	wnd->total_zeroes = 0;
 +
 +	vbo = 0;
-+	iw = 0;
 +
-+start_wnd:
++	for (iw = 0; iw < wnd->nwnd; iw++) {
++		if (iw + 1 == wnd->nwnd)
++			wbits = wnd->bits_last;
 +
-+	if (iw + 1 == wnd->nwnd)
-+		wbits = wnd->bits_last;
-+
-+	if (wnd->inited) {
-+		if (!wnd->free_bits[iw]) {
-+			/* all ones */
-+			if (!prev_tail)
++		if (wnd->inited) {
++			if (!wnd->free_bits[iw]) {
++				/* all ones */
++				if (prev_tail) {
++					wnd_add_free_ext(wnd,
++							 vbo * 8 - prev_tail,
++							 prev_tail, true);
++					prev_tail = 0;
++				}
 +				goto next_wnd;
++			}
++			if (wbits == wnd->free_bits[iw]) {
++				/* all zeroes */
++				prev_tail += wbits;
++				wnd->total_zeroes += wbits;
++				goto next_wnd;
++			}
++		}
 +
-+			wnd_add_free_ext(wnd, vbo * 8 - prev_tail, prev_tail,
-+					 true);
++		if (!len) {
++			if (!run_lookup_entry(&wnd->run, vbo >> cluster_bits,
++					      &lcn, &clen, NULL)) {
++				err = -ENOENT;
++				goto out;
++			}
++
++			lbo = (u64)lcn << cluster_bits;
++			len = (u64)clen << cluster_bits;
++		}
++
++		bh = ntfs_bread(sb, lbo >> sb->s_blocksize_bits);
++		if (!bh) {
++			err = -EIO;
++			goto out;
++		}
++
++		buf = (ulong *)bh->b_data;
++
++		used = __bitmap_weight(buf, wbits);
++		if (used < wbits) {
++			frb = wbits - used;
++			wnd->free_bits[iw] = frb;
++			wnd->total_zeroes += frb;
++		}
++
++		wpos = 0;
++		wbit = vbo * 8;
++
++		if (wbit + wbits > wnd->nbits)
++			wbits = wnd->nbits - wbit;
++
++		do {
++			used = find_next_zero_bit(buf, wbits, wpos);
++
++			if (used > wpos && prev_tail) {
++				wnd_add_free_ext(wnd, wbit + wpos - prev_tail,
++						 prev_tail, true);
++				prev_tail = 0;
++			}
++
++			wpos = used;
++
++			if (wpos >= wbits) {
++				/* No free blocks */
++				prev_tail = 0;
++				break;
++			}
++
++			frb = find_next_bit(buf, wbits, wpos);
++			if (frb >= wbits) {
++				/* keep last free block */
++				prev_tail += frb - wpos;
++				break;
++			}
++
++			wnd_add_free_ext(wnd, wbit + wpos - prev_tail,
++					 frb + prev_tail - wpos, true);
++
++			/* Skip free block and first '1' */
++			wpos = frb + 1;
++			/* Reset previous tail */
 +			prev_tail = 0;
-+			goto next_wnd;
-+		}
-+		if (wbits == wnd->free_bits[iw]) {
-+			/* all zeroes */
-+			prev_tail += wbits;
-+			wnd->total_zeroes += wbits;
-+			goto next_wnd;
-+		}
-+	}
++		} while (wpos < wbits);
 +
-+	if (len)
-+		goto read_wnd;
-+
-+	if (!run_lookup_entry(&wnd->run, vbo >> cluster_bits, &lcn, &clen,
-+			      NULL)) {
-+		err = -ENOENT;
-+		goto out;
-+	}
-+
-+	lbo = (u64)lcn << cluster_bits;
-+	len = (u64)clen << cluster_bits;
-+
-+read_wnd:
-+	if (!(iw & ra_mask))
-+		page_cache_readahead_unbounded(mapping, NULL, lbo >> PAGE_SHIFT,
-+					       ra_pages, 0);
-+
-+	bh = ntfs_bread(sb, lbo >> sb->s_blocksize_bits);
-+	if (!bh) {
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+	buf = (ulong *)bh->b_data;
-+
-+	used = __bitmap_weight(buf, wbits);
-+	if (used < wbits) {
-+		frb = wbits - used;
-+		wnd->free_bits[iw] = frb;
-+		wnd->total_zeroes += frb;
-+	}
-+
-+	wpos = 0;
-+	wbit = vbo * 8;
-+
-+	if (wbit + wbits > wnd->nbits)
-+		wbits = wnd->nbits - wbit;
-+
-+next_range:
-+	used = find_next_zero_bit(buf, wbits, wpos);
-+
-+	if (used > wpos && prev_tail) {
-+		wnd_add_free_ext(wnd, wbit + wpos - prev_tail, prev_tail, true);
-+		prev_tail = 0;
-+	}
-+
-+	wpos = used;
-+
-+	if (wpos >= wbits) {
-+		/* No free blocks */
-+		prev_tail = 0;
-+		goto next_wnd;
-+	}
-+
-+	frb = find_next_bit(buf, wbits, wpos);
-+	if (frb >= wbits) {
-+		/* keep last free block */
-+		prev_tail += frb - wpos;
-+		goto next_wnd;
-+	}
-+
-+	wnd_add_free_ext(wnd, wbit + wpos - prev_tail, frb + prev_tail - wpos,
-+			 true);
-+
-+	/* Skip free block and first '1' */
-+	wpos = frb + 1;
-+	/* Reset previous tail */
-+	prev_tail = 0;
-+	if (wpos < wbits)
-+		goto next_range;
 +next_wnd:
 +
-+	if (bh)
-+		put_bh(bh);
-+	bh = NULL;
++		if (bh)
++			put_bh(bh);
++		bh = NULL;
 +
-+	vbo += blocksize;
-+	if (len) {
-+		len -= blocksize;
-+		lbo += blocksize;
++		vbo += blocksize;
++		if (len) {
++			len -= blocksize;
++			lbo += blocksize;
++		}
 +	}
-+
-+	if (++iw < wnd->nwnd)
-+		goto start_wnd;
 +
 +	/* Add last block */
 +	if (prev_tail)
@@ -1325,17 +1295,17 @@ index 000000000000..fe41e010b2eb
 +		wnd->extent_max = e->count.key;
 +
 +	if (e->count.key < max_alloc) {
-+		if (e->count.key >= to_alloc)
++		if (e->count.key >= to_alloc) {
 +			;
-+		else if (flags & BITMAP_FIND_FULL) {
++		} else if (flags & BITMAP_FIND_FULL) {
 +			if (e->count.key < to_alloc0) {
 +				/* Biggest free block is less then requested */
 +				goto no_space;
 +			}
 +			to_alloc = e->count.key;
-+		} else if (-1 != wnd->uptodated)
++		} else if (-1 != wnd->uptodated) {
 +			to_alloc = e->count.key;
-+		else {
++		} else {
 +			/* Check if we can use more bits */
 +			size_t op, max_check;
 +			struct rb_root start_tree;
@@ -1395,136 +1365,130 @@ index 000000000000..fe41e010b2eb
 +	}
 +
 +	/* Enumerate all windows */
-+	iw -= 1;
-+next_wnd:
-+	iw += 1;
-+	if (iw >= nwnd)
-+		goto estimate;
++	for (; iw < nwnd; iw++) {
++		wbit = iw << log2_bits;
 +
-+	wbit = iw << log2_bits;
++		if (!wnd->free_bits[iw]) {
++			if (prev_tail > b_len) {
++				b_pos = wbit - prev_tail;
++				b_len = prev_tail;
++			}
 +
-+	if (!wnd->free_bits[iw]) {
-+		if (prev_tail > b_len) {
-+			b_pos = wbit - prev_tail;
-+			b_len = prev_tail;
++			/* Skip full used window */
++			prev_tail = 0;
++			wpos = 0;
++			continue;
 +		}
 +
-+		/* Skip full used window */
-+		prev_tail = 0;
-+		wpos = 0;
-+		goto next_wnd;
-+	}
++		if (unlikely(iw + 1 == nwnd)) {
++			if (max_alloc == wnd->nbits) {
++				wbits = wnd->bits_last;
++			} else {
++				size_t t = max_alloc & (wbits - 1);
 +
-+	if (unlikely(iw + 1 == nwnd)) {
-+		if (max_alloc == wnd->nbits)
-+			wbits = wnd->bits_last;
-+		else {
-+			size_t t = max_alloc & (wbits - 1);
-+
-+			if (t) {
-+				wbits = t;
-+				fbits_valid = false;
++				if (t) {
++					wbits = t;
++					fbits_valid = false;
++				}
 +			}
 +		}
-+	}
 +
-+	if (wnd->zone_end <= wnd->zone_bit)
-+		goto skip_zone;
++		if (wnd->zone_end > wnd->zone_bit) {
++			ebit = wbit + wbits;
++			zbit = max(wnd->zone_bit, wbit);
++			zend = min(wnd->zone_end, ebit);
 +
-+	ebit = wbit + wbits;
-+	zbit = max(wnd->zone_bit, wbit);
-+	zend = min(wnd->zone_end, ebit);
++			/* Here we have a window [wbit, ebit) and zone [zbit, zend) */
++			if (zend <= zbit) {
++				/* Zone does not overlap window */
++			} else {
++				wzbit = zbit - wbit;
++				wzend = zend - wbit;
 +
-+	/* Here we have a window [wbit, ebit) and zone [zbit, zend) */
-+	if (zend <= zbit) {
-+		/* Zone does not overlap window */
-+		goto skip_zone;
-+	}
++				/* Zone overlaps window */
++				if (wnd->free_bits[iw] == wzend - wzbit) {
++					prev_tail = 0;
++					wpos = 0;
++					continue;
++				}
 +
-+	wzbit = zbit - wbit;
-+	wzend = zend - wbit;
++				/* Scan two ranges window: [wbit, zbit) and [zend, ebit) */
++				bh = wnd_map(wnd, iw);
 +
-+	/* Zone overlaps window */
-+	if (wnd->free_bits[iw] == wzend - wzbit) {
-+		prev_tail = 0;
-+		wpos = 0;
-+		goto next_wnd;
-+	}
++				if (IS_ERR(bh)) {
++					/* TODO: error */
++					prev_tail = 0;
++					wpos = 0;
++					continue;
++				}
 +
-+	/* Scan two ranges window: [wbit, zbit) and [zend, ebit) */
-+	bh = wnd_map(wnd, iw);
++				buf = (ulong *)bh->b_data;
 +
-+	if (IS_ERR(bh)) {
-+		/* TODO: error */
-+		prev_tail = 0;
-+		wpos = 0;
-+		goto next_wnd;
-+	}
++				/* Scan range [wbit, zbit) */
++				if (wpos < wzbit) {
++					/* Scan range [wpos, zbit) */
++					fnd = wnd_scan(buf, wbit, wpos, wzbit,
++						       to_alloc, &prev_tail,
++						       &b_pos, &b_len);
++					if (fnd != MINUS_ONE_T) {
++						put_bh(bh);
++						goto found;
++					}
++				}
 +
-+	buf = (ulong *)bh->b_data;
++				prev_tail = 0;
 +
-+	/* Scan range [wbit, zbit) */
-+	if (wpos < wzbit) {
-+		/* Scan range [wpos, zbit) */
-+		fnd = wnd_scan(buf, wbit, wpos, wzbit, to_alloc, &prev_tail,
++				/* Scan range [zend, ebit) */
++				if (wzend < wbits) {
++					fnd = wnd_scan(buf, wbit,
++						       max(wzend, wpos), wbits,
++						       to_alloc, &prev_tail,
++						       &b_pos, &b_len);
++					if (fnd != MINUS_ONE_T) {
++						put_bh(bh);
++						goto found;
++					}
++				}
++
++				wpos = 0;
++				put_bh(bh);
++				continue;
++			}
++		}
++
++		/* Current window does not overlap zone */
++		if (!wpos && fbits_valid && wnd->free_bits[iw] == wbits) {
++			/* window is empty */
++			if (prev_tail + wbits >= to_alloc) {
++				fnd = wbit + wpos - prev_tail;
++				goto found;
++			}
++
++			/* Increase 'prev_tail' and process next window */
++			prev_tail += wbits;
++			wpos = 0;
++			continue;
++		}
++
++		/* read window */
++		bh = wnd_map(wnd, iw);
++		if (IS_ERR(bh)) {
++			// TODO: error
++			prev_tail = 0;
++			wpos = 0;
++			continue;
++		}
++
++		buf = (ulong *)bh->b_data;
++
++		/* Scan range [wpos, eBits) */
++		fnd = wnd_scan(buf, wbit, wpos, wbits, to_alloc, &prev_tail,
 +			       &b_pos, &b_len);
-+		if (fnd != MINUS_ONE_T) {
-+			put_bh(bh);
++		put_bh(bh);
++		if (fnd != MINUS_ONE_T)
 +			goto found;
-+		}
 +	}
 +
-+	prev_tail = 0;
-+
-+	/* Scan range [zend, ebit) */
-+	if (wzend < wbits) {
-+		fnd = wnd_scan(buf, wbit, max(wzend, wpos), wbits, to_alloc,
-+			       &prev_tail, &b_pos, &b_len);
-+		if (fnd != MINUS_ONE_T) {
-+			put_bh(bh);
-+			goto found;
-+		}
-+	}
-+
-+	wpos = 0;
-+	put_bh(bh);
-+	goto next_wnd;
-+
-+skip_zone:
-+	/* Current window does not overlap zone */
-+	if (!wpos && fbits_valid && wnd->free_bits[iw] == wbits) {
-+		/* window is empty */
-+		if (prev_tail + wbits >= to_alloc) {
-+			fnd = wbit + wpos - prev_tail;
-+			goto found;
-+		}
-+
-+		/* Increase 'prev_tail' and process next window */
-+		prev_tail += wbits;
-+		wpos = 0;
-+		goto next_wnd;
-+	}
-+
-+	/* read window */
-+	bh = wnd_map(wnd, iw);
-+	if (IS_ERR(bh)) {
-+		// TODO: error
-+		prev_tail = 0;
-+		wpos = 0;
-+		goto next_wnd;
-+	}
-+
-+	buf = (ulong *)bh->b_data;
-+
-+	/* Scan range [wpos, eBits) */
-+	fnd = wnd_scan(buf, wbit, wpos, wbits, to_alloc, &prev_tail, &b_pos,
-+		       &b_len);
-+	put_bh(bh);
-+	if (fnd != MINUS_ONE_T)
-+		goto found;
-+	goto next_wnd;
-+
-+estimate:
 +	if (b_len < prev_tail) {
 +		/* The last fragment */
 +		b_len = prev_tail;
@@ -1598,26 +1562,26 @@ index 000000000000..fe41e010b2eb
 +	if (!new_last)
 +		new_last = wbits;
 +
-+	if (new_wnd == wnd->nwnd)
-+		goto skip_reallocate;
++	if (new_wnd != wnd->nwnd) {
++		if (new_wnd <= ARRAY_SIZE(wnd->free_holder)) {
++			new_free = wnd->free_holder;
++		} else {
++			new_free = ntfs_alloc(new_wnd * sizeof(u16), 0);
++			if (!new_free)
++				return -ENOMEM;
++		}
 +
-+	if (new_wnd <= ARRAY_SIZE(wnd->free_holder))
-+		new_free = wnd->free_holder;
-+	else {
-+		new_free = ntfs_alloc(new_wnd * sizeof(u16), 0);
-+		if (!new_free)
-+			return -ENOMEM;
++		if (new_free != wnd->free_bits)
++			memcpy(new_free, wnd->free_bits,
++			       wnd->nwnd * sizeof(short));
++		memset(new_free + wnd->nwnd, 0,
++		       (new_wnd - wnd->nwnd) * sizeof(short));
++		if (wnd->free_bits != wnd->free_holder)
++			ntfs_free(wnd->free_bits);
++
++		wnd->free_bits = new_free;
 +	}
 +
-+	if (new_free != wnd->free_bits)
-+		memcpy(new_free, wnd->free_bits, wnd->nwnd * sizeof(short));
-+	memset(new_free + wnd->nwnd, 0, (new_wnd - wnd->nwnd) * sizeof(short));
-+	if (wnd->free_bits != wnd->free_holder)
-+		ntfs_free(wnd->free_bits);
-+
-+	wnd->free_bits = new_free;
-+
-+skip_reallocate:
 +	/* Zero bits [old_bits,new_bits) */
 +	bits = new_bits - old_bits;
 +	b0 = old_bits & (wbits - 1);
@@ -1762,13 +1726,13 @@ index 000000000000..fe41e010b2eb
 +	}
 +
 +out:
-+	range->len = done << sbi->cluster_bits;
++	range->len = (u64)done << sbi->cluster_bits;
 +
 +	up_read(&wnd->rw_lock);
 +
 +	return err;
 +}
 -- 
-2.25.2
+2.25.4
 
 

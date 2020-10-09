@@ -1,66 +1,67 @@
 From mboxrd@z Thu Jan  1 00:00:00 1970
-Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+Return-Path: <SRS0=IB9q=DQ=vger.kernel.org=linux-kernel-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CB4C433E7
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD30C433DF
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC917207DF
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:42:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC7C422314
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="sgZW9nbB"
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="K8iqEAyu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728161AbgH1Omf (ORCPT
+        id S2388721AbgJIOXN (ORCPT
         <rfc822;linux-kernel@archiver.kernel.org>);
-        Fri, 28 Aug 2020 10:42:35 -0400
-Received: from relaydlg-01.paragon-software.com ([81.5.88.159]:49826 "EHLO
-        relaydlg-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727957AbgH1Okh (ORCPT
+        Fri, 9 Oct 2020 10:23:13 -0400
+Received: from relayfre-01.paragon-software.com ([176.12.100.13]:52088 "EHLO
+        relayfre-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731820AbgJIOXK (ORCPT
         <rfc822;linux-kernel@vger.kernel.org>);
-        Fri, 28 Aug 2020 10:40:37 -0400
+        Fri, 9 Oct 2020 10:23:10 -0400
 Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
-        by relaydlg-01.paragon-software.com (Postfix) with ESMTPS id 4A39F82040;
-        Fri, 28 Aug 2020 17:40:15 +0300 (MSK)
+        by relayfre-01.paragon-software.com (Postfix) with ESMTPS id 7E2F52118;
+        Fri,  9 Oct 2020 17:23:07 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paragon-software.com; s=mail; t=1598625615;
-        bh=CuXwGA0MkObc5Qsav619OwalyrJr+uJfxc31FbSI1HU=;
+        d=paragon-software.com; s=mail; t=1602253387;
+        bh=Pb9YHvLAO/0hWDGmlW7R79g1VHpSm634mCFbEwLP8Zk=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=sgZW9nbBCRn7Gbqd0CQm10bmyvjMwVEwSK6m0YW3DRIKXt344hnFfnKtsyrSjLZsC
-         +l3dIN565TkD/cL5UY1CkJTDrPYl33PNzD6mX+e5dn0m15ESsLPBNrIuIlBxFLrpXx
-         tWd6bn+J6hyHW/1gyB99hQJg/lE2ma1qnSmsrahE=
-Received: from localhost.localdomain (172.30.8.44) by
+        b=K8iqEAyubrQJM+W04JG2mtsaqJsZb/lZ8Ui7Eh3rVOGV3puyP9UaVcoUi7eGqvh+e
+         Z1kLrDV7/XjxPTWmbGEqKcyDHt1pWJQVvCIrkTb10njKDjGQEJcaA79R6uw9JsfXRz
+         yL1sNcLGHP8QBhBDEA4Q5bV387EY4BILZntXoDnE=
+Received: from fsd-lkpg.ufsd.paragon-software.com (172.30.114.105) by
  vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1847.3; Fri, 28 Aug 2020 17:40:14 +0300
+ 15.1.1847.3; Fri, 9 Oct 2020 17:23:06 +0300
 From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 To:     <linux-fsdevel@vger.kernel.org>
 CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
         <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
         <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
-        <mark@harmstone.com>,
+        <mark@harmstone.com>, <nborisov@suse.com>,
+        <linux-ntfs-dev@lists.sourceforge.net>, <anton@tuxera.com>,
         Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-Subject: [PATCH v3 01/10] fs/ntfs3: Add headers and misc files
-Date:   Fri, 28 Aug 2020 07:39:29 -0700
-Message-ID: <20200828143938.102889-2-almaz.alexandrovich@paragon-software.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
-References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v8 01/10] fs/ntfs3: Add headers and misc files
+Date:   Fri, 9 Oct 2020 17:22:52 +0300
+Message-ID: <20201009142301.412454-2-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
+References: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.30.8.44]
-X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+X-Originating-IP: [172.30.114.105]
+X-ClientProxiedBy: vdlg-exch-02.paragon-software.com (172.30.1.105) To
  vdlg-exch-02.paragon-software.com (172.30.1.105)
-Sender: linux-kernel-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kernel.vger.kernel.org>
 X-Mailing-List: linux-kernel@vger.kernel.org
-Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-2-almaz.alexandrovich@paragon-software.com/>
+Archived-At: <https://lore.kernel.org/lkml/20201009142301.412454-2-almaz.alexandrovich@paragon-software.com/>
 List-Archive: <https://lore.kernel.org/lkml/>
 List-Post: <mailto:linux-kernel@vger.kernel.org>
 
@@ -68,11 +69,11 @@ This adds headers and misc files
 
 Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 ---
- fs/ntfs3/debug.h   |   45 ++
- fs/ntfs3/ntfs.h    | 1249 ++++++++++++++++++++++++++++++++++++++++++++
- fs/ntfs3/ntfs_fs.h | 1001 +++++++++++++++++++++++++++++++++++
+ fs/ntfs3/debug.h   |   62 +++
+ fs/ntfs3/ntfs.h    | 1295 ++++++++++++++++++++++++++++++++++++++++++++
+ fs/ntfs3/ntfs_fs.h |  984 +++++++++++++++++++++++++++++++++
  fs/ntfs3/upcase.c  |   78 +++
- 4 files changed, 2373 insertions(+)
+ 4 files changed, 2419 insertions(+)
  create mode 100644 fs/ntfs3/debug.h
  create mode 100644 fs/ntfs3/ntfs.h
  create mode 100644 fs/ntfs3/ntfs_fs.h
@@ -80,10 +81,10 @@ Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 
 diff --git a/fs/ntfs3/debug.h b/fs/ntfs3/debug.h
 new file mode 100644
-index 000000000000..eff8e52b1560
+index 000000000000..b23cae11eba7
 --- /dev/null
 +++ b/fs/ntfs3/debug.h
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,62 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + *  linux/fs/ntfs3/debug.h
@@ -93,21 +94,23 @@ index 000000000000..eff8e52b1560
 + * useful functions for debuging
 + */
 +
++// clang-format off
 +#ifndef Add2Ptr
-+#define Add2Ptr(P, I) (void *)((u8 *)(P) + (I))
-+#define PtrOffset(B, O) ((size_t)((size_t)(O) - (size_t)(B)))
++#define Add2Ptr(P, I)		(void *)((u8 *)(P) + (I))
++#define PtrOffset(B, O)		((size_t)((size_t)(O) - (size_t)(B)))
 +#endif
 +
-+#define QuadAlign(n) (((n) + 7u) & (~7u))
-+#define IsQuadAligned(n) (!((size_t)(n)&7u))
-+#define Quad2Align(n) (((n) + 15u) & (~15u))
-+#define IsQuad2Aligned(n) (!((size_t)(n)&15u))
-+#define Quad4Align(n) (((n) + 31u) & (~31u))
-+#define IsSizeTAligned(n) (!((size_t)(n) & (sizeof(size_t) - 1)))
-+#define DwordAlign(n) (((n) + 3u) & (~3u))
-+#define IsDwordAligned(n) (!((size_t)(n)&3u))
-+#define WordAlign(n) (((n) + 1u) & (~1u))
-+#define IsWordAligned(n) (!((size_t)(n)&1u))
++#define QuadAlign(n)		(((n) + 7u) & (~7u))
++#define IsQuadAligned(n)	(!((size_t)(n)&7u))
++#define Quad2Align(n)		(((n) + 15u) & (~15u))
++#define IsQuad2Aligned(n)	(!((size_t)(n)&15u))
++#define Quad4Align(n)		(((n) + 31u) & (~31u))
++#define IsSizeTAligned(n)	(!((size_t)(n) & (sizeof(size_t) - 1)))
++#define DwordAlign(n)		(((n) + 3u) & (~3u))
++#define IsDwordAligned(n)	(!((size_t)(n)&3u))
++#define WordAlign(n)		(((n) + 1u) & (~1u))
++#define IsWordAligned(n)	(!((size_t)(n)&1u))
++// clang-format on
 +
 +#ifdef CONFIG_PRINTK
 +__printf(2, 3) void ntfs_printk(const struct super_block *sb, const char *fmt,
@@ -126,15 +129,30 @@ index 000000000000..eff8e52b1560
 +}
 +#endif
 +
++/*
++ * Logging macros ( thanks Joe Perches <joe@perches.com> for implementation )
++ */
++
++#define ntfs_err(sb, fmt, ...) ntfs_printk(sb, KERN_ERR fmt, ##__VA_ARGS__)
++#define ntfs_warn(sb, fmt, ...) ntfs_printk(sb, KERN_WARNING fmt, ##__VA_ARGS__)
++#define ntfs_info(sb, fmt, ...) ntfs_printk(sb, KERN_INFO fmt, ##__VA_ARGS__)
++#define ntfs_notice(sb, fmt, ...)                                              \
++	ntfs_printk(sb, KERN_NOTICE fmt, ##__VA_ARGS__)
++
++#define ntfs_inode_err(inode, fmt, ...)                                        \
++	ntfs_inode_printk(inode, KERN_ERR fmt, ##__VA_ARGS__)
++#define ntfs_inode_warn(inode, fmt, ...)                                       \
++	ntfs_inode_printk(inode, KERN_WARNING fmt, ##__VA_ARGS__)
++
 +#define ntfs_alloc(s, z) kmalloc(s, z ? (GFP_NOFS | __GFP_ZERO) : GFP_NOFS)
 +#define ntfs_free(p) kfree(p)
 +#define ntfs_memdup(src, len) kmemdup(src, len, GFP_NOFS)
 diff --git a/fs/ntfs3/ntfs.h b/fs/ntfs3/ntfs.h
 new file mode 100644
-index 000000000000..d7fac44adfa3
+index 000000000000..645a492fc1b9
 --- /dev/null
 +++ b/fs/ntfs3/ntfs.h
-@@ -0,0 +1,1249 @@
+@@ -0,0 +1,1295 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + *  linux/fs/ntfs3/ntfs.h
@@ -184,16 +202,22 @@ index 000000000000..d7fac44adfa3
 +	u8 Data4[8];
 +};
 +
-+struct le_str {
-+	u8 len;
-+	u8 unused;
-+	__le16 name[20];
-+};
-+
++/*
++ * this struct repeats layout of ATTR_FILE_NAME
++ * at offset 0x40
++ * it used to store global constants NAME_MFT/NAME_MIRROR...
++ * most constant names are shorter than 10
++ */
 +struct cpu_str {
 +	u8 len;
 +	u8 unused;
-+	u16 name[20];
++	u16 name[10];
++};
++
++struct le_str {
++	u8 len;
++	u8 unused;
++	__le16 name[1];
 +};
 +
 +static_assert(SECTOR_SHIFT == 9);
@@ -756,13 +780,13 @@ index 000000000000..d7fac44adfa3
 +		struct {
 +			__le16 data_off; // 0x00:
 +			__le16 data_size; // 0x02:
-+			__le32 Res; // 0x04: must be 0
-+		} View;
++			__le32 res; // 0x04: must be 0
++		} view;
 +	};
 +	__le16 size; // 0x08: The size of this entry
 +	__le16 key_size; // 0x0A: The size of File name length in bytes + 0x42
 +	__le16 flags; // 0x0C: Entry flags, 1=subnodes, 2=last
-+	__le16 Reserved; // 0x0E:
++	__le16 res; // 0x0E:
 +
 +	// Here any indexed attribute can be placed
 +	// One of them is:
@@ -1353,6 +1377,7 @@ index 000000000000..d7fac44adfa3
 +
 +static inline u32 ntfs_reparse_bytes(u32 uni_len)
 +{
++	/* two unicode strings + header */
 +	return sizeof(short) * (2 * uni_len + 4) +
 +	       offsetof(struct REPARSE_DATA_BUFFER,
 +			SymbolicLink2ReparseBuffer.PathBuffer);
@@ -1384,12 +1409,51 @@ index 000000000000..d7fac44adfa3
 +static_assert(offsetof(struct EA_FULL, name) == 8);
 +
 +#define MAX_EA_DATA_SIZE (256 * 1024)
++
++#define ACL_REVISION 2
++
++#define SE_SELF_RELATIVE 0x8000
++
++struct SECURITY_DESCRIPTOR_RELATIVE {
++	u8 Revision;
++	u8 Sbz1;
++	__le16 Control;
++	__le32 Owner;
++	__le32 Group;
++	__le32 Sacl;
++	__le32 Dacl;
++};
++static_assert(sizeof(struct SECURITY_DESCRIPTOR_RELATIVE) == 0x14);
++
++struct ACE_HEADER {
++	u8 AceType;
++	u8 AceFlags;
++	__le16 AceSize;
++};
++static_assert(sizeof(struct ACE_HEADER) == 4);
++
++struct ACL {
++	u8 AclRevision;
++	u8 Sbz1;
++	__le16 AclSize;
++	__le16 AceCount;
++	__le16 Sbz2;
++};
++static_assert(sizeof(struct ACL) == 8);
++
++struct SID {
++	u8 Revision;
++	u8 SubAuthorityCount;
++	u8 IdentifierAuthority[6];
++	__le32 SubAuthority[1];
++};
++static_assert(offsetof(struct SID, SubAuthority) == 8);
 diff --git a/fs/ntfs3/ntfs_fs.h b/fs/ntfs3/ntfs_fs.h
 new file mode 100644
-index 000000000000..a28ccc36b288
+index 000000000000..bf26ee5f2172
 --- /dev/null
 +++ b/fs/ntfs3/ntfs_fs.h
-@@ -0,0 +1,1001 @@
+@@ -0,0 +1,984 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + *  linux/fs/ntfs3/ntfs_fs.h
@@ -1423,7 +1487,9 @@ index 000000000000..a28ccc36b288
 +struct ntfs_sb_info;
 +struct lznt;
 +
-+struct mount_options {
++struct ntfs_mount_options {
++	struct nls_table *nls[2];
++
 +	kuid_t fs_uid;
 +	kgid_t fs_gid;
 +	u16 fs_fmask_inv;
@@ -1498,12 +1564,12 @@ index 000000000000..a28ccc36b288
 +	size_t extent_min; // Minimal extent used while building
 +	size_t extent_max; // Upper estimate of biggest free block
 +
-+	bool set_tail; // not necessary in driver
-+	bool inited;
-+
 +	/* Zone [bit, end) */
 +	size_t zone_bit;
 +	size_t zone_end;
++
++	bool set_tail; // not necessary in driver
++	bool inited;
 +};
 +
 +typedef int (*NTFS_CMP_FUNC)(const void *key1, size_t len1, const void *key2,
@@ -1535,30 +1601,13 @@ index 000000000000..a28ccc36b288
 +};
 +
 +/* Set when $LogFile is replaying */
-+#define NTFS_FLAGS_LOG_REPLAING 0x00000008
++#define NTFS_FLAGS_LOG_REPLAYING 0x00000008
 +
 +/* Set when we changed first MFT's which copy must be updated in $MftMirr */
 +#define NTFS_FLAGS_MFTMIRR 0x00001000
 +
 +/* Minimum mft zone */
 +#define NTFS_MIN_MFT_ZONE 100
-+
-+struct COMPRESS_CTX {
-+	u64 chunk_num; // Number of chunk cmpr_buffer/unc_buffer
-+	u64 first_chunk, last_chunk, total_chunks;
-+	u64 chunk0_off;
-+	void *ctx;
-+	u8 *cmpr_buffer;
-+	u8 *unc_buffer;
-+	void *chunk_off_mem;
-+	size_t chunk_off;
-+	u32 *chunk_off32; // pointer inside ChunkOffsetsMem
-+	u64 *chunk_off64; // pointer inside ChunkOffsetsMem
-+	u32 compress_format;
-+	u32 offset_bits;
-+	u32 chunk_bits;
-+	u32 chunk_size;
-+};
 +
 +/* ntfs file system in-core superblock data */
 +struct ntfs_sb_info {
@@ -1604,8 +1653,6 @@ index 000000000000..a28ccc36b288
 +
 +	u16 *upcase;
 +
-+	struct nls_table *nls; /*use utf8 if nls==NULL*/
-+
 +	struct {
 +		u64 lbo, lbo2;
 +		struct ntfs_inode *ni;
@@ -1642,8 +1689,7 @@ index 000000000000..a28ccc36b288
 +		u32 next_id;
 +		u64 next_off;
 +
-+		__le32 def_file_id;
-+		__le32 def_dir_id;
++		__le32 def_security_id;
 +	} security;
 +
 +	struct {
@@ -1664,7 +1710,7 @@ index 000000000000..a28ccc36b288
 +		struct lznt *ctx;
 +	} compress;
 +
-+	struct mount_options options;
++	struct ntfs_mount_options options;
 +	struct ratelimit_state msg_ratelimit;
 +};
 +
@@ -1715,7 +1761,7 @@ index 000000000000..a28ccc36b288
 +
 +	struct {
 +		struct runs_tree run;
-+		void *le; // 1K aligned memory
++		struct ATTR_LIST_ENTRY *le; // 1K aligned memory
 +		size_t size;
 +		bool dirty;
 +	} attr_list;
@@ -1755,8 +1801,8 @@ index 000000000000..a28ccc36b288
 +		  const __le16 *name, u8 name_len, struct runs_tree *run,
 +		  u64 new_size, const u64 *new_valid, bool keep_prealloc,
 +		  struct ATTRIB **ret);
-+int attr_data_get_block(struct ntfs_inode *ni, CLST vcn, CLST *lcn, CLST *len,
-+			bool *new);
++int attr_data_get_block(struct ntfs_inode *ni, CLST vcn, CLST clen, CLST *lcn,
++			CLST *len, bool *new);
 +int attr_load_runs_vcn(struct ntfs_inode *ni, enum ATTR_TYPE type,
 +		       const __le16 *name, u8 name_len, struct runs_tree *run,
 +		       CLST vcn);
@@ -1804,8 +1850,6 @@ index 000000000000..a28ccc36b288
 +		      enum utf16_endian endian);
 +struct inode *dir_search_u(struct inode *dir, const struct cpu_str *uni,
 +			   struct ntfs_fnd *fnd);
-+struct inode *dir_search(struct inode *dir, const struct qstr *name,
-+			 struct ntfs_fnd *fnd);
 +bool dir_is_empty(struct inode *dir);
 +extern const struct file_operations ntfs_dir_operations;
 +
@@ -1827,6 +1871,7 @@ index 000000000000..a28ccc36b288
 +/* globals from frecord.c */
 +void ni_remove_mi(struct ntfs_inode *ni, struct mft_inode *mi);
 +struct ATTR_STD_INFO *ni_std(struct ntfs_inode *ni);
++struct ATTR_STD_INFO5 *ni_std5(struct ntfs_inode *ni);
 +void ni_clear(struct ntfs_inode *ni);
 +int ni_load_mi_ex(struct ntfs_inode *ni, CLST rno, struct mft_inode **mi);
 +int ni_load_mi(struct ntfs_inode *ni, struct ATTR_LIST_ENTRY *le,
@@ -1866,7 +1911,6 @@ index 000000000000..a28ccc36b288
 +struct ATTR_FILE_NAME *ni_fname_type(struct ntfs_inode *ni, u8 name_type,
 +				     struct ATTR_LIST_ENTRY **entry);
 +u16 ni_fnames_count(struct ntfs_inode *ni);
-+int ni_init_compress(struct ntfs_inode *ni, struct COMPRESS_CTX *ctx);
 +enum REPARSE_SIGN ni_parse_reparse(struct ntfs_inode *ni, struct ATTRIB *attr,
 +				   void *buffer);
 +int ni_write_inode(struct inode *inode, int sync, const char *hint);
@@ -1874,7 +1918,7 @@ index 000000000000..a28ccc36b288
 +int ni_fiemap(struct ntfs_inode *ni, struct fiemap_extent_info *fieinfo,
 +	      __u64 vbo, __u64 len);
 +int ni_readpage_cmpr(struct ntfs_inode *ni, struct page *page);
-+int ni_writepage_cmpr(struct page *page, int sync);
++int ni_write_frame(struct ntfs_inode *ni, struct page **pages, u32 npages);
 +
 +/* globals from fslog.c */
 +int log_replay(struct ntfs_inode *ni);
@@ -1897,38 +1941,40 @@ index 000000000000..a28ccc36b288
 +int ntfs_refresh_zone(struct ntfs_sb_info *sbi);
 +int ntfs_update_mftmirr(struct ntfs_sb_info *sbi, int wait);
 +enum NTFS_DIRTY_FLAGS {
-+	NTFS_DIRTY_DIRTY = 0,
-+	NTFS_DIRTY_CLEAR = 1,
++	NTFS_DIRTY_CLEAR = 0,
++	NTFS_DIRTY_DIRTY = 1,
 +	NTFS_DIRTY_ERROR = 2,
 +};
 +int ntfs_set_state(struct ntfs_sb_info *sbi, enum NTFS_DIRTY_FLAGS dirty);
 +int ntfs_sb_read(struct super_block *sb, u64 lbo, size_t bytes, void *buffer);
 +int ntfs_sb_write(struct super_block *sb, u64 lbo, size_t bytes,
 +		  const void *buffer, int wait);
-+int ntfs_sb_write_run(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
-+		      const void *buf, size_t bytes);
++int ntfs_sb_write_run(struct ntfs_sb_info *sbi, const struct runs_tree *run,
++		      u64 vbo, const void *buf, size_t bytes);
 +struct buffer_head *ntfs_bread_run(struct ntfs_sb_info *sbi,
-+				   struct runs_tree *run, u64 vbo);
-+int ntfs_read_run_nb(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
-+		     void *buf, u32 bytes, struct ntfs_buffers *nb);
-+int ntfs_read_bh_ex(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
-+		    struct NTFS_RECORD_HEADER *rhdr, u32 bytes,
-+		    struct ntfs_buffers *nb);
-+int ntfs_get_bh(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
++				   const struct runs_tree *run, u64 vbo);
++int ntfs_read_run_nb(struct ntfs_sb_info *sbi, const struct runs_tree *run,
++		     u64 vbo, void *buf, u32 bytes, struct ntfs_buffers *nb);
++int ntfs_read_bh(struct ntfs_sb_info *sbi, const struct runs_tree *run, u64 vbo,
++		 struct NTFS_RECORD_HEADER *rhdr, u32 bytes,
++		 struct ntfs_buffers *nb);
++int ntfs_get_bh(struct ntfs_sb_info *sbi, const struct runs_tree *run, u64 vbo,
 +		u32 bytes, struct ntfs_buffers *nb);
-+int ntfs_write_bh_ex(struct ntfs_sb_info *sbi, struct NTFS_RECORD_HEADER *rhdr,
-+		     struct ntfs_buffers *nb, int sync);
-+int ntfs_vbo_to_lbo(struct ntfs_sb_info *sbi, struct runs_tree *run, u64 vbo,
-+		    u64 *lbo, u64 *bytes);
++int ntfs_write_bh(struct ntfs_sb_info *sbi, struct NTFS_RECORD_HEADER *rhdr,
++		  struct ntfs_buffers *nb, int sync);
++int ntfs_vbo_to_lbo(struct ntfs_sb_info *sbi, const struct runs_tree *run,
++		    u64 vbo, u64 *lbo, u64 *bytes);
 +struct ntfs_inode *ntfs_new_inode(struct ntfs_sb_info *sbi, CLST nRec,
 +				  bool dir);
-+extern const u8 s_dir_security[0x50];
-+extern const u8 s_file_security[0x58];
++extern const u8 s_default_security[0x50];
++bool is_sd_valid(const struct SECURITY_DESCRIPTOR_RELATIVE *sd, u32 len);
 +int ntfs_security_init(struct ntfs_sb_info *sbi);
-+int ntfs_get_security_by_id(struct ntfs_sb_info *sbi, u32 security_id,
-+			    void **sd, size_t *size);
-+int ntfs_insert_security(struct ntfs_sb_info *sbi, const void *sd, u32 size,
-+			 __le32 *security_id, bool *inserted);
++int ntfs_get_security_by_id(struct ntfs_sb_info *sbi, __le32 security_id,
++			    struct SECURITY_DESCRIPTOR_RELATIVE **sd,
++			    size_t *size);
++int ntfs_insert_security(struct ntfs_sb_info *sbi,
++			 const struct SECURITY_DESCRIPTOR_RELATIVE *sd,
++			 u32 size, __le32 *security_id, bool *inserted);
 +int ntfs_reparse_init(struct ntfs_sb_info *sbi);
 +int ntfs_objid_init(struct ntfs_sb_info *sbi);
 +int ntfs_objid_remove(struct ntfs_sb_info *sbi, struct GUID *guid);
@@ -1983,7 +2029,7 @@ index 000000000000..a28ccc36b288
 +		      struct inode *i2);
 +int inode_write_data(struct inode *inode, const void *data, size_t bytes);
 +int ntfs_create_inode(struct inode *dir, struct dentry *dentry,
-+		      struct file *file, umode_t mode, dev_t dev,
++		      const struct cpu_str *uni, umode_t mode, dev_t dev,
 +		      const char *symname, unsigned int size, int excl,
 +		      struct ntfs_fnd *fnd, struct inode **new_inode);
 +int ntfs_link_inode(struct inode *inode, struct dentry *dentry);
@@ -1995,7 +2041,8 @@ index 000000000000..a28ccc36b288
 +extern const struct address_space_operations ntfs_aops_cmpr;
 +
 +/* globals from name_i.c*/
-+int fill_name_de(struct ntfs_sb_info *sbi, void *buf, const struct qstr *name);
++int fill_name_de(struct ntfs_sb_info *sbi, void *buf, const struct qstr *name,
++		 const struct cpu_str *uni);
 +struct dentry *ntfs_get_parent(struct dentry *child);
 +
 +extern const struct inode_operations ntfs_dir_inode_operations;
@@ -2121,7 +2168,7 @@ index 000000000000..a28ccc36b288
 +
 +char *attr_str(const struct ATTRIB *attr, char *buf, size_t buf_len);
 +
-+static inline bool is_nt5(struct ntfs_sb_info *sbi)
++static inline bool is_ntfs3(struct ntfs_sb_info *sbi)
 +{
 +	return sbi->volume.major_ver >= 3;
 +}
@@ -2284,8 +2331,8 @@ index 000000000000..a28ccc36b288
 +	if (bh)
 +		return bh;
 +
-+	ntfs_printk(sb, KERN_ERR "failed to read volume at offset 0x%llx",
-+		    (u64)block << sb->s_blocksize_bits);
++	ntfs_err(sb, "failed to read volume at offset 0x%llx",
++		 (u64)block << sb->s_blocksize_bits);
 +	return NULL;
 +}
 +
@@ -2393,7 +2440,7 @@ index 000000000000..a28ccc36b288
 +}
 diff --git a/fs/ntfs3/upcase.c b/fs/ntfs3/upcase.c
 new file mode 100644
-index 000000000000..0bb8d75b8abb
+index 000000000000..16e05a27c423
 --- /dev/null
 +++ b/fs/ntfs3/upcase.c
 @@ -0,0 +1,78 @@
@@ -2419,7 +2466,7 @@ index 000000000000..0bb8d75b8abb
 +		return chr;
 +
 +	if (chr <= 'z')
-+		return (u16)(chr - ('a' - 'A'));
++		return chr - ('a' - 'A');
 +
 +	return upcase[chr];
 +}
@@ -2476,6 +2523,6 @@ index 000000000000..0bb8d75b8abb
 +	return l1 - l2;
 +}
 -- 
-2.25.2
+2.25.4
 
 

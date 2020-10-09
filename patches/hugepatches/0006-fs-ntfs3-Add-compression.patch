@@ -1,66 +1,67 @@
 From mboxrd@z Thu Jan  1 00:00:00 1970
-Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+Return-Path: <SRS0=IB9q=DQ=vger.kernel.org=linux-kernel-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 568E6C433E6
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADC9C433DF
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21E56207DF
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:41:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82423222D9
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="GRxDe/bE"
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="ubZgKEs9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727846AbgH1OlW (ORCPT
+        id S2388744AbgJIOXZ (ORCPT
         <rfc822;linux-kernel@archiver.kernel.org>);
-        Fri, 28 Aug 2020 10:41:22 -0400
-Received: from relaydlg-01.paragon-software.com ([81.5.88.159]:49856 "EHLO
+        Fri, 9 Oct 2020 10:23:25 -0400
+Received: from relaydlg-01.paragon-software.com ([81.5.88.159]:42941 "EHLO
         relaydlg-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727996AbgH1Ok0 (ORCPT
+        by vger.kernel.org with ESMTP id S2388664AbgJIOXN (ORCPT
         <rfc822;linux-kernel@vger.kernel.org>);
-        Fri, 28 Aug 2020 10:40:26 -0400
+        Fri, 9 Oct 2020 10:23:13 -0400
 Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
-        by relaydlg-01.paragon-software.com (Postfix) with ESMTPS id E28F08220D;
-        Fri, 28 Aug 2020 17:40:18 +0300 (MSK)
+        by relaydlg-01.paragon-software.com (Postfix) with ESMTPS id 5F7EA82380;
+        Fri,  9 Oct 2020 17:23:09 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paragon-software.com; s=mail; t=1598625618;
-        bh=LwSP4sdGEoS5blbdBK1kStl5SsPyV2Y9wuIW/kU72AY=;
+        d=paragon-software.com; s=mail; t=1602253389;
+        bh=Q+KG5Z18YE2u9rcMb4sDFDVT+T/QQmZPhoMCAzYzTjI=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=GRxDe/bEIFVvm93zIXe7C57qSgw61dNNQUya9rycM+MWngk15cF72TP2Rx/TElj1u
-         x3aNx4IfXze0InqIUgPDrAlM6f/2yufM0WGrqzEnOR6yhlGkm6qjie6wyS2Tf708pL
-         G9/Zs3jkSFxin1PtMRgazkICXpfG07dh1R30BtSk=
-Received: from localhost.localdomain (172.30.8.44) by
+        b=ubZgKEs9sl4qWgBpc665Q1lo9fuzKb0JzcOeAQki9sCJWrD9KBBSi/f1TikmsKjug
+         VJ1LY1yW/A9thWvME/EOeqoAs+jUVHIjiVXm1qezUe4gEC+OOaVPJYIdnR+8dBZKsX
+         nYzoRW2hl+58Nk+T0/hyMyuTxbMlpMOZpuUjynks=
+Received: from fsd-lkpg.ufsd.paragon-software.com (172.30.114.105) by
  vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1847.3; Fri, 28 Aug 2020 17:40:18 +0300
+ 15.1.1847.3; Fri, 9 Oct 2020 17:23:08 +0300
 From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 To:     <linux-fsdevel@vger.kernel.org>
 CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
         <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
         <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
-        <mark@harmstone.com>,
+        <mark@harmstone.com>, <nborisov@suse.com>,
+        <linux-ntfs-dev@lists.sourceforge.net>, <anton@tuxera.com>,
         Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-Subject: [PATCH v3 06/10] fs/ntfs3: Add compression
-Date:   Fri, 28 Aug 2020 07:39:34 -0700
-Message-ID: <20200828143938.102889-7-almaz.alexandrovich@paragon-software.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
-References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v8 06/10] fs/ntfs3: Add compression
+Date:   Fri, 9 Oct 2020 17:22:57 +0300
+Message-ID: <20201009142301.412454-7-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
+References: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.30.8.44]
-X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+X-Originating-IP: [172.30.114.105]
+X-ClientProxiedBy: vdlg-exch-02.paragon-software.com (172.30.1.105) To
  vdlg-exch-02.paragon-software.com (172.30.1.105)
-Sender: linux-kernel-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kernel.vger.kernel.org>
 X-Mailing-List: linux-kernel@vger.kernel.org
-Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-7-almaz.alexandrovich@paragon-software.com/>
+Archived-At: <https://lore.kernel.org/lkml/20201009142301.412454-7-almaz.alexandrovich@paragon-software.com/>
 List-Archive: <https://lore.kernel.org/lkml/>
 List-Post: <mailto:linux-kernel@vger.kernel.org>
 
@@ -68,16 +69,16 @@ This adds compression
 
 Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 ---
- fs/ntfs3/lznt.c | 451 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 451 insertions(+)
+ fs/ntfs3/lznt.c | 452 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 452 insertions(+)
  create mode 100644 fs/ntfs3/lznt.c
 
 diff --git a/fs/ntfs3/lznt.c b/fs/ntfs3/lznt.c
 new file mode 100644
-index 000000000000..123ee648dc38
+index 000000000000..c9bdecfb1294
 --- /dev/null
 +++ b/fs/ntfs3/lznt.c
-@@ -0,0 +1,451 @@
+@@ -0,0 +1,452 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/lznt.c
@@ -156,8 +157,9 @@ index 000000000000..123ee648dc38
 +	if (len1 < len2) {
 +		ctx->best_match = hash[1];
 +		len1 = len2;
-+	} else
++	} else {
 +		ctx->best_match = hash[0];
++	}
 +
 +	hash[1] = hash[0];
 +	hash[0] = src;
@@ -530,6 +532,6 @@ index 000000000000..123ee648dc38
 +	return PtrOffset(unc, unc_chunk);
 +}
 -- 
-2.25.2
+2.25.4
 
 

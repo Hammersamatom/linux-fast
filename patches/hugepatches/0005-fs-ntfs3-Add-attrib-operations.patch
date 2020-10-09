@@ -1,66 +1,67 @@
 From mboxrd@z Thu Jan  1 00:00:00 1970
-Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+Return-Path: <SRS0=IB9q=DQ=vger.kernel.org=linux-kernel-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0527C433E6
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7280C4363A
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A879F207DF
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76B932222F
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="DaqZcY/g"
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="jZW0dE3V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728034AbgH1Okv (ORCPT
+        id S2388795AbgJIOXu (ORCPT
         <rfc822;linux-kernel@archiver.kernel.org>);
-        Fri, 28 Aug 2020 10:40:51 -0400
-Received: from relayfre-01.paragon-software.com ([176.12.100.13]:57876 "EHLO
-        relayfre-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727993AbgH1OkZ (ORCPT
+        Fri, 9 Oct 2020 10:23:50 -0400
+Received: from relaydlg-01.paragon-software.com ([81.5.88.159]:42931 "EHLO
+        relaydlg-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388579AbgJIOXY (ORCPT
         <rfc822;linux-kernel@vger.kernel.org>);
-        Fri, 28 Aug 2020 10:40:25 -0400
+        Fri, 9 Oct 2020 10:23:24 -0400
 Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
-        by relayfre-01.paragon-software.com (Postfix) with ESMTPS id A4B9E1B9;
-        Fri, 28 Aug 2020 17:40:18 +0300 (MSK)
+        by relaydlg-01.paragon-software.com (Postfix) with ESMTPS id 50B1F8237F;
+        Fri,  9 Oct 2020 17:23:09 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paragon-software.com; s=mail; t=1598625618;
-        bh=/t4sPA01hNgMGmZJD3a0RryK9fmW0BVXNjbt4u70WEg=;
+        d=paragon-software.com; s=mail; t=1602253389;
+        bh=tH1JDRHTaLQKShSXLEr9X6IYqo+MWZr0n2q7S1+K9j8=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=DaqZcY/gDsbSEa9DWz0WjHJZjwKWYC8hjj/HIzIc2RGurSh7pf7W97zTV27wWuT1H
-         qlaIYKluIY4LC8MBdUUVg+NDuIXV3agFFE1GRSvdNK8w8gI39qd2zZbNZom8C5TloA
-         IwPzOrXnDIYCciOW833VB9C02rhmWDS33el1gyE0=
-Received: from localhost.localdomain (172.30.8.44) by
+        b=jZW0dE3VLMolCrYVJZzwylsBc7nAHmsEE83b7Si6dRUuR7wgWfPFyt2wVXSU9RBS+
+         E/mFPCarXfmWI4/Zhex70BFx47UfXqe5AQqJNRmPsBJ9HJB3IpfK5roq6VPcqyEeKK
+         lAnJsByyqSCZyBSu2/0nhAdWC1txZaFiubrNYy50=
+Received: from fsd-lkpg.ufsd.paragon-software.com (172.30.114.105) by
  vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1847.3; Fri, 28 Aug 2020 17:40:17 +0300
+ 15.1.1847.3; Fri, 9 Oct 2020 17:23:08 +0300
 From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 To:     <linux-fsdevel@vger.kernel.org>
 CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
         <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
         <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
-        <mark@harmstone.com>,
+        <mark@harmstone.com>, <nborisov@suse.com>,
+        <linux-ntfs-dev@lists.sourceforge.net>, <anton@tuxera.com>,
         Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-Subject: [PATCH v3 05/10] fs/ntfs3: Add attrib operations
-Date:   Fri, 28 Aug 2020 07:39:33 -0700
-Message-ID: <20200828143938.102889-6-almaz.alexandrovich@paragon-software.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
-References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v8 05/10] fs/ntfs3: Add attrib operations
+Date:   Fri, 9 Oct 2020 17:22:56 +0300
+Message-ID: <20201009142301.412454-6-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
+References: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.30.8.44]
-X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+X-Originating-IP: [172.30.114.105]
+X-ClientProxiedBy: vdlg-exch-02.paragon-software.com (172.30.1.105) To
  vdlg-exch-02.paragon-software.com (172.30.1.105)
-Sender: linux-kernel-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kernel.vger.kernel.org>
 X-Mailing-List: linux-kernel@vger.kernel.org
-Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-6-almaz.alexandrovich@paragon-software.com/>
+Archived-At: <https://lore.kernel.org/lkml/20201009142301.412454-6-almaz.alexandrovich@paragon-software.com/>
 List-Archive: <https://lore.kernel.org/lkml/>
 List-Post: <mailto:linux-kernel@vger.kernel.org>
 
@@ -68,20 +69,20 @@ This adds attrib operations
 
 Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 ---
- fs/ntfs3/attrib.c   | 1285 +++++++++++++++++++++++++++++++++++++++++++
- fs/ntfs3/attrlist.c |  462 ++++++++++++++++
- fs/ntfs3/xattr.c    | 1007 +++++++++++++++++++++++++++++++++
- 3 files changed, 2754 insertions(+)
+ fs/ntfs3/attrib.c   | 1325 +++++++++++++++++++++++++++++++++++++++++++
+ fs/ntfs3/attrlist.c |  462 +++++++++++++++
+ fs/ntfs3/xattr.c    | 1060 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 2847 insertions(+)
  create mode 100644 fs/ntfs3/attrib.c
  create mode 100644 fs/ntfs3/attrlist.c
  create mode 100644 fs/ntfs3/xattr.c
 
 diff --git a/fs/ntfs3/attrib.c b/fs/ntfs3/attrib.c
 new file mode 100644
-index 000000000000..3a61dbbe2b5f
+index 000000000000..a7dc84626af0
 --- /dev/null
 +++ b/fs/ntfs3/attrib.c
-@@ -0,0 +1,1285 @@
+@@ -0,0 +1,1325 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/attrib.c
@@ -477,13 +478,10 @@ index 000000000000..3a61dbbe2b5f
 +	if (!attr_b->non_res) {
 +		err = attr_set_size_res(ni, attr_b, le_b, mi_b, new_size, run,
 +					&attr_b);
-+		if (err)
++		if (err || !attr_b->non_res)
 +			goto out;
 +
-+		if (!attr_b->non_res)
-+			goto out;
-+
-+		/* Resident attribute becomes non resident */
++		/* layout of records may be changed, so do a full search */
 +		goto again;
 +	}
 +
@@ -646,7 +644,7 @@ index 000000000000..3a61dbbe2b5f
 +
 +		/* at least two mft to avoid recursive loop*/
 +		if (is_mft && next_svcn == vcn &&
-+		    (done << sbi->cluster_bits) >= 2 * sbi->record_size) {
++		    ((u64)done << sbi->cluster_bits) >= 2 * sbi->record_size) {
 +			new_size = new_alloc_tmp;
 +			attr_b->nres.data_size = attr_b->nres.alloc_size;
 +			goto ok;
@@ -657,6 +655,10 @@ index 000000000000..3a61dbbe2b5f
 +			evcn = old_alen - 1;
 +			goto add_alloc_in_same_attr_seg;
 +		}
++
++		attr_b->nres.data_size = attr_b->nres.alloc_size;
++		if (new_alloc_tmp < old_valid)
++			attr_b->nres.valid_size = attr_b->nres.data_size;
 +
 +		if (type == ATTR_LIST) {
 +			err = ni_expand_list(ni);
@@ -704,7 +706,7 @@ index 000000000000..3a61dbbe2b5f
 +			goto out;
 +		}
 +
-+		attr_b->nres.alloc_size = cpu_to_le64(vcn << cluster_bits);
++		attr_b->nres.alloc_size = cpu_to_le64((u64)vcn << cluster_bits);
 +		attr_b->nres.data_size = attr_b->nres.alloc_size;
 +		attr_b->nres.valid_size = attr_b->nres.alloc_size;
 +		mi_b->dirty = true;
@@ -824,18 +826,30 @@ index 000000000000..3a61dbbe2b5f
 +	if (!err && attr_b && attr_b->non_res &&
 +	    ((type == ATTR_DATA && !name_len) ||
 +	     (type == ATTR_ALLOC && name == I30_NAME))) {
-+		ni->vfs_inode.i_size = new_size;
-+		inode_set_bytes(&ni->vfs_inode,
-+				le64_to_cpu(attr_b->nres.alloc_size));
-+		ni->ni_flags |= NI_FLAG_UPDATE_PARENT;
-+		mark_inode_dirty(&ni->vfs_inode);
++		bool dirty = false;
++
++		if (ni->vfs_inode.i_size != new_size) {
++			ni->vfs_inode.i_size = new_size;
++			dirty = true;
++		}
++
++		new_alloc = le64_to_cpu(attr_b->nres.alloc_size);
++		if (inode_get_bytes(&ni->vfs_inode) != new_alloc) {
++			inode_set_bytes(&ni->vfs_inode, new_alloc);
++			dirty = true;
++		}
++
++		if (dirty) {
++			ni->ni_flags |= NI_FLAG_UPDATE_PARENT;
++			mark_inode_dirty(&ni->vfs_inode);
++		}
 +	}
 +
 +	return err;
 +}
 +
-+int attr_data_get_block(struct ntfs_inode *ni, CLST vcn, CLST *lcn, CLST *len,
-+			bool *new)
++int attr_data_get_block(struct ntfs_inode *ni, CLST vcn, CLST clen, CLST *lcn,
++			CLST *len, bool *new)
 +{
 +	int err = 0;
 +	struct runs_tree *run = &ni->file.run;
@@ -844,9 +858,9 @@ index 000000000000..3a61dbbe2b5f
 +	struct ATTRIB *attr, *attr_b;
 +	struct ATTR_LIST_ENTRY *le, *le_b;
 +	struct mft_inode *mi, *mi_b;
-+	CLST hint, svcn, evcn1, new_evcn1, next_svcn;
++	CLST hint, svcn, to_alloc, evcn1, new_evcn1, next_svcn, asize;
 +	u64 new_size, total_size;
-+	u32 clst_per_frame, frame_size;
++	u32 clst_per_frame;
 +	bool ok;
 +
 +	if (new)
@@ -861,9 +875,15 @@ index 000000000000..3a61dbbe2b5f
 +		return 0;
 +	}
 +
++	if (!clen)
++		clen = 1;
++
++	if (ok && clen > *len)
++		clen = *len;
++
 +	sbi = ni->mi.sbi;
 +	cluster_bits = sbi->cluster_bits;
-+	new_size = ((u64)vcn + 1) << cluster_bits;
++	new_size = ((u64)vcn + clen) << cluster_bits;
 +
 +	ni_lock(ni);
 +	down_write(&ni->file.run_lock);
@@ -897,8 +917,17 @@ index 000000000000..3a61dbbe2b5f
 +		goto again;
 +	}
 +
++	asize = attr_b->nres.alloc_size >> sbi->cluster_bits;
++	if (vcn >= asize) {
++		err = -EINVAL;
++		goto out;
++	}
++
 +	clst_per_frame = 1u << attr_b->nres.c_unit;
-+	frame_size = clst_per_frame << cluster_bits;
++	to_alloc = (clen + clst_per_frame - 1) & ~(clst_per_frame - 1);
++
++	if (vcn + to_alloc > asize)
++		to_alloc = asize - vcn;
 +
 +	svcn = le64_to_cpu(attr_b->nres.svcn);
 +	evcn1 = le64_to_cpu(attr_b->nres.evcn) + 1;
@@ -935,6 +964,13 @@ index 000000000000..3a61dbbe2b5f
 +			err = 0;
 +			goto out;
 +		}
++
++		if (ok && clen > *len) {
++			clen = *len;
++			new_size = ((u64)vcn + clen) << cluster_bits;
++			to_alloc = (clen + clst_per_frame - 1) &
++				   ~(clst_per_frame - 1);
++		}
 +	}
 +
 +	if (!is_attr_ext(attr_b)) {
@@ -954,17 +990,20 @@ index 000000000000..3a61dbbe2b5f
 +		hint = -1;
 +	}
 +
-+	err = attr_allocate_clusters(sbi, run, vcn, hint + 1, clst_per_frame,
-+				     NULL, 0, len, 0, lcn);
++	err = attr_allocate_clusters(
++		sbi, run, vcn, hint + 1, to_alloc, NULL, 0, len,
++		(sbi->record_size - le32_to_cpu(mi->mrec->used) + 8) / 3 + 1,
++		lcn);
 +	if (err)
 +		goto out;
 +	*new = true;
 +
-+	new_evcn1 = vcn + clst_per_frame;
++	new_evcn1 = vcn + *len;
 +	if (new_evcn1 < evcn1)
 +		new_evcn1 = evcn1;
 +
-+	total_size = le64_to_cpu(attr_b->nres.total_size) + frame_size;
++	total_size = le64_to_cpu(attr_b->nres.total_size) +
++		     ((u64)*len << cluster_bits);
 +
 +repack:
 +
@@ -976,10 +1015,10 @@ index 000000000000..3a61dbbe2b5f
 +	inode_set_bytes(&ni->vfs_inode, total_size);
 +
 +	mi_b->dirty = true;
++	ni->ni_flags |= NI_FLAG_UPDATE_PARENT;
 +	mark_inode_dirty(&ni->vfs_inode);
 +
 +	next_svcn = le64_to_cpu(attr->nres.evcn) + 1;
-+
 +	if (next_svcn >= evcn1) {
 +		/* Normal way. update attribute and exit */
 +		goto out;
@@ -1021,6 +1060,7 @@ index 000000000000..3a61dbbe2b5f
 +			goto out;
 +
 +		le->vcn = cpu_to_le64(svcn);
++		ni->attr_list.dirty = true;
 +
 +		mi->dirty = true;
 +
@@ -1155,9 +1195,9 @@ index 000000000000..3a61dbbe2b5f
 +				return -ENOENT;
 +		}
 +
-+		if (lcn == SPARSE_LCN)
++		if (lcn == SPARSE_LCN) {
 +			slen += len;
-+		else {
++		} else {
 +			if (slen) {
 +				/*
 +				 * data_clusters + sparse_clusters =
@@ -1175,8 +1215,9 @@ index 000000000000..3a61dbbe2b5f
 +				 * So it is not compressed
 +				 */
 +				*clst_data = clst_frame;
-+			} else
++			} else {
 +				*is_compr = *clst_data < clst_frame;
++			}
 +			break;
 +		}
 +	}
@@ -1246,7 +1287,7 @@ index 000000000000..3a61dbbe2b5f
 +	if (err)
 +		goto out;
 +
-+	total_size -= clst_data << sbi->cluster_bits;
++	total_size -= (u64)clst_data << sbi->cluster_bits;
 +
 +	len = bytes_to_cluster(sbi, compr_size);
 +
@@ -1280,7 +1321,7 @@ index 000000000000..3a61dbbe2b5f
 +			goto out;
 +	}
 +
-+	total_size += len << sbi->cluster_bits;
++	total_size += (u64)len << sbi->cluster_bits;
 +
 +repack:
 +	err = mi_pack_runs(mi, attr, run, evcn1 - svcn);
@@ -1336,7 +1377,7 @@ index 000000000000..3a61dbbe2b5f
 +			goto out;
 +
 +		le->vcn = cpu_to_le64(svcn);
-+
++		ni->attr_list.dirty = true;
 +		mi->dirty = true;
 +
 +		next_svcn = le64_to_cpu(attr->nres.evcn) + 1;
@@ -1837,10 +1878,10 @@ index 000000000000..3739572a4eca
 +}
 diff --git a/fs/ntfs3/xattr.c b/fs/ntfs3/xattr.c
 new file mode 100644
-index 000000000000..04e1c74b0e3d
+index 000000000000..086653748a5a
 --- /dev/null
 +++ b/fs/ntfs3/xattr.c
-@@ -0,0 +1,1007 @@
+@@ -0,0 +1,1060 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + *  linux/fs/ntfs3/xattr.c
@@ -1863,8 +1904,7 @@ index 000000000000..04e1c74b0e3d
 +
 +#define SYSTEM_DOS_ATTRIB "system.dos_attrib"
 +#define SYSTEM_NTFS_ATTRIB "system.ntfs_attrib"
-+#define SYSTEM_NTFS_ATTRIB_BE "system.ntfs_attrib_be"
-+#define SAMBA_PROCESS_NAME "smbd"
++#define SYSTEM_NTFS_SECURITY "system.ntfs_security"
 +#define USER_DOSATTRIB "user.DOSATTRIB"
 +
 +static inline size_t unpacked_ea_size(const struct EA_FULL *ea)
@@ -2008,37 +2048,27 @@ index 000000000000..04e1c74b0e3d
 +	if (err)
 +		return err;
 +
-+	if (!info)
++	if (!info || !ea_all)
 +		return 0;
 +
 +	size = le32_to_cpu(info->size);
 +
-+	if (!ea_all)
-+		return 0;
-+
 +	/* Enumerate all xattrs */
-+	off = 0;
-+next_ea:
-+	if (off >= size)
-+		goto out;
++	for (off = 0; off < size; off += unpacked_ea_size(ea)) {
++		ea = Add2Ptr(ea_all, off);
 +
-+	ea = Add2Ptr(ea_all, off);
++		if (buffer) {
++			if (*bytes + ea->name_len + 1 > bytes_per_buffer) {
++				err = -ERANGE;
++				goto out;
++			}
 +
-+	if (!buffer)
-+		goto skip_ea;
++			memcpy(buffer + *bytes, ea->name, ea->name_len);
++			buffer[*bytes + ea->name_len] = 0;
++		}
 +
-+	if (*bytes + ea->name_len + 1 > bytes_per_buffer) {
-+		err = -ERANGE;
-+		goto out;
++		*bytes += ea->name_len + 1;
 +	}
-+
-+	memcpy(buffer + *bytes, ea->name, ea->name_len);
-+	buffer[*bytes + ea->name_len] = 0;
-+
-+skip_ea:
-+	*bytes += ea->name_len + 1;
-+	off += unpacked_ea_size(ea);
-+	goto next_ea;
 +
 +out:
 +	ntfs_free(ea_all);
@@ -2138,6 +2168,7 @@ index 000000000000..04e1c74b0e3d
 +	struct EA_FULL *ea_all = NULL;
 +	size_t name_len, add;
 +	u32 off, size;
++	__le16 size_pack;
 +	struct ATTRIB *attr;
 +	struct ATTR_LIST_ENTRY *le;
 +	struct mft_inode *mi;
@@ -2166,9 +2197,11 @@ index 000000000000..04e1c74b0e3d
 +	if (!info) {
 +		memset(&ea_info, 0, sizeof(ea_info));
 +		size = 0;
++		size_pack = 0;
 +	} else {
 +		memcpy(&ea_info, info, sizeof(ea_info));
 +		size = le32_to_cpu(ea_info.size);
++		size_pack = ea_info.size_pack;
 +	}
 +
 +	if (info && find_ea(ea_all, size, name, name_len, &off)) {
@@ -2300,7 +2333,8 @@ index 000000000000..04e1c74b0e3d
 +		mi->dirty = true;
 +	}
 +
-+	ni->ni_flags |= NI_FLAG_UPDATE_PARENT;
++	if (ea_info.size_pack != size_pack)
++		ni->ni_flags |= NI_FLAG_UPDATE_PARENT;
 +	mark_inode_dirty(&ni->vfs_inode);
 +
 +	/* Check if we delete the last xattr */
@@ -2439,6 +2473,8 @@ index 000000000000..04e1c74b0e3d
 +	err = ntfs_set_ea(inode, name, value, size, 0, locked);
 +	if (err)
 +		goto out;
++
++	inode->i_flags &= ~S_NOSEC;
 +
 +out:
 +	if (!err)
@@ -2599,11 +2635,11 @@ index 000000000000..04e1c74b0e3d
 +	if (name_len == sizeof(SYSTEM_DOS_ATTRIB) - 1 &&
 +	    !memcmp(name, SYSTEM_DOS_ATTRIB, sizeof(SYSTEM_DOS_ATTRIB))) {
 +		/* system.dos_attrib */
-+		if (!buffer)
++		if (!buffer) {
 +			err = sizeof(u8);
-+		else if (size < sizeof(u8))
++		} else if (size < sizeof(u8)) {
 +			err = -ENODATA;
-+		else {
++		} else {
 +			err = sizeof(u8);
 +			*(u8 *)buffer = le32_to_cpu(ni->std_fa);
 +		}
@@ -2613,47 +2649,69 @@ index 000000000000..04e1c74b0e3d
 +	if (name_len == sizeof(SYSTEM_NTFS_ATTRIB) - 1 &&
 +	    !memcmp(name, SYSTEM_NTFS_ATTRIB, sizeof(SYSTEM_NTFS_ATTRIB))) {
 +		/* system.ntfs_attrib */
-+		if (!buffer)
++		if (!buffer) {
 +			err = sizeof(u32);
-+		else if (size < sizeof(u32))
++		} else if (size < sizeof(u32)) {
 +			err = -ENODATA;
-+		else {
++		} else {
 +			err = sizeof(u32);
 +			*(u32 *)buffer = le32_to_cpu(ni->std_fa);
 +		}
 +		goto out;
 +	}
 +
-+	if (name_len == sizeof(SYSTEM_NTFS_ATTRIB_BE) - 1 &&
-+	    !memcmp(name, SYSTEM_NTFS_ATTRIB_BE,
-+		    sizeof(SYSTEM_NTFS_ATTRIB_BE))) {
-+		/* system.ntfs_attrib_be */
-+		if (!buffer)
-+			err = sizeof(u32);
-+		else if (size < sizeof(u32))
-+			err = -ENODATA;
-+		else {
-+			err = sizeof(u32);
-+			*(__be32 *)buffer =
-+				cpu_to_be32(le32_to_cpu(ni->std_fa));
-+		}
-+		goto out;
-+	}
-+
 +	if (name_len == sizeof(USER_DOSATTRIB) - 1 &&
-+	    !memcmp(current->comm, SAMBA_PROCESS_NAME,
-+		    sizeof(SAMBA_PROCESS_NAME)) &&
 +	    !memcmp(name, USER_DOSATTRIB, sizeof(USER_DOSATTRIB))) {
 +		/* user.DOSATTRIB */
-+		if (!buffer)
++		if (!buffer) {
 +			err = 5;
-+		else if (size < 5)
++		} else if (size < 5) {
 +			err = -ENODATA;
-+		else {
++		} else {
 +			err = sprintf((char *)buffer, "0x%x",
 +				      le32_to_cpu(ni->std_fa) & 0xff) +
 +			      1;
 +		}
++		goto out;
++	}
++
++	if (name_len == sizeof(SYSTEM_NTFS_SECURITY) - 1 &&
++	    !memcmp(name, SYSTEM_NTFS_SECURITY, sizeof(SYSTEM_NTFS_SECURITY))) {
++		/* system.ntfs_security*/
++		struct SECURITY_DESCRIPTOR_RELATIVE *sd = NULL;
++		size_t sd_size = 0;
++
++		if (!is_ntfs3(ni->mi.sbi)) {
++			/* we should get nt4 security */
++			err = -EINVAL;
++			goto out;
++		} else if (le32_to_cpu(ni->std_security_id) <
++			   SECURITY_ID_FIRST) {
++			err = -ENOENT;
++			goto out;
++		}
++
++		err = ntfs_get_security_by_id(ni->mi.sbi, ni->std_security_id,
++					      &sd, &sd_size);
++		if (err)
++			goto out;
++
++		if (!is_sd_valid(sd, sd_size)) {
++			ntfs_inode_warn(
++				inode,
++				"looks like you get incorrect security descriptor id=%u",
++				ni->std_security_id);
++		}
++
++		if (!buffer) {
++			err = sd_size;
++		} else if (size < sd_size) {
++			err = -ENODATA;
++		} else {
++			err = sd_size;
++			memcpy(buffer, sd, sd_size);
++		}
++		ntfs_free(sd);
 +		goto out;
 +	}
 +
@@ -2710,18 +2768,7 @@ index 000000000000..04e1c74b0e3d
 +		goto set_dos_attr;
 +	}
 +
-+	if (name_len == sizeof(SYSTEM_NTFS_ATTRIB_BE) - 1 &&
-+	    !memcmp(name, SYSTEM_NTFS_ATTRIB_BE,
-+		    sizeof(SYSTEM_NTFS_ATTRIB_BE))) {
-+		if (sizeof(u32) != size)
-+			goto out;
-+		attrib = be32_to_cpu(*(__be32 *)value);
-+		goto set_dos_attr;
-+	}
-+
 +	if (name_len == sizeof(USER_DOSATTRIB) - 1 &&
-+	    !memcmp(current->comm, SAMBA_PROCESS_NAME,
-+		    sizeof(SAMBA_PROCESS_NAME)) &&
 +	    !memcmp(name, USER_DOSATTRIB, sizeof(USER_DOSATTRIB))) {
 +		if (size < 4 || ((char *)value)[size - 1])
 +			goto out;
@@ -2750,10 +2797,55 @@ index 000000000000..04e1c74b0e3d
 +
 +		if (ni->std_fa != new_fa) {
 +			ni->std_fa = new_fa;
++			/* std attribute always in primary record */
++			ni->mi.dirty = true;
 +			mark_inode_dirty(inode);
 +		}
 +		err = 0;
 +
++		goto out;
++	}
++
++	if (name_len == sizeof(SYSTEM_NTFS_SECURITY) - 1 &&
++	    !memcmp(name, SYSTEM_NTFS_SECURITY, sizeof(SYSTEM_NTFS_SECURITY))) {
++		/* system.ntfs_security*/
++		__le32 security_id;
++		bool inserted;
++		struct ATTR_STD_INFO5 *std;
++
++		if (!is_ntfs3(ni->mi.sbi)) {
++			/*
++			 * we should replace ATTR_SECURE
++			 * Skip this way cause it is nt4 feature
++			 */
++			err = -EINVAL;
++			goto out;
++		}
++
++		if (!is_sd_valid(value, size)) {
++			err = -EINVAL;
++			ntfs_inode_warn(
++				inode,
++				"you try to set invalid security descriptor");
++			goto out;
++		}
++
++		err = ntfs_insert_security(ni->mi.sbi, value, size,
++					   &security_id, &inserted);
++		if (err)
++			goto out;
++
++		ni_lock(ni);
++		std = ni_std5(ni);
++		if (!std) {
++			err = -EINVAL;
++		} else if (std->security_id != security_id) {
++			std->security_id = ni->std_security_id = security_id;
++			/* std attribute always in primary record */
++			ni->mi.dirty = true;
++			mark_inode_dirty(&ni->vfs_inode);
++		}
++		ni_unlock(ni);
 +		goto out;
 +	}
 +
@@ -2846,9 +2938,11 @@ index 000000000000..04e1c74b0e3d
 +	.list = ntfs_xattr_user_list,
 +};
 +
-+const struct xattr_handler *ntfs_xattr_handlers[] = { &ntfs_xattr_handler,
-+						      NULL };
++const struct xattr_handler *ntfs_xattr_handlers[] = {
++	&ntfs_xattr_handler,
++	NULL,
++};
 -- 
-2.25.2
+2.25.4
 
 

@@ -1,66 +1,67 @@
 From mboxrd@z Thu Jan  1 00:00:00 1970
-Return-Path: <SRS0=aBbL=CG=vger.kernel.org=linux-kernel-owner@kernel.org>
+Return-Path: <SRS0=IB9q=DQ=vger.kernel.org=linux-kernel-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51376C433E2
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F12AC433DF
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6A9C207DF
-	for <linux-kernel@archiver.kernel.org>; Fri, 28 Aug 2020 14:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A68F82222F
+	for <linux-kernel@archiver.kernel.org>; Fri,  9 Oct 2020 14:23:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="gQU/erhI"
+	dkim=pass (1024-bit key) header.d=paragon-software.com header.i=@paragon-software.com header.b="ADvTQOa0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728054AbgH1OlG (ORCPT
+        id S2388779AbgJIOXo (ORCPT
         <rfc822;linux-kernel@archiver.kernel.org>);
-        Fri, 28 Aug 2020 10:41:06 -0400
-Received: from relayfre-01.paragon-software.com ([176.12.100.13]:57894 "EHLO
+        Fri, 9 Oct 2020 10:23:44 -0400
+Received: from relayfre-01.paragon-software.com ([176.12.100.13]:52164 "EHLO
         relayfre-01.paragon-software.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727997AbgH1OkZ (ORCPT
+        by vger.kernel.org with ESMTP id S2388699AbgJIOXU (ORCPT
         <rfc822;linux-kernel@vger.kernel.org>);
-        Fri, 28 Aug 2020 10:40:25 -0400
+        Fri, 9 Oct 2020 10:23:20 -0400
 Received: from dlg2.mail.paragon-software.com (vdlg-exch-02.paragon-software.com [172.30.1.105])
-        by relayfre-01.paragon-software.com (Postfix) with ESMTPS id A53DF437;
-        Fri, 28 Aug 2020 17:40:19 +0300 (MSK)
+        by relayfre-01.paragon-software.com (Postfix) with ESMTPS id 62ACD212F;
+        Fri,  9 Oct 2020 17:23:10 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paragon-software.com; s=mail; t=1598625619;
-        bh=n8v6W5bQDQAZPcispKV+R/aYC9563mP27VfYxdbEXuU=;
+        d=paragon-software.com; s=mail; t=1602253390;
+        bh=UrewsEC6NnwvDjnTG46DV99jRqvJSNNlWVBrIPcb/wA=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=gQU/erhInus8f6hMmJIU+mT9Fe9pk+22jdt+QxX09UsR4dpuasHPoHE/azkiw+HR5
-         0pbxVUux3wfvtvto/XyB6TQ4EtdYdIiAcq0TAH2KkuLsvDVdictd5ubDQFxRcYFOvu
-         JA41k5ICCgYJGHgHKLFhT6ZWSJAfTeyJgbdMoUz8=
-Received: from localhost.localdomain (172.30.8.44) by
+        b=ADvTQOa0a9+khygUGEYbEG86kJWtkMPjFtT1Vx/ln/23pPH6FLL845dxxNhcpkLxN
+         lB9d3lC+cErcd+o2z1rKhVgEFwl364e4BmFten5sTpTE+HtGr3Jh6QLIy6Ye1Vq/yw
+         WjCMYdRP926UDlEFEBakdEMK0csxsO/zMUV68qdc=
+Received: from fsd-lkpg.ufsd.paragon-software.com (172.30.114.105) by
  vdlg-exch-02.paragon-software.com (172.30.1.105) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1847.3; Fri, 28 Aug 2020 17:40:18 +0300
+ 15.1.1847.3; Fri, 9 Oct 2020 17:23:09 +0300
 From:   Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 To:     <linux-fsdevel@vger.kernel.org>
 CC:     <viro@zeniv.linux.org.uk>, <linux-kernel@vger.kernel.org>,
         <pali@kernel.org>, <dsterba@suse.cz>, <aaptel@suse.com>,
         <willy@infradead.org>, <rdunlap@infradead.org>, <joe@perches.com>,
-        <mark@harmstone.com>,
+        <mark@harmstone.com>, <nborisov@suse.com>,
+        <linux-ntfs-dev@lists.sourceforge.net>, <anton@tuxera.com>,
         Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
-Subject: [PATCH v3 07/10] fs/ntfs3: Add NTFS journal
-Date:   Fri, 28 Aug 2020 07:39:35 -0700
-Message-ID: <20200828143938.102889-8-almaz.alexandrovich@paragon-software.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
-References: <20200828143938.102889-1-almaz.alexandrovich@paragon-software.com>
+Subject: [PATCH v8 07/10] fs/ntfs3: Add NTFS journal
+Date:   Fri, 9 Oct 2020 17:22:58 +0300
+Message-ID: <20201009142301.412454-8-almaz.alexandrovich@paragon-software.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
+References: <20201009142301.412454-1-almaz.alexandrovich@paragon-software.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [172.30.8.44]
-X-ClientProxiedBy: vobn-exch-01.paragon-software.com (172.30.72.13) To
+X-Originating-IP: [172.30.114.105]
+X-ClientProxiedBy: vdlg-exch-02.paragon-software.com (172.30.1.105) To
  vdlg-exch-02.paragon-software.com (172.30.1.105)
-Sender: linux-kernel-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-kernel.vger.kernel.org>
 X-Mailing-List: linux-kernel@vger.kernel.org
-Archived-At: <https://lore.kernel.org/lkml/20200828143938.102889-8-almaz.alexandrovich@paragon-software.com/>
+Archived-At: <https://lore.kernel.org/lkml/20201009142301.412454-8-almaz.alexandrovich@paragon-software.com/>
 List-Archive: <https://lore.kernel.org/lkml/>
 List-Post: <mailto:linux-kernel@vger.kernel.org>
 
@@ -74,7 +75,7 @@ Signed-off-by: Konstantin Komarov <almaz.alexandrovich@paragon-software.com>
 
 diff --git a/fs/ntfs3/fslog.c b/fs/ntfs3/fslog.c
 new file mode 100644
-index 000000000000..e9d41b7d99dd
+index 000000000000..388d332b9ca1
 --- /dev/null
 +++ b/fs/ntfs3/fslog.c
 @@ -0,0 +1,5222 @@
@@ -921,8 +922,9 @@ index 000000000000..e9d41b7d99dd
 +	if (tbl->first_free) {
 +		rt->first_free = tbl->first_free;
 +		*(__le32 *)Add2Ptr(rt, le32_to_cpu(tbl->last_free)) = osize;
-+	} else
++	} else {
 +		rt->first_free = osize;
++	}
 +
 +	rt->total = tbl->total;
 +
@@ -3585,7 +3587,7 @@ index 000000000000..e9d41b7d99dd
 +
 +		e = Add2Ptr(attr, le16_to_cpu(lrh->attr_off));
 +
-+		memmove(Add2Ptr(e, le16_to_cpu(e->View.data_off)), data, dlen);
++		memmove(Add2Ptr(e, le16_to_cpu(e->view.data_off)), data, dlen);
 +
 +		mi->dirty = true;
 +		break;
@@ -3796,7 +3798,7 @@ index 000000000000..e9d41b7d99dd
 +			goto dirty_vol;
 +		}
 +
-+		memmove(Add2Ptr(e, le16_to_cpu(e->View.data_off)), data, dlen);
++		memmove(Add2Ptr(e, le16_to_cpu(e->view.data_off)), data, dlen);
 +
 +		a_dirty = true;
 +		ntfs_fix_pre_write(&ib->rhdr, bytes);
@@ -3815,9 +3817,9 @@ index 000000000000..e9d41b7d99dd
 +			ib->rhdr.lsn = t64;
 +	}
 +
-+	if (inode)
++	if (inode) {
 +		err = _ni_write_inode(inode, 0);
-+	else if (mi && mi->dirty) {
++	} else if (mi && mi->dirty) {
 +		err = mi_write(mi, 0);
 +		if (err)
 +			goto out;
@@ -4136,9 +4138,9 @@ index 000000000000..e9d41b7d99dd
 +	log->ra = ra;
 +
 +	t16 = le16_to_cpu(ra2->client_off);
-+	if (t16 == offsetof(struct RESTART_AREA, clients))
++	if (t16 == offsetof(struct RESTART_AREA, clients)) {
 +		memcpy(ra, ra2, log->ra_size);
-+	else {
++	} else {
 +		memcpy(ra, ra2, offsetof(struct RESTART_AREA, clients));
 +		memcpy(ra->clients, Add2Ptr(ra2, t16),
 +		       le16_to_cpu(ra2->ra_len) - t16);
@@ -4176,10 +4178,8 @@ index 000000000000..e9d41b7d99dd
 +	case 0x20000:
 +		break;
 +	default:
-+		ntfs_printk(sbi->sb,
-+			    KERN_WARNING
-+			    "$LogFile version %d.%d is not supported",
-+			    log->major_ver, log->minor_ver);
++		ntfs_warn(sbi->sb, "$LogFile version %d.%d is not supported",
++			  log->major_ver, log->minor_ver);
 +		err = -EOPNOTSUPP;
 +		log->set_dirty = true;
 +		goto out;
@@ -4593,11 +4593,11 @@ index 000000000000..e9d41b7d99dd
 +		 * Calculate the number of clusters per page the system
 +		 * which wrote the checkpoint, possibly creating the table
 +		 */
-+		if (dptbl)
++		if (dptbl) {
 +			t32 = 1 + (le16_to_cpu(dptbl->size) -
 +				   sizeof(struct DIR_PAGE_ENTRY)) /
 +					  sizeof(u64);
-+		else {
++		} else {
 +			t32 = log->clst_per_page;
 +			ntfs_free(dptbl);
 +			dptbl = init_rsttbl(sizeof(struct DIR_PAGE_ENTRY) +
@@ -4697,8 +4697,9 @@ index 000000000000..e9d41b7d99dd
 +			oe->name_len = 0; //oe0.name_len;
 +			oe->ref = oe0->ref;
 +			oe->open_record_lsn = oe0->open_record_lsn;
-+		} else
++		} else {
 +			memcpy(oe, Add2Ptr(lrh, t16), bytes_per_attr_entry);
++		}
 +
 +		t16 = le16_to_cpu(lrh->undo_len);
 +		if (t16) {
@@ -5301,6 +5302,6 @@ index 000000000000..e9d41b7d99dd
 +	return err;
 +}
 -- 
-2.25.2
+2.25.4
 
 
